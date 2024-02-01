@@ -1,5 +1,5 @@
 import { IPlugin } from '@rancher/shell/core/types';
-import { STACKSTATE_PRODUCT_NAME, STACKSTATE_NAME } from './types';
+import { STACKSTATE_PRODUCT_NAME, STACKSTATE_NAME, STS_DASHBOARD } from './types';
 const stsIcon = require('./sts.svg');
 
 export function init($plugin: IPlugin, store: any) {
@@ -14,16 +14,32 @@ export function init($plugin: IPlugin, store: any) {
     name:                STACKSTATE_NAME,
     label:               STACKSTATE_PRODUCT_NAME,
     inStore:             'management',
-    weight:              100,
-    showClusterSwitcher: true,
+    weight: 100,
+    inExplorer:          true,
     to:                  {
       name:   `${ STACKSTATE_NAME }-c-cluster`,
-      path:   `/${ STACKSTATE_NAME }/c/:cluster/dashboard`,
       params: {
         product: STACKSTATE_NAME,
         cluster: BLANK_CLUSTER,
-        pkg:     STACKSTATE_NAME,
       },
     },
   });
+
+  // virtualType({
+  //   ifHaveType: STS_DASHBOARD,
+  //   labelKey:   'advancedSettings.label',
+  //   name:       'Dashboard',
+  //   namespaced: false,
+  //   weight:     100,
+  //   icon:       'folder',
+  //   route:      {
+  //     name:   `${ STACKSTATE_NAME }-c-cluster`,
+  //     params: {
+  //       product:  STACKSTATE_NAME,
+  //       resource: BLANK_CLUSTER,
+  //     }
+  //   }
+  // });
+
+  basicType(['provisioning.cattle.io.cluster', STS_DASHBOARD]);
 }
