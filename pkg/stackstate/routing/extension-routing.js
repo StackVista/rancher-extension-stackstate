@@ -1,17 +1,27 @@
-import { STACKSTATE_NAME, BLANK_CLUSTER } from '../types';
-import Dashboard from '../pages/index.vue';
+import { STACKSTATE_PRODUCT_NAME, BLANK_CLUSTER, DASHBOARD_PAGE, STS_SETTINGS_TYPE } from '../types/types';
+import StackStateDashboard from '../pages/dashboard.vue';
 
 const routes = [
   {
-    name:      `${ STACKSTATE_NAME }-c-cluster`,
-    path:      `/${ STACKSTATE_NAME }/c/:cluster/test`,
-    component: Dashboard,
+    name:      `${ STACKSTATE_PRODUCT_NAME }-c-cluster-${ DASHBOARD_PAGE }`,
+    path:      `/${ STACKSTATE_PRODUCT_NAME }/c/:cluster/${ DASHBOARD_PAGE }`,
+    component: StackStateDashboard,
     meta:      {
-      product: STACKSTATE_NAME,
+      product: STACKSTATE_PRODUCT_NAME,
       cluster: BLANK_CLUSTER,
-      pkg:     STACKSTATE_NAME
+      pkg:     STACKSTATE_PRODUCT_NAME
     }
   },
+  {
+    name:      `${ STACKSTATE_PRODUCT_NAME }-c-cluster-${ STS_SETTINGS_TYPE }`,
+    path:      `/${ STACKSTATE_PRODUCT_NAME }/c/:cluster/${ STS_SETTINGS_TYPE }`,
+    component: StackStateDashboard,
+    meta:      {
+      product: STACKSTATE_PRODUCT_NAME,
+      cluster: BLANK_CLUSTER,
+      pkg:     STACKSTATE_PRODUCT_NAME
+    }
+  }
   // {
   //   name: `c-cluster-${ STACKSTATE_NAME }-dashboard`,
   //   path: `/c/:cluster/:product/dashboard`,

@@ -5,18 +5,34 @@
     ".drone.yml": true,
     ".editorconfig": true,
     ".eslintcache": true,
-    ".eslintignore": true,
-    ".eslintrc.js": true,
+    ".eslintignore": false,
+    ".eslintrc.js": false,
     ".gitignore": true,
     ".nuxt*": true,
     ".nyc_output": true,
-    ".vscode": true,
+    ".vscode": false,
+    "assets": false,
+    "babel.config.js": false,
+    "charts": false,
+    "extensions": false,
+    "jsconfig.json": true,
     "LICENSE": true,
     "node_modules": true,
-    "babel.config.js": true,
-    "jsconfig.json": true,
-    "yarn-error.log": true,
     "pkg/**/.shell": true,
     "pkg/**/node_modules": true,
-  }
+    "yarn-error.log": true,
+    "CODEOWNERS": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
 }
