@@ -3,25 +3,24 @@ import StackStateDashboard from '../pages/dashboard.vue';
 
 const routes = [
   {
-    name:      `${ STACKSTATE_PRODUCT_NAME }-c-cluster-${ DASHBOARD_PAGE }`,
+    name:      `stackstate-c-cluster-dashboard`,
     path:      `/${ STACKSTATE_PRODUCT_NAME }/c/:cluster/${ DASHBOARD_PAGE }`,
     component: StackStateDashboard,
     meta:      {
       product: STACKSTATE_PRODUCT_NAME,
       cluster: BLANK_CLUSTER,
-      pkg:     STACKSTATE_PRODUCT_NAME
     }
   },
-  {
-    name:      `${ STACKSTATE_PRODUCT_NAME }-c-cluster-${ STS_SETTINGS_TYPE }`,
-    path:      `/${ STACKSTATE_PRODUCT_NAME }/c/:cluster/${ STS_SETTINGS_TYPE }`,
-    component: StackStateDashboard,
-    meta:      {
-      product: STACKSTATE_PRODUCT_NAME,
-      cluster: BLANK_CLUSTER,
-      pkg:     STACKSTATE_PRODUCT_NAME
-    }
-  }
+  // {
+  //   name:      `${ STACKSTATE_PRODUCT_NAME }-c-cluster-${ STS_SETTINGS_TYPE }`,
+  //   path:      `/${ STACKSTATE_PRODUCT_NAME }/c/:cluster/${ STS_SETTINGS_TYPE }`,
+  //   component: StackStateDashboard,
+  //   meta:      {
+  //     product: STACKSTATE_PRODUCT_NAME,
+  //     cluster: BLANK_CLUSTER,
+  //     pkg:     STACKSTATE_PRODUCT_NAME
+  //   }
+  // }
   // {
   //   name: `c-cluster-${ STACKSTATE_NAME }-dashboard`,
   //   path: `/c/:cluster/:product/dashboard`,

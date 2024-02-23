@@ -1,44 +1,66 @@
 <script>
 export default {
-  name: 'HealthState',
+  name:  'HealthState',
   props: {
-    state: String
+    state: String,
+    color: String
+  },
+
+  computed: {
+    badgeColor() {
+      if (this.color) {
+        return this.color;
+      } else {
+        switch (this.state) {
+        case 'CLEAR':
+          return 'green';
+        case 'DEVIATING':
+          return 'orange';
+        case 'CRITICAL':
+          return 'red';
+        case 'UNKNOWN':
+          return 'grey';
+        }
+      }
+
+      return this.state;
+    },
   },
 };
 </script>
 <template>
   <span>
-    <div :class="`healthstate-${state}`">
+    <div :class="`healthstate-${badgeColor}`">
       <span>{{ state }}</span>
     </div>
   </span>
 </template>
 
 <style lang="scss" scoped>
-.healthstate-CLEAR {
+.healthstate-green {
   color: rgb(43, 158, 64);
   border-color: rgb(43, 158, 64);
 }
 
-.healthstate-DEVIATING {
+.healthstate-orange {
   color: rgb(255, 138, 30);
   border-color: rgb(255, 138, 30);
 }
 
-.healthstate-CRITICAL {
+.healthstate-red {
   border-color: rgb(235, 87, 87);
   color: rgb(235, 87, 87);
 }
 
-.healthstate-UNKNOWN {
+.healthstate-grey {
   border-color: rgb(135, 142, 152);
   color: rgb(135, 142, 152);
 }
 
-.healthstate-DEVIATING,
-.healthstate-CRITICAL,
-.healthstate-UNKNOWN,
-.healthstate-CLEAR {
+.healthstate-orange,
+.healthstate-red,
+.healthstate-grey,
+.healthstate-green {
   display: inline-block;
   border-width: 1px;
   border-style: solid;

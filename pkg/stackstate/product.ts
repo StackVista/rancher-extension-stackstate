@@ -1,6 +1,10 @@
 import { IPlugin } from '@rancher/shell/core/types';
+import { STACKSTATE_CERTIFICATE } from './types/stackstate.io.certificate';
+import { STACKSTATE_CLUSTER } from './types/stackstate.io.cluster';
 import {
-  STACKSTATE_PRODUCT_NAME, STACKSTATE_NAME, DASHBOARD_PAGE, STS_SETTINGS_TYPE, STS_SETTINGS
+  DASHBOARD_PAGE,
+  STACKSTATE_NAME,
+  STACKSTATE_PRODUCT_NAME,
 } from './types/types';
 const stsIcon = require('./sts.svg');
 
@@ -9,7 +13,10 @@ export function init($plugin: IPlugin, store: any) {
     product,
     configureType,
     virtualType,
-    basicType
+    basicType,
+    headers,
+    // @ts-ignore -- though it's not in the interface, it is returned by the DSL
+    spoofedType,
   } = $plugin.DSL(
     store,
     STACKSTATE_PRODUCT_NAME
@@ -17,13 +24,14 @@ export function init($plugin: IPlugin, store: any) {
   const BLANK_CLUSTER = '_';
 
   product({
+    // @ts-ignore -- though `svg` is not part of the interface, it does work.
     svg:                 stsIcon,
     name:                STACKSTATE_PRODUCT_NAME,
     label:               STACKSTATE_NAME,
     inStore:             'management',
     showClusterSwitcher: true,
     to:                  {
-      name:   `${ STACKSTATE_PRODUCT_NAME }-c-cluster-${ DASHBOARD_PAGE }`,
+      name:   `stackstate-c-cluster-dashboard`,
       params: {
         product: STACKSTATE_PRODUCT_NAME,
         cluster: BLANK_CLUSTER,
@@ -32,32 +40,26 @@ export function init($plugin: IPlugin, store: any) {
   });
 
   virtualType({
-    labelKey:         'sts.dashboard',
-    name:             DASHBOARD_PAGE,
-    displayName:      'Dashboard',
-    showListMasthead: false,
-    route:            {
-      name:   `${ STACKSTATE_PRODUCT_NAME }-c-cluster-${ DASHBOARD_PAGE }`,
+    labelKey:            'sts.dashboard',
+    name:                DASHBOARD_PAGE,
+    displayName:         'Dashboard',
+    showListMasthead:    false,
+    route:               {
+      name:   `stackstate-c-cluster-dashboard`,
       params: {
         product:  STACKSTATE_PRODUCT_NAME,
-        resource: BLANK_CLUSTER,
+        cluster: BLANK_CLUSTER,
       }
     }
   });
 
-  virtualType({
-    name:             STS_SETTINGS_TYPE,
-    labelKey:         'sts.settings',
-    displayName:      STS_SETTINGS,
-    showListMasthead: false,
-    route:            {
-      name:   `${ STACKSTATE_PRODUCT_NAME }-c-cluster-${ STS_SETTINGS_TYPE }`,
-      params: {
-        product:  STACKSTATE_PRODUCT_NAME,
-        resource: STS_SETTINGS_TYPE,
-      }
-    }
-  });
+  spoofedType(STACKSTATE_CLUSTER.typeDef(store));
+  headers(STACKSTATE_CLUSTER.name, STACKSTATE_CLUSTER.headers);
+  configureType(STACKSTATE_CLUSTER.name, STACKSTATE_CLUSTER.config);
+  basicType([STACKSTATE_CLUSTER.name]);
+  spoofedType(STACKSTATE_CERTIFICATE.typeDef(store));
+  headers(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.headers);
+  configureType(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.config);
   // virtualType({
   //   name: STS_DASHBOARD,
   //   labelKey:   'sts.settings',
@@ -72,5 +74,5 @@ export function init($plugin: IPlugin, store: any) {
   //   },
   // });
 
-  basicType([DASHBOARD_PAGE, STS_SETTINGS_TYPE]);
+  basicType([DASHBOARD_PAGE, STACKSTATE_CERTIFICATE.name]);
 }

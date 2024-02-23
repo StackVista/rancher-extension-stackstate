@@ -1,3 +1,13 @@
 sts:
   settings: "Settings"
   dashboard: "Dashboard"
+  cluster:
+    observed: "Observed"
+    label: "Cluster"
+    namespace: "Namespace"
+  clusters: "Clusters"
+  certificate:
+    label: "Certificate"
+    namespace: "Namespace"
+    health: "Health"
+  certificates: "Certificates"

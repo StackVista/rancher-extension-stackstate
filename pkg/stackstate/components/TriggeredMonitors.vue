@@ -1,6 +1,7 @@
 <script>
 import HealthState from '../components/HealthState.vue';
 import HealthDisc from '../components/HealthDisc.vue';
+import { getSnapshot } from '../modules/stackstate';
 
 export default {
   components: {
@@ -30,24 +31,7 @@ export default {
   },
 
   async fetch() {
-    const resp = await this.$store.dispatch('management/request', {
-      url:     `meta/proxy/${ this.stackStateURL }/api/snapshot`,
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'X-API-Auth-Header': `ApiKey ${ this.stackStateToken }` },
-      data:    {
-        query:        `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${ this.clusterName }"`,
-        queryVersion: '1.0',
-        metadata:     {
-          groupingEnabled:       false,
-          showIndirectRelations: false,
-          minGroupSize:          10,
-          groupedByLayer:        false,
-          groupedByDomain:       false,
-          groupedByRelation:     false,
-          autoGrouping:          false
-        }
-      },
-    });
+    const resp = await getSnapshot(this.$store, `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${ this.clusterName }"`);
     const data = await resp;
 
     this.triggeredMonitors = data;
@@ -87,9 +71,6 @@ export default {
             >
               <td>
                 <HealthState :state="component.state.healthState" />
-                <!-- <div :class="`healthstate-${component.state.healthState}`">
-                  <span>{{ component.state.healthState }}</span>
-                </div> -->
               </td>
               <td>
                 <a :href="`https://jvanerp.gke-sandbox.gcp.stackstate.io/#/components/${encodeURIComponent(component.identifiers[0])}`" target="_blank">{{ component.name }}</a>

@@ -6,8 +6,8 @@ import actions from './actions';
 
 export interface StackStateConfig {
   componentTypes: Map<string, string>;
-  apiURL: string;
-  apiToken: string;
+  apiURL?: string;
+  apiToken?: string;
 }
 
 const stackstateFactory = (config: StackStateConfig): CoreStoreSpecifics => {
@@ -30,8 +30,8 @@ const config: CoreStoreConfig = { namespace: STACKSTATE_PRODUCT_NAME };
 export default {
   specifics: stackstateFactory({
     componentTypes: new Map<string, string>(),
-    apiURL:         '',
-    apiToken:       '',
+    apiURL:         'jvanerp.gke-sandbox.gcp.stackstate.io',
+    apiToken:       '1234hoedjevanpapier',
   }),
   config,
 };
