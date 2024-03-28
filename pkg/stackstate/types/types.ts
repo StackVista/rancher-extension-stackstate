@@ -4,5 +4,3 @@ export const BLANK_CLUSTER = '_';
 
 export const STS_DASHBOARD = 'stackstate.io.dashboard';
 export const DASHBOARD_PAGE = 'dashboard';
-export const STS_SETTINGS = 'stackstate.io.configuration';
-export const SETTINGS_PAGE = 'settings';

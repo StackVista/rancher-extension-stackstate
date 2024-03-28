@@ -14,15 +14,6 @@ const routes = [
       cluster: BLANK_CLUSTER,
     }
   },
-  {
-    name:      `stackstate-c-cluster-settings`,
-    path:      `/${ STACKSTATE_PRODUCT_NAME }/c/:cluster/${ STS_SETTINGS }`,
-    component: StackStateSettings,
-    meta:      {
-      product:   STACKSTATE_PRODUCT_NAME,
-      cluster:   BLANK_CLUSTER,
-    }
-  },
   // {
   //   name:      `${ STACKSTATE_PRODUCT_NAME }-c-cluster-${ STS_SETTINGS_TYPE }`,
   //   path:      `/${ STACKSTATE_PRODUCT_NAME }/c/:cluster/${ STS_SETTINGS_TYPE }`,

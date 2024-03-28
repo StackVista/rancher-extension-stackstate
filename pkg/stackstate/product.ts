@@ -1,13 +1,12 @@
-import { IPlugin } from '@rancher/shell/core/types';
-import { STACKSTATE_CERTIFICATE } from './types/stackstate.io.certificate';
+import { HeaderOptions, IPlugin, TableColumnLocation } from '@rancher/shell/core/types';
+import { NODE, POD, SERVICE, WORKLOAD_TYPES } from '@shell/config/types';
+import { StackStateHealth } from './types/headers';
 import { STACKSTATE_CLUSTER } from './types/stackstate.io.cluster';
+import { STACKSTATE_SETTINGS } from './types/stackstate.io.settings';
 import {
-  DASHBOARD_PAGE,
-  SETTINGS_PAGE,
   STACKSTATE_NAME,
   STACKSTATE_PRODUCT_NAME,
-  STS_DASHBOARD,
-  STS_SETTINGS,
+  STS_DASHBOARD
 } from './types/types';
 const stsIcon = require('./sts.svg');
 
@@ -56,41 +55,18 @@ export function init($plugin: IPlugin, store: any) {
     }
   });
 
-  virtualType({
-    labelKey:         'sts.settings',
-    name:                STS_SETTINGS,
-    displayName:         SETTINGS_PAGE,
-    showListMasthead:    false,
-    route:               {
-      name:   `stackstate-c-cluster-settings`,
-      params: {
-        product: STACKSTATE_PRODUCT_NAME,
-        cluster: BLANK_CLUSTER,
-      }
-    }
-  });
-
-  spoofedType(STACKSTATE_CLUSTER.typeDef(store));
-  headers(STACKSTATE_CLUSTER.name, STACKSTATE_CLUSTER.headers);
+  spoofedType(STACKSTATE_CLUSTER.typeDef!(store));
+  headers(STACKSTATE_CLUSTER.name, STACKSTATE_CLUSTER.headers!);
   configureType(STACKSTATE_CLUSTER.name, STACKSTATE_CLUSTER.config);
   basicType([STACKSTATE_CLUSTER.name]);
-  spoofedType(STACKSTATE_CERTIFICATE.typeDef(store));
-  headers(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.headers);
-  configureType(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.config);
-  basicType([STACKSTATE_CERTIFICATE.name], 'SRE');
-  // virtualType({
-  //   name: STS_DASHBOARD,
-  //   labelKey:   'sts.settings',
-  //   displayName: 'Settings',
-  //   namespaced: false,
-  //   route:       {
-  //     name:   `${ STACKSTATE_NAME }-c-cluster-${ STS_DASHBOARD }`,
-  //     params: {
-  //       product: STACKSTATE_NAME,
-  //       cluster: BLANK_CLUSTER,
-  //     },
-  //   },
-  // });
+  // spoofedType(STACKSTATE_CERTIFICATE.typeDef!(store));
+  // headers(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.headers!);
+  // configureType(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.config);
+  // basicType([STACKSTATE_CERTIFICATE.name], 'SRE');
+  configureType(STACKSTATE_SETTINGS.name, STACKSTATE_SETTINGS.config);
+  headers(STACKSTATE_SETTINGS.name, STACKSTATE_SETTINGS.headers!);
 
-  basicType([STS_DASHBOARD, STS_SETTINGS]);
+  basicType([STACKSTATE_SETTINGS.name]);
+
+  basicType([STS_DASHBOARD]);
 }

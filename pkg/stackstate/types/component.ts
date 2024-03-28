@@ -7,7 +7,13 @@ export type ComponentType = {
 
 export type UITypeDef = {
   name: string;
-  typeDef: (store: any) => any;
-  headers: HeaderOptions[];
+  typeDef?: (store: any) => any;
+  headers?: HeaderOptions[];
   config: ConfigureTypeOptions;
+};
+
+export type ConnectionInfo = {
+  apiURL: string;
+  serviceToken: string;
+  apiToken: string;
 };

@@ -17,7 +17,7 @@ export default {
       case 'active':
         return 'green';
       case 'inactive':
-        return 'red';
+        return 'grey';
       default:
         return '';
       }

@@ -8,6 +8,7 @@ export interface StackStateConfig {
   componentTypes: Map<string, string>;
   apiURL?: string;
   apiToken?: string;
+  serviceToken?: string;
 }
 
 const stackstateFactory = (config: StackStateConfig): CoreStoreSpecifics => {
@@ -17,6 +18,7 @@ const stackstateFactory = (config: StackStateConfig): CoreStoreSpecifics => {
         componentTypes: config.componentTypes,
         apiURL:         config.apiURL,
         apiToken:       config.apiToken,
+        serviceToken:   config.serviceToken,
       };
     },
     getters:   { ...getters },
@@ -30,8 +32,9 @@ const config: CoreStoreConfig = { namespace: STACKSTATE_PRODUCT_NAME };
 export default {
   specifics: stackstateFactory({
     componentTypes: new Map<string, string>(),
-    apiURL:         'jvanerp.gke-sandbox.gcp.stackstate.io',
-    apiToken:       '1234hoedjevanpapier',
+    apiURL:         '',
+    apiToken:       '',
+    serviceToken:   '',
   }),
   config,
 };

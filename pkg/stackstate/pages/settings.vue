@@ -3,7 +3,6 @@ import Loading from '@shell/components/Loading';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { _CREATE } from '@shell/config/query-params';
 import { LabeledInput } from '@rancher/components';
-import { DEFAULT_STS_SETTINGS } from '../models/stackstate.io.configuration';
 
 export default {
   name:       'StackStateDashboard',
@@ -13,16 +12,9 @@ export default {
     return { loading: false };
   },
   computed: {
-    stackStateURL() {
-      return this.$store.getters['stackstate/apiURL'];
-    },
-
-    stackStateToken() {
-      return this.$store.getters['stackstate/apiToken'];
-    },
 
     isConfigured() {
-      return this.stackStateURL && this.stackStateToken;
+      return this.$store.getters['stackstate/hasCredentials'];
     },
   },
   methods: {
@@ -45,7 +37,7 @@ export default {
       this.value = settings;
     } else {
       console.log('creating new settings');
-      this.value = await this.$store.dispatch('rancher/create', merge({ metadata: { name: 'rancher-stackstate' } }, structuredClone(DEFAULT_STS_SETTINGS)));
+      // this.value = await this.$store.dispatch('rancher/create', merge({ metadata: { name: 'rancher-stackstate' } }, structuredClone(DEFAULT_STS_SETTINGS)));
     }
 
     this.loading = false;

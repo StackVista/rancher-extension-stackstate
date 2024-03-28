@@ -14,22 +14,15 @@ export default {
     observed() {
       return this.value.stackstateIdentifier;
     },
-    stackStateURL() {
-      return this.$store.getters['stackstate/apiURL'];
-    },
 
-    stackStateToken() {
-      return this.$store.getters['stackstate/apiToken'];
-    },
-
-    notConfigured() {
-      return !this.stackStateURL || !this.stackStateToken;
+    configured() {
+      return this.$store.getters['stackstate/hasCredentials'];
     }
   },
 };
 </script>
 <template>
-  <div v-if="notConfigured">
+  <div v-if="!configured">
     <div class="alert alert-warning">
       StackState is not configured.
     </div>

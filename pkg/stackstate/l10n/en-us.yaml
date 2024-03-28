@@ -1,4 +1,5 @@
 sts:
+  observed: "StackState Observability"
   settings: "Settings"
   dashboard: "Dashboard"
   cluster:
@@ -11,3 +12,4 @@ sts:
     namespace: "Namespace"
     health: "Health"
   certificates: "Certificates"
+  health: "StackState Health"

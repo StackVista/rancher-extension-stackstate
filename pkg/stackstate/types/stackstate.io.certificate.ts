@@ -82,10 +82,11 @@ export const STACKSTATE_CERTIFICATE: UITypeDef = {
       formatterOpts: { arbitrary: true }
     },
     {
-      labelKey:  'sts.certificate.label',
-      value:     'metadata.name',
-      sort:      'metadata.name',
-      formatter: 'LinkDetail',
+      labelKey:      'sts.certificate.label',
+      value:         'metadata.name',
+      sort:          'metadata.name',
+      formatter:     'ClusterLinkName',
+      formatterOpts: { type: 'stackstate.io.certificate', product: STACKSTATE_PRODUCT_NAME },
     },
     {
       labelKey: 'sts.cluster.label',

@@ -17,16 +17,12 @@ export default {
     };
   },
   computed: {
-    componentTypes() {
-      return this.$store.getters['stackstate/componentTypes'];
-    },
-
-    stackStateURL() {
+    stackstateURL() {
       return this.$store.getters['stackstate/apiURL'];
     },
 
-    stackStateToken() {
-      return this.$store.getters['stackstate/apiToken'];
+    componentTypes() {
+      return this.$store.getters['stackstate/componentTypes'];
     },
   },
 
@@ -73,7 +69,7 @@ export default {
                 <HealthState :state="component.state.healthState" />
               </td>
               <td>
-                <a :href="`https://jvanerp.gke-sandbox.gcp.stackstate.io/#/components/${encodeURIComponent(component.identifiers[0])}`" target="_blank">{{ component.name }}</a>
+                <a :href="`https://${stackstateURL}/#/components/${encodeURIComponent(component.identifiers[0])}`" target="_blank">{{ component.name }}</a>
               </td>
               <td>
                 {{ componentTypes.get(component.type) }}

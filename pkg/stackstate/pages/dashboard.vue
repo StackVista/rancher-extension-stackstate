@@ -17,12 +17,8 @@ export default {
       return this.$store.getters['stackstate/apiURL'];
     },
 
-    stackStateToken() {
-      return this.$store.getters['stackstate/apiToken'];
-    },
-
     isConfigured() {
-      return this.stackStateURL && this.stackStateToken;
+      return this.$store.getters['stackstate/hasCredentials'];
     },
   },
 };
