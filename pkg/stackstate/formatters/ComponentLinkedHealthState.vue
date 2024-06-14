@@ -18,7 +18,7 @@ export default {
 
   computed: {
     componentIdentifier() {
-      let identifier = `urn:kubernetes:/rke2-challenges-cluster`;
+      let identifier = `urn:kubernetes:/susecon-frb-cluster-0`;
 
       if (this.row.metadata.namespace) {
         identifier += `:${ this.row.metadata.namespace }`;
