@@ -26,6 +26,9 @@ export default {
     };
   },
   computed: {
+    stackstateURL() {
+      return this.$store.getters['stackstate/apiURL'];
+    },
     componentTypes() {
       return this.$store.getters['stackstate/componentTypes'];
     },
@@ -95,7 +98,7 @@ export default {
                 <HealthState :state="violation.state.state" />
               </td>
               <td>
-                <a :href="`https://jvanerp.gke-sandbox.gcp.stackstate.io/#/components/${encodeURIComponent(component.identifiers[0])}`" target="_blank">{{ violation.name }}</a>
+                <a :href="`https://${stackstateURL}/#/components/${encodeURIComponent(stackstateIdentifier)}`" target="_blank">{{ violation.name }}</a>
               </td>
             </tr>
           </tbody>

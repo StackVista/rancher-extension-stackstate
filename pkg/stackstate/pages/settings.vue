@@ -1,55 +1,67 @@
 <script>
 import Loading from '@shell/components/Loading';
-import TriggeredMonitors from '../components/TriggeredMonitors.vue';
+import CreateEditView from '@shell/mixins/create-edit-view';
+import { _CREATE } from '@shell/config/query-params';
+import { LabeledInput } from '@rancher/components';
 
 export default {
   name:       'StackStateDashboard',
-  components: { Loading },
-
+  components: { Loading, LabeledInput },
+  mixins:     [CreateEditView],
   data() {
-    return {
-      stackStateClusters:  [],
-      loading:             false,
-    };
+    return { loading: false };
   },
   computed: {
-    stackStateURL() {
-      return this.$store.getters['stackstate/apiURL'];
-    },
 
     isConfigured() {
       return this.$store.getters['stackstate/hasCredentials'];
     },
   },
+  methods: {
+    async finish(event) {
+      try {
+        await this.save(event);
+      } catch (e) {
+        this.errors.push(e);
+      }
+    }
+  },
+
+  async fetch() {
+    this.loading = true;
+    console.log('fetching settings');
+    const settings = await this.$store.dispatch('rancher/find', { type: 'stackstate.io.configuration', id: 'rancher-stackstate' });
+
+    console.log('settings', settings);
+    if (settings) {
+      this.value = settings;
+    } else {
+      console.log('creating new settings');
+      // this.value = await this.$store.dispatch('rancher/create', merge({ metadata: { name: 'rancher-stackstate' } }, structuredClone(DEFAULT_STS_SETTINGS)));
+    }
+
+    this.loading = false;
+  }
 };
 </script>
 
 <template>
-  <div class="dashboard">
+  <Loading v-if="loading" />
+  <div v-else class="dashboard">
     <div class="banner">
       <div>
         <img src="../sts-color.svg" alt="StackState logo" />
       </div>
       <div>
-        <h1>StackState</h1>
+        <h1>StackState Extension Configuration</h1>
       </div>
-      <div>Welcome to StackState!</div>
-      <div>Using StackState, you can monitor the health of your Kubernetes clusters.</div>
-    </div>
-    <div v-if="!isConfigured">
-      <p>
-        StackState is not configured. Please configure StackState in the
-        <router-link to="/management/stackstate">
-          management
-        </router-link> page.
-      </p>
-    </div>
-    <Loading v-else-if="loading" />
-    <div v-else>
       <div>
-        Rancher is connected to StackState at
-        <a :href="`https://${stackStateURL}/`">
-          {{ stackStateURL }}</a>.
+        <LabeledInput
+          v-model="value.spec.stackStateURL"
+          label="StackState URL"
+          placeholder="https://stackstate.example.com"
+          required
+        />
       </div>
     </div>
   </div>

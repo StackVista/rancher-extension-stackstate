@@ -25,7 +25,7 @@ export const STACKSTATE_CERTIFICATE: UITypeDef = {
           id:                STACKSTATE_CERTIFICATE.name,
           type:              'schema',
           collectionMethods: [],
-          attributes:        { namespaced: true },
+          attributes:        { namespaced: false },
         },
       ],
       group:        'Root',
@@ -82,20 +82,22 @@ export const STACKSTATE_CERTIFICATE: UITypeDef = {
       formatterOpts: { arbitrary: true }
     },
     {
-      labelKey:  'sts.certificate.label',
-      value:     'metadata.name',
-      sortBy:      'nameSort',
-      formatter: 'LinkDetail',
-    },
-    {
-      labelKey:  'sts.certificate.namespace',
-      value:     'metadata.namespace',
-      sort:      ['namespaceSort'],
+      labelKey:      'sts.certificate.label',
+      value:         'metadata.name',
+      sort:          'metadata.name',
+      formatter:     'ClusterLinkName',
+      formatterOpts: { type: 'stackstate.io.certificate', product: STACKSTATE_PRODUCT_NAME },
     },
     {
       labelKey: 'sts.cluster.label',
       value:    'cluster.spec.displayName',
-    }
+      sort:      'cluster.spec.displayName',
+    },
+    {
+      labelKey:  'sts.certificate.namespace',
+      value:     'metadata.namespace',
+      // sort:      ['namespaceSort'],
+    },
   ],
   config:  {
     isCreatable:      false,
@@ -105,6 +107,5 @@ export const STACKSTATE_CERTIFICATE: UITypeDef = {
     canYaml:          false,
     showState:        false,
     displayName:      'Certificate',
-    customRoute:      { name: 'c-cluster-product-resource' }
   },
 };
