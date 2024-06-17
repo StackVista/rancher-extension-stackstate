@@ -11,13 +11,32 @@ entries:
       catalog.cattle.io/scope: management
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
+    appVersion: 0.2.0
+    created: "2024-06-17T21:29:56.802251294Z"
+    description: StackState Rancher Plugin
+    digest: 1f8def443beb320419f0893825a3b8c63b8ef590a9beb4c89c9592375ca61064
+    name: stackstate
+    type: application
+    urls:
+    - assets/stackstate/stackstate-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/kube-version: '>= 1.16.0-0 < 1.29.0-0'
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= v2.8.0'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
+    apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-17T13:19:05.101753774Z"
-    description: stackstate plugin
-    digest: 70744da90afe8a979dbde4515afc0e0401b2f3b3a7c7bf63f144bd9097c9b4cf
+    created: "2024-06-14T20:57:18.604005879Z"
+    description: sts-rancher plugin
+    digest: dec78ae4b98df2506bcf162fa06ed4419576e06ba17a554e05412ff54de8e949
     name: stackstate
     type: application
     urls:
     - assets/stackstate/stackstate-0.1.0.tgz
     version: 0.1.0
-generated: "2024-06-17T13:19:05.10114487Z"
+generated: "2024-06-17T21:29:56.801655575Z"
