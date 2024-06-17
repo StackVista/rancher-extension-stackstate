@@ -1,6 +1,6 @@
 {
   "name": "stackstate",
-  "description": "sts-rancher plugin",
+  "description": "stackstate plugin",
   "version": "0.1.0",
   "private": false,
   "rancher": true,

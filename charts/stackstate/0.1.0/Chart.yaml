@@ -4,12 +4,12 @@ annotations:
   catalog.cattle.io/namespace: cattle-ui-plugin-system
   catalog.cattle.io/os: linux
   catalog.cattle.io/permits-os: linux, windows
-  catalog.cattle.io/rancher-version: '>= v2.8.0'
+  catalog.cattle.io/rancher-version: '>= v2.8.4'
   catalog.cattle.io/scope: management
   catalog.cattle.io/ui-component: plugins
 apiVersion: v2
 appVersion: 0.1.0
-description: sts-rancher plugin
+description: stackstate plugin
 name: stackstate
 type: application
 version: 0.1.0
