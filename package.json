@@ -1,16 +1,16 @@
 {
-  "name": "rancher",
-  "version": "0.1.0",
+  "name": "rancher-extension-stackstate",
+  "version": "0.2.0",
   "private": false,
   "engines": {
     "node": ">=12"
   },
   "dependencies": {
-    "@rancher/shell": "^0.4.0",
+    "@rancher/shell": "^0.5.3",
     "core-js": "3.21.1",
     "css-loader": "6.7.3",
     "@types/lodash": "4.14.184",
-    "@rancher/components": "0.1.4"
+    "@rancher/components": "0.2.1-alpha.0"
   },
   "resolutions": {
     "**/webpack": "4",

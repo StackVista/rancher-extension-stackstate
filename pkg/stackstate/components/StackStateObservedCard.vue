@@ -82,16 +82,19 @@ export default {
     </div>
     <div>
       <span>Component healths:</span>
+    </div>
+    <div>
+      <HealthDisc state="DEVIATING" />
+      Deviating:
       <span class="spacer">&nbsp;</span>
       {{ countDeviating }}
-      <span class="spacer">&nbsp;</span>
-      <HealthDisc state="DEVIATING" />
+    </div>
+    <div>
+      <HealthDisc state="CRITICAL" />
+      Critical:
       <span class="spacer">&nbsp;</span>
       {{ countCritical }}
-      <span class="spacer">&nbsp;</span>
-      <HealthDisc state="CRITICAL" />
     </div>
-  </div>
   </div>
 </template>
 <style lang="scss" scoped>

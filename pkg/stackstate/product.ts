@@ -1,13 +1,14 @@
 import { HeaderOptions, IPlugin, TableColumnLocation } from '@rancher/shell/core/types';
 import { NODE, POD, SERVICE, WORKLOAD_TYPES } from '@shell/config/types';
-import { StackStateHealth } from './types/headers';
-import { STACKSTATE_CLUSTER } from './types/stackstate.io.cluster';
+// import { StackStateHealth } from './types/headers';
+// import { STACKSTATE_CLUSTER } from './types/stackstate.io.cluster';
 import { STACKSTATE_SETTINGS } from './types/stackstate.io.settings';
 import {
   STACKSTATE_NAME,
   STACKSTATE_PRODUCT_NAME,
   STS_DASHBOARD
 } from './types/types';
+
 const stsIcon = require('./sts.svg');
 
 export function init($plugin: IPlugin, store: any) {
@@ -55,14 +56,14 @@ export function init($plugin: IPlugin, store: any) {
     }
   });
 
-  spoofedType(STACKSTATE_CLUSTER.typeDef!(store));
-  headers(STACKSTATE_CLUSTER.name, STACKSTATE_CLUSTER.headers!);
-  configureType(STACKSTATE_CLUSTER.name, STACKSTATE_CLUSTER.config);
-  basicType([STACKSTATE_CLUSTER.name]);
-  // spoofedType(STACKSTATE_CERTIFICATE.typeDef!(store));
-  // headers(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.headers!);
-  // configureType(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.config);
-  // basicType([STACKSTATE_CERTIFICATE.name], 'SRE');
+  // spoofedType(STACKSTATE_CLUSTER.typeDef!(store));
+  // headers(STACKSTATE_CLUSTER.name, STACKSTATE_CLUSTER.headers!);
+  // configureType(STACKSTATE_CLUSTER.name, STACKSTATE_CLUSTER.config);
+  // basicType([STACKSTATE_CLUSTER.name]);
+  // // spoofedType(STACKSTATE_CERTIFICATE.typeDef!(store));
+  // // headers(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.headers!);
+  // // configureType(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.config);
+  // // basicType([STACKSTATE_CERTIFICATE.name], 'SRE');
   configureType(STACKSTATE_SETTINGS.name, STACKSTATE_SETTINGS.config);
   headers(STACKSTATE_SETTINGS.name, STACKSTATE_SETTINGS.headers!);
 
