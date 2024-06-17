@@ -1,7 +1,7 @@
 {
   "name": "stackstate",
-  "description": "stackstate plugin",
-  "version": "0.1.0",
+  "description": "StackState Rancher Plugin",
+  "version": "0.2.0",
   "private": false,
   "rancher": {
     "annotations": {
