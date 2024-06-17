@@ -1,8 +1,5 @@
-import {
-  STACKSTATE_PRODUCT_NAME, BLANK_CLUSTER, DASHBOARD_PAGE, SETTINGS_PAGE, STS_SETTINGS, STS_DASHBOARD
-} from '../types/types';
+import { STACKSTATE_PRODUCT_NAME, BLANK_CLUSTER, STS_DASHBOARD } from '../types/types';
 import StackStateDashboard from '../pages/dashboard.vue';
-import StackStateSettings from '../pages/settings.vue';
 
 const routes = [
   {

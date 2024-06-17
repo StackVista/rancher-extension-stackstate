@@ -1,6 +1,7 @@
 sts:
   observed: "StackState Observability"
-  settings: "Settings"
+  settings:
+    label: "Settings"
   dashboard: "Dashboard"
   cluster:
     observed: "Observed"

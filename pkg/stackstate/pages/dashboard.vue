@@ -1,6 +1,5 @@
 <script>
 import Loading from '@shell/components/Loading';
-import TriggeredMonitors from '../components/TriggeredMonitors.vue';
 
 export default {
   name:       'StackStateDashboard',
@@ -28,7 +27,7 @@ export default {
   <div class="dashboard">
     <div class="banner">
       <div>
-        <img src="../sts-color.svg" alt="StackState logo" />
+        <img src="../sts.svg" alt="StackState logo" />
       </div>
       <div>
         <h1>StackState</h1>

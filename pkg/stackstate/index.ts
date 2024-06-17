@@ -10,19 +10,13 @@ import {
   PV,
   PVC
 } from '@shell/config/types';
-import { StackStateHealth } from './types/headers';
-import { loadComponentTypes, loadConnectionInfo } from './modules/stackstate';
-import extensionRouting from './routing/extension-routing';
-import { ConnectionInfo } from './types/component';
-// @ts-ignore
-import HealthStateBadgeFormatter from './formatters/HealthStateBadge';
-// @ts-ignore
-import CodeFormatter from './formatters/Code';
-// @ts-ignore
-import ClusterLinkNameFormatter from './formatters/ClusterLinkName';
+
 // @ts-ignore
 import ComponentLinkedHealthStateFormatter from './formatters/ComponentLinkedHealthState';
+import { loadComponentTypes, loadConnectionInfo } from './modules/stackstate';
+import extensionRouting from './routing/extension-routing';
 import stackstateStore from './store';
+import { StackStateHealth } from './types/headers';
 
 const onEnter: OnNavToPackage = async(store) => {
   await loadComponentTypes(store);
@@ -33,9 +27,7 @@ const onEnter: OnNavToPackage = async(store) => {
 export default function(plugin: IPlugin): void {
   // Auto-import model, detail, edit from the folders
   importTypes(plugin);
-  FORMATTERS[HealthStateBadgeFormatter.name] = HealthStateBadgeFormatter;
-  FORMATTERS[CodeFormatter.name] = CodeFormatter;
-  FORMATTERS[ClusterLinkNameFormatter.name] = ClusterLinkNameFormatter;
+
   FORMATTERS[ComponentLinkedHealthStateFormatter.name] = ComponentLinkedHealthStateFormatter;
 
   // Provide plugin metadata from package.json
@@ -48,7 +40,6 @@ export default function(plugin: IPlugin): void {
     loadComponentTypes(store);
     loadConnectionInfo(store);
   });
-
   plugin.addNavHooks(onEnter);
 
   plugin.addTableColumn(

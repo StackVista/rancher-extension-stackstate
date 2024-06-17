@@ -24,7 +24,7 @@ export default {
         identifier += `:${ this.row.metadata.namespace }`;
       }
 
-      identifier += `:${ mapKind(this.row.kind.toLowerCase()) }/${ this.row.metadata.name }`;
+      identifier += `:${ mapKind(this.row.type.toLowerCase()) }/${ this.row.metadata.name }`;
 
       return identifier;
     },
@@ -54,6 +54,8 @@ export default {
 
   async fetch() {
     const creds = await loadStackStateSettings(this.$store);
+
+    this.health = 'UNKNOWN';
 
     this.componentUrn = this.componentIdentifier;
     const component = await loadComponent(this.$store, creds, this.componentUrn);
