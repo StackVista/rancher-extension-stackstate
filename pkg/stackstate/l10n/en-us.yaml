@@ -1,5 +1,5 @@
 sts:
-  observed: "StackState Observability"
+  observed: "Rancher Prime Observability"
   settings:
     label: "Settings"
   dashboard: "Dashboard"
@@ -13,4 +13,4 @@ sts:
     namespace: "Namespace"
     health: "Health"
   certificates: "Certificates"
-  health: "StackState Health"
+  health: "Health"
