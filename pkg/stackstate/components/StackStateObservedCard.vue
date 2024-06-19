@@ -60,7 +60,7 @@ export default {
   </div>
   <div v-else-if="!isObserved">
     <div class="card">
-      <span><img src="../sts-color.svg" alt="StackState logo" style="width: 50px;" /></span>
+      <span><img src="../sts.svg" alt="StackState logo" style="width: 50px;" /></span>
       <span class="spacer">&nbsp;</span>
       <div>
         <span>Cluster is</span>
@@ -72,7 +72,7 @@ export default {
   </div>
   <div v-else>
     <div class="card">
-      <span><img src="../sts-color.svg" alt="StackState logo" style="width: 50px;" /></span>
+      <span><img src="../sts.svg" alt="StackState logo" style="width: 50px;" /></span>
       <span class="spacer">&nbsp;</span>
       <div>
         <span>Cluster health:</span>
