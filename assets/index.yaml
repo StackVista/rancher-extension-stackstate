@@ -11,14 +11,33 @@ entries:
       catalog.cattle.io/scope: management
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
-    appVersion: 0.2.0
-    created: "2024-06-17T21:29:56.802251294Z"
-    description: StackState Rancher Plugin
-    digest: 1f8def443beb320419f0893825a3b8c63b8ef590a9beb4c89c9592375ca61064
+    appVersion: 0.3.0
+    created: "2024-06-19T12:17:45.122707661Z"
+    description: Rancher Prime Observability Extension
+    digest: 0d8021f14b01891e3a057c173ce869ab248bf66fc325d8520c0240316dea64e3
     name: stackstate
     type: application
     urls:
-    - assets/stackstate/stackstate-0.2.0.tgz
+    - assets/stackstate/stackstate-0.3.0.tgz
+    version: 0.3.0
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/kube-version: '>= 1.16.0-0 < 1.29.0-0'
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= v2.8.4'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
+    apiVersion: v2
+    appVersion: 0.2.0
+    created: "2024-06-17T21:30:11.482063402Z"
+    description: StackState Rancher Plugin
+    digest: 66be925a85f9aeccef0b1f82f052656c093777a9c012b6adc2e418d2b2ea118c
+    name: stackstate
+    type: application
+    urls:
+    - https://github.com/StackVista/rancher-extension-stackstate/releases/download/stackstate-0.2.0/stackstate-0.2.0.tgz
     version: 0.2.0
   - annotations:
       catalog.cattle.io/certified: rancher
@@ -39,4 +58,4 @@ entries:
     urls:
     - assets/stackstate/stackstate-0.1.0.tgz
     version: 0.1.0
-generated: "2024-06-17T21:29:56.801655575Z"
+generated: "2024-06-19T12:17:45.122160171Z"
