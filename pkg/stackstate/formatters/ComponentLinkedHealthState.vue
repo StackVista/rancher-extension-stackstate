@@ -1,4 +1,5 @@
 <script>
+import { mapGetters } from 'vuex';
 import HealthState from '../components/HealthState';
 import { loadStackStateSettings, mapKind, loadComponent } from '../modules/stackstate';
 
@@ -17,8 +18,16 @@ export default {
   },
 
   computed: {
+    ...mapGetters(['currentCluster']),
+
     componentIdentifier() {
-      let identifier = `urn:kubernetes:/susecon-frb-cluster-0`;
+      const cluster = this.currentCluster?.spec.displayName;
+
+      if (!cluster) {
+        return '';
+      }
+
+      let identifier = `urn:kubernetes:/${ cluster }`;
 
       if (this.row.metadata.namespace) {
         identifier += `:${ this.row.metadata.namespace }`;
@@ -27,10 +36,6 @@ export default {
       identifier += `:${ mapKind(this.row.type.toLowerCase()) }/${ this.row.metadata.name }`;
 
       return identifier;
-    },
-
-    componentHealth() {
-      return nil;
     },
 
     color() {
@@ -58,9 +63,11 @@ export default {
     this.health = 'UNKNOWN';
 
     this.componentUrn = this.componentIdentifier;
+    if (!this.componentUrn) {
+      this.health = 'UNKNOWN';
+    }
     const component = await loadComponent(this.$store, creds, this.componentUrn);
 
-    console.log('component', component);
     this.health = component.state.healthState;
     this.url = creds.spec.url;
   }
