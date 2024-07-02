@@ -19,6 +19,7 @@ export default {
         case 'CRITICAL':
           return 'red';
         case 'UNKNOWN':
+        case 'NOT MONITORED':
           return 'grey';
         }
       }

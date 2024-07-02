@@ -1,5 +1,6 @@
 sts:
   observed: "Rancher Prime Observability"
+  observability: "Observability"
   settings:
     label: "Settings"
   dashboard: "Dashboard"

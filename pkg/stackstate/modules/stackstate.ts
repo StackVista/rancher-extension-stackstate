@@ -13,7 +13,7 @@ const KINDS = new Map<string, string>([
   [WORKLOAD_TYPES.DAEMON_SET, 'daemonset'],
   [WORKLOAD_TYPES.DEPLOYMENT, 'deployment'],
   [WORKLOAD_TYPES.STATEFUL_SET, 'statefulset'],
-  [WORKLOAD_TYPES.CRON_JOB, 'cron-job'],
+  [WORKLOAD_TYPES.CRON_JOB, 'cronjob'],
   [WORKLOAD_TYPES.JOB, 'job'],
   [WORKLOAD_TYPES.REPLICA_SET, 'replicaset'],
   [WORKLOAD_TYPES.REPLICATION_CONTROLLER, 'replication-controller'],
@@ -28,7 +28,6 @@ export function mapKind(kind: string): string {
 }
 
 export async function loadStackStateSettings(store: any) {
-  console.log('Loading StackState settings');
   const settings = await store.dispatch('management/findAll', { type: 'stackstate.io.setting' });
 
   if (isEmpty(settings)) {
@@ -40,26 +39,21 @@ export async function loadStackStateSettings(store: any) {
   if (isEmpty(stackstateSettings)) {
     return;
   }
-  console.log('Has stackstate settings', stackstateSettings.spec.url, stackstateSettings.spec.apiToken, stackstateSettings.spec.serviceToken);
 
   return stackstateSettings;
 }
 
 export async function loadConnectionInfo(store: any): Promise<void> {
-  console.log('Loading StackState connection info');
   const settings = await store.dispatch('management/findAll', { type: 'stackstate.io.setting' });
 
-  console.log('settings', settings);
   if (isEmpty(settings)) {
     return;
   }
-  console.log('Has settings');
   const stackstateSettings = settings.find((s: any) => s.metadata.name === 'stackstate');
 
   if (isEmpty(stackstateSettings)) {
     return;
   }
-  console.log('Has stackstate settings', stackstateSettings.spec.url, stackstateSettings.spec.apiToken, stackstateSettings.spec.serviceToken);
   store.dispatch('stackstate/setConnectionInfo', {
     apiURL: stackstateSettings.spec.url, apiToken: stackstateSettings.spec.apiToken, serviceToken: stackstateSettings.spec.serviceToken
   });
