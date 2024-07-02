@@ -1,4 +1,5 @@
 import { CoreStoreConfig, CoreStoreSpecifics } from '@rancher/shell/core/types';
+import { init } from 'product';
 import { STACKSTATE_PRODUCT_NAME } from '../types/types';
 import getters from './getters';
 import mutations from './mutations';

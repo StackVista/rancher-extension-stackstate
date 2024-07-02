@@ -1,5 +1,4 @@
 <script>
-import Loading from '@shell/components/Loading';
 import { getSnapshot, loadStackStateSettings } from '../modules/stackstate';
 import { isStackStateObserved } from '../modules/observed';
 import HealthState from './HealthState.vue';
@@ -7,9 +6,7 @@ import HealthDisc from './HealthDisc.vue';
 
 export default {
   name:       'StackStateObservedCard',
-  components: {
-    Loading, HealthState, HealthDisc
-  },
+  components: { HealthState, HealthDisc },
   props:      { resource: Object },
   computed:   {
     countDeviating() {
@@ -55,45 +52,53 @@ export default {
 };
 </script>
 <template>
-  <div v-if="loading">
-    <Loading />
-  </div>
-  <div v-else-if="!isObserved">
-    <div class="card">
-      <span><img src="../sts.svg" alt="StackState logo" style="width: 50px;" /></span>
-      <span class="spacer">&nbsp;</span>
-      <div>
-        <span>Cluster is</span>
-        <span class="spacer">&nbsp;</span>
-        <HealthState state="unobserved" color="grey" />
+  <div class="card">
+    <div>
+      <span><div class="logo" /></span>
+    </div>
+    <span class="spacer">&nbsp;</span>
+    <div class="col">
+      <div v-if="loading">
+        <div>
+          <span>
+            Connecting to Observability...
+          </span>
+        </div>
       </div>
-    </div>
-    <span>Cluster is not observed by StackState. Please <a :href="`/c/${resource.id}/apps/charts/chart?repo-type=cluster&repo=rancher-partner-charts&chart=stackstate-k8s-agent`">install</a> the agent</span>
-  </div>
-  <div v-else>
-    <div class="card">
-      <span><img src="../sts.svg" alt="StackState logo" style="width: 50px;" /></span>
-      <span class="spacer">&nbsp;</span>
-      <div>
-        <span>Cluster health:</span>
-        <span class="spacer">&nbsp;</span>
-        <HealthState state="observed" color="green" />
+      <div v-else-if="!isObserved">
+        <div>
+          <span>Cluster is</span>
+          <span class="spacer">&nbsp;</span>
+          <HealthState state="unobserved" color="grey" />
+        </div>
+        <div><span class="spacer">&nbsp;</span></div>
+        <div><span>Cluster is not observed by StackState. Please <a :href="`/c/${resource.id}/apps/charts/chart?repo-type=cluster&repo=rancher-partner-charts&chart=stackstate-k8s-agent`">install</a> the agent</span></div>
       </div>
-    </div>
-    <div>
-      <span>Component healths:</span>
-    </div>
-    <div>
-      <HealthDisc state="DEVIATING" />
-      Deviating:
-      <span class="spacer">&nbsp;</span>
-      {{ countDeviating }}
-    </div>
-    <div>
-      <HealthDisc state="CRITICAL" />
-      Critical:
-      <span class="spacer">&nbsp;</span>
-      {{ countCritical }}
+      <div v-else>
+        <div>
+          <span>
+            Cluster health:
+          </span>
+          <span class="spacer">&nbsp;</span>
+          <HealthState state="observed" color="green" />
+        </div>
+        <div><span class="spacer">&nbsp;</span></div>
+        <div>
+          <span>Component healths:</span>
+          <div>
+            <HealthDisc state="DEVIATING" />
+            Deviating:
+            <span class="spacer">&nbsp;</span>
+            {{ countDeviating }}
+          </div>
+          <div>
+            <HealthDisc state="CRITICAL" />
+            Critical:
+            <span class="spacer">&nbsp;</span>
+            {{ countCritical }}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -103,6 +108,19 @@ div.card {
   font-size: 14px;
   align-items: center;
   display: flex;
+}
+
+span.header {
+  font-size: 18px;
+}
+
+div.coldiv {
+  padding-top: 10px;
+}
+
+div.col {
+  display: flex;
+  flex-direction: column;
 }
 
 span.spacer {
@@ -116,4 +134,19 @@ span.spacer {
     margin: 10px 0;
     border-radius: 5px;
   }
+
+div.logo {
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100px;
+  height: 100px;
+}
+
+.theme-light div.logo {
+  background-image: url('../sts-color.svg');
+}
+
+.theme-dark div.logo {
+  background-image: url('../sts.svg');
+}
 </style>

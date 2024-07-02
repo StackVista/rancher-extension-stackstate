@@ -2,8 +2,8 @@
 export default {
   name:  'HealthState',
   props: {
-    state: String,
-    color: String
+    state: { type: String, default: 'UNKNOWN' },
+    color: { type: String, default: null }
   },
 
   computed: {
@@ -19,6 +19,7 @@ export default {
         case 'CRITICAL':
           return 'red';
         case 'UNKNOWN':
+        case 'NOT MONITORED':
           return 'grey';
         }
       }
@@ -65,9 +66,9 @@ export default {
   border-width: 1px;
   border-style: solid;
   border-radius: 20px;
-  padding: 0 12px;
+  padding: 2px 10px;
   height: 21px;
-  line-height: 19px;
+  line-height: 16px;
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.3px;

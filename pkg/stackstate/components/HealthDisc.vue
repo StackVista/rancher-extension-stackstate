@@ -1,13 +1,11 @@
 <script>
 export default {
-  name: 'HealthDisc',
-  props: {
-    state: String
-  },
+  name:  'HealthDisc',
+  props: { state: { type: String, default: 'UNKNOWN' } },
 };
 </script>
 <template>
-    <div :class="`healthdisc-${state}`" />
+  <div :class="`healthdisc-${state}`" />
 </template>
 <style lang="scss" scoped>
 .healthdisc-CLEAR {

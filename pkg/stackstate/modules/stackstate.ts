@@ -5,22 +5,37 @@ import {
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
 
+export const STS_POD = 'pod';
+export const STS_SERVICE = 'service';
+export const STS_NODE = 'node';
+export const STS_DAEMON_SET = 'daemonset';
+export const STS_DEPLOYMENT = 'deployment';
+export const STS_STATEFUL_SET = 'statefulset';
+export const STS_CRON_JOB = 'cronjob';
+export const STS_JOB = 'job';
+export const STS_REPLICA_SET = 'replicaset';
+export const STS_REPLICATION_CONTROLLER = 'replication-controller';
+export const STS_CLUSTER = 'cluster';
+export const STS_CONFIG_MAP = 'configmap';
+export const STS_SECRET = 'secret';
+export const STS_NAMESPACE = 'namespace';
+
 // Map of kinds to their display names
 const KINDS = new Map<string, string>([
-  [POD, 'pod'],
-  [SERVICE, 'service'],
-  [NODE, 'node'],
-  [WORKLOAD_TYPES.DAEMON_SET, 'daemonset'],
-  [WORKLOAD_TYPES.DEPLOYMENT, 'deployment'],
-  [WORKLOAD_TYPES.STATEFUL_SET, 'statefulset'],
-  [WORKLOAD_TYPES.CRON_JOB, 'cron-job'],
-  [WORKLOAD_TYPES.JOB, 'job'],
-  [WORKLOAD_TYPES.REPLICA_SET, 'replicaset'],
-  [WORKLOAD_TYPES.REPLICATION_CONTROLLER, 'replication-controller'],
-  [CLUSTER, 'cluster'],
-  [CONFIG_MAP, 'configmap'],
-  [SECRET, 'secret'],
-  [NAMESPACE, 'namespace'],
+  [POD, STS_POD],
+  [SERVICE, STS_SERVICE],
+  [NODE, STS_NODE],
+  [WORKLOAD_TYPES.DAEMON_SET, STS_DAEMON_SET],
+  [WORKLOAD_TYPES.DEPLOYMENT, STS_DEPLOYMENT],
+  [WORKLOAD_TYPES.STATEFUL_SET, STS_STATEFUL_SET],
+  [WORKLOAD_TYPES.CRON_JOB, STS_CRON_JOB],
+  [WORKLOAD_TYPES.JOB, STS_JOB],
+  [WORKLOAD_TYPES.REPLICA_SET, STS_REPLICA_SET],
+  [WORKLOAD_TYPES.REPLICATION_CONTROLLER, STS_REPLICATION_CONTROLLER],
+  [CLUSTER, STS_CLUSTER],
+  [CONFIG_MAP, STS_CONFIG_MAP],
+  [SECRET, STS_SECRET],
+  [NAMESPACE, STS_NAMESPACE],
 ]);
 
 export function mapKind(kind: string): string {
@@ -28,7 +43,6 @@ export function mapKind(kind: string): string {
 }
 
 export async function loadStackStateSettings(store: any) {
-  console.log('Loading StackState settings');
   const settings = await store.dispatch('management/findAll', { type: 'stackstate.io.setting' });
 
   if (isEmpty(settings)) {
@@ -40,26 +54,21 @@ export async function loadStackStateSettings(store: any) {
   if (isEmpty(stackstateSettings)) {
     return;
   }
-  console.log('Has stackstate settings', stackstateSettings.spec.url, stackstateSettings.spec.apiToken, stackstateSettings.spec.serviceToken);
 
   return stackstateSettings;
 }
 
 export async function loadConnectionInfo(store: any): Promise<void> {
-  console.log('Loading StackState connection info');
   const settings = await store.dispatch('management/findAll', { type: 'stackstate.io.setting' });
 
-  console.log('settings', settings);
   if (isEmpty(settings)) {
     return;
   }
-  console.log('Has settings');
   const stackstateSettings = settings.find((s: any) => s.metadata.name === 'stackstate');
 
   if (isEmpty(stackstateSettings)) {
     return;
   }
-  console.log('Has stackstate settings', stackstateSettings.spec.url, stackstateSettings.spec.apiToken, stackstateSettings.spec.serviceToken);
   store.dispatch('stackstate/setConnectionInfo', {
     apiURL: stackstateSettings.spec.url, apiToken: stackstateSettings.spec.apiToken, serviceToken: stackstateSettings.spec.serviceToken
   });

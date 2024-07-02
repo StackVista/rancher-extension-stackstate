@@ -1,6 +1,8 @@
 <script>
+import { mapGetters } from 'vuex';
 import HealthState from '../components/HealthState';
 import { loadStackStateSettings, mapKind, loadComponent } from '../modules/stackstate';
+import { buildUrn } from '../modules/urn';
 
 export default {
   name:       'ComponentLinkedHealthState',
@@ -17,20 +19,12 @@ export default {
   },
 
   computed: {
+    ...mapGetters(['currentCluster']),
+
     componentIdentifier() {
-      let identifier = `urn:kubernetes:/susecon-frb-cluster-0`;
+      const cluster = this.currentCluster?.spec.displayName;
 
-      if (this.row.metadata.namespace) {
-        identifier += `:${ this.row.metadata.namespace }`;
-      }
-
-      identifier += `:${ mapKind(this.row.type.toLowerCase()) }/${ this.row.metadata.name }`;
-
-      return identifier;
-    },
-
-    componentHealth() {
-      return nil;
+      return buildUrn(this.row, cluster);
     },
 
     color() {
@@ -58,9 +52,13 @@ export default {
     this.health = 'UNKNOWN';
 
     this.componentUrn = this.componentIdentifier;
+    if (!this.componentUrn) {
+      this.health = 'UNKNOWN';
+
+      return;
+    }
     const component = await loadComponent(this.$store, creds, this.componentUrn);
 
-    console.log('component', component);
     this.health = component.state.healthState;
     this.url = creds.spec.url;
   }
@@ -68,5 +66,5 @@ export default {
 </script>
 
 <template>
-  <a :href="`https://${url}/#/components/${encodeURIComponent(componentIdentifier)}`" target="_blank"><HealthState :state="health" :color="color" /></a>
+  <a v-if="componentUrn" :href="`https://${url}/#/components/${encodeURIComponent(componentIdentifier)}`" target="_blank"><HealthState :state="health" :color="color" /></a>
 </template>

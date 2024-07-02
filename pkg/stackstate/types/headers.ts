@@ -3,9 +3,7 @@ import { TableColumn } from '@rancher/shell/core/types';
 export const StackStateHealth: TableColumn = {
   labelKey: 'sts.health',
   getValue: (row: any) => {
-    console.log('row', row);
-
-    return 'CRITICAL';
+    return 'UNKNOWN';
   },
   sort:          ['stateSort'],
   formatter:     'ComponentLinkedHealthState',
