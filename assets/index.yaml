@@ -12,9 +12,9 @@ entries:
       catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 0.3.0
-    created: "2024-06-19T12:17:45.122707661Z"
+    created: "2024-07-02T15:05:39.726333687Z"
     description: Rancher Prime Observability Extension
-    digest: 0d8021f14b01891e3a057c173ce869ab248bf66fc325d8520c0240316dea64e3
+    digest: 11a9e51b842eeca54e562e6ee8041f1280bcf6f47d3ef1d9eead91be6c681b06
     name: stackstate
     type: application
     urls:
@@ -58,4 +58,4 @@ entries:
     urls:
     - assets/stackstate/stackstate-0.1.0.tgz
     version: 0.1.0
-generated: "2024-06-19T12:17:45.122160171Z"
+generated: "2024-07-02T15:05:39.726008899Z"
