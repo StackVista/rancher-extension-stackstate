@@ -1,6 +1,7 @@
 <script>
 import { mapGetters } from 'vuex';
-import { loadComponent, mapKind, loadStackStateSettings } from '../modules/stackstate';
+import { loadComponent, loadStackStateSettings } from '../modules/stackstate';
+import { buildUrn } from '../modules/urn';
 import { isStackStateObserved } from '../modules/observed';
 import HealthState from './HealthState.vue';
 
@@ -25,19 +26,7 @@ export default {
     componentIdentifier() {
       const cluster = this.currentCluster?.spec.displayName;
 
-      if (!cluster) {
-        return '';
-      }
-
-      let identifier = `urn:kubernetes:/${ cluster }`;
-
-      if (this.resource.metadata.namespace) {
-        identifier += `:${ this.resource.metadata.namespace }`;
-      }
-
-      identifier += `:${ mapKind(this.resource.type.toLowerCase()) }/${ this.resource.metadata.name }`;
-
-      return identifier;
+      return buildUrn(this.resource, cluster);
     },
   },
   async fetch() {
@@ -51,6 +40,9 @@ export default {
     const creds = await loadStackStateSettings(this.$store);
 
     this.urn = this.componentIdentifier;
+    if (!this.urn) {
+      return;
+    }
 
     const component = await loadComponent(this.$store, creds, this.urn);
 

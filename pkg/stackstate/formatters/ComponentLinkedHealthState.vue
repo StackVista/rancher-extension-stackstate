@@ -2,6 +2,7 @@
 import { mapGetters } from 'vuex';
 import HealthState from '../components/HealthState';
 import { loadStackStateSettings, mapKind, loadComponent } from '../modules/stackstate';
+import { buildUrn } from '../modules/urn';
 
 export default {
   name:       'ComponentLinkedHealthState',
@@ -23,19 +24,7 @@ export default {
     componentIdentifier() {
       const cluster = this.currentCluster?.spec.displayName;
 
-      if (!cluster) {
-        return '';
-      }
-
-      let identifier = `urn:kubernetes:/${ cluster }`;
-
-      if (this.row.metadata.namespace) {
-        identifier += `:${ this.row.metadata.namespace }`;
-      }
-
-      identifier += `:${ mapKind(this.row.type.toLowerCase()) }/${ this.row.metadata.name }`;
-
-      return identifier;
+      return buildUrn(this.row, cluster);
     },
 
     color() {
@@ -65,6 +54,8 @@ export default {
     this.componentUrn = this.componentIdentifier;
     if (!this.componentUrn) {
       this.health = 'UNKNOWN';
+
+      return;
     }
     const component = await loadComponent(this.$store, creds, this.componentUrn);
 
@@ -75,5 +66,5 @@ export default {
 </script>
 
 <template>
-  <a :href="`https://${url}/#/components/${encodeURIComponent(componentIdentifier)}`" target="_blank"><HealthState :state="health" :color="color" /></a>
+  <a v-if="componentUrn" :href="`https://${url}/#/components/${encodeURIComponent(componentIdentifier)}`" target="_blank"><HealthState :state="health" :color="color" /></a>
 </template>
