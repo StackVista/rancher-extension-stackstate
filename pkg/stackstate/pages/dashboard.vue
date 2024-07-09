@@ -1,14 +1,15 @@
 <script>
 import Loading from '@shell/components/Loading';
+import ConfigurationView from '../components/Dashboard/ConfigurationView';
 
 export default {
   name:       'StackStateDashboard',
-  components: { Loading },
+  components: { Loading, ConfigurationView },
 
   data() {
     return {
-      stackStateClusters:  [],
-      loading:             false,
+      loading: false,
+      editing: false,
     };
   },
   computed: {
@@ -27,28 +28,30 @@ export default {
   <div class="dashboard">
     <div class="banner">
       <div>
-        <img src="../sts.svg" alt="StackState logo" />
+        <img src="../rancher-observability.svg" alt="StackState logo" />
       </div>
       <div>
-        <h1>StackState</h1>
+        <h1>Rancher Prime Observability</h1>
       </div>
-      <div>Welcome to StackState!</div>
-      <div>Using StackState, you can monitor the health of your Kubernetes clusters.</div>
+      <div>Welcome to Rancher Prime Observability powered by StackState by SUSE.</div>
+      <div>Using StackState by SUSE, you can monitor the health of all clusters managed by Rancher and the workloads running on them.</div>
     </div>
-    <div v-if="!isConfigured">
-      <p>
-        StackState is not configured. Please configure StackState in the
-        <router-link to="/management/stackstate">
-          management
-        </router-link> page.
-      </p>
+    <Loading v-if="loading" />
+    <div v-else-if="!isConfigured">
+      <div><span>The connection details for StackState by SUSE have not been configured yet. Please enter them here to start using Rancher Prime Observability.</span></div>
+      <ConfigurationView mode="create" />
     </div>
-    <Loading v-else-if="loading" />
     <div v-else>
-      <div>
+      <div style="text-align: center;">
         Rancher is connected to StackState at
         <a :href="`https://${stackStateURL}/`">
           {{ stackStateURL }}</a>.
+      </div>
+      <div style="padding-top: 15px;">
+        <ConfigurationView v-if="editing" mode="editing" />
+        <button @click="editing = !editing">
+          {{ editing ? 'Cancel' : 'Edit' }}
+        </button>
       </div>
     </div>
   </div>

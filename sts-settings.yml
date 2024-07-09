@@ -1,0 +1,12 @@
+apiVersion: stackstate.io/v1beta1
+kind: Configuration
+metadata:
+  creationTimestamp: "2024-06-15T11:39:58Z"
+  generation: 3
+  name: stackstate
+  namespace: default
+  resourceVersion: "1238293"
+  uid: 229ecc53-3097-4b00-a989-a472bb7ac779
+spec:
+  serviceToken: svctok-b8wDl9WLBXjZPagbKMQmnc4k0Bw-A8pF
+  url: susecon.app.stackstate.io

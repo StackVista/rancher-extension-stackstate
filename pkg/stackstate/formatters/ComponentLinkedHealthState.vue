@@ -1,6 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-import HealthState from '../components/HealthState';
+import HealthState from '../components/Health/HealthState';
 import { loadStackStateSettings, mapKind, loadComponent } from '../modules/stackstate';
 import { buildUrn } from '../modules/urn';
 

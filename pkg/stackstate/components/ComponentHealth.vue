@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex';
 import { loadComponent, loadStackStateSettings } from '../modules/stackstate';
 import { buildUrn } from '../modules/urn';
 import { isStackStateObserved } from '../modules/observed';
-import HealthState from './HealthState.vue';
+import HealthState from './Health/HealthState.vue';
 
 export default {
   name:       'ComponentHealth',

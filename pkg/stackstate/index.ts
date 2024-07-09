@@ -9,7 +9,8 @@ import {
   CONFIG_MAP,
   STORAGE_CLASS,
   PV,
-  PVC
+  PVC,
+  MANAGEMENT,
 } from '@shell/config/types';
 
 import { loadComponentTypes, loadConnectionInfo } from './modules/stackstate';
@@ -97,6 +98,7 @@ export default function(plugin: IPlugin): void {
       CONFIG_MAP,
       PV,
       PVC,
+      MANAGEMENT.CLUSTER,
     ]
   },
   {
