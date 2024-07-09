@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex';
 import LiveDate from '@shell/components/formatter/LiveDate.vue';
 import { loadComponent, mapKind, loadStackStateSettings } from '../modules/stackstate';
 import { isStackStateObserved } from '../modules/observed';
-import HealthState from './HealthState.vue';
+import HealthState from './Health/HealthState.vue';
 
 export default {
   name:       'MonitorTab',
@@ -60,7 +60,6 @@ export default {
 
     const component = await loadComponent(this.$store, creds, this.urn);
 
-    console.log(component.syncedCheckStates);
     this.monitors = component.syncedCheckStates;
 
     this.url = creds.spec.url;

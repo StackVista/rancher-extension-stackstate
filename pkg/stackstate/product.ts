@@ -2,15 +2,27 @@ import { HeaderOptions, IPlugin, TableColumnLocation } from '@rancher/shell/core
 import { NODE, POD, SERVICE, WORKLOAD_TYPES } from '@shell/config/types';
 // import { StackStateHealth } from './types/headers';
 // import { STACKSTATE_CLUSTER } from './types/stackstate.io.cluster';
-import { STACKSTATE_SETTINGS } from './types/stackstate.io.settings';
+import { STACKSTATE_CONFIGURATION_TYPE } from './models/stackstate.io.configuration';
 import {
   STACKSTATE_NAME,
   STACKSTATE_PRODUCT_NAME,
   STS_DASHBOARD
 } from './types/types';
 
-const stsIcon = require('./sts.svg');
+const stsIcon = require('./rancher-observability.svg');
+const styleSheet = document.createElement('style');
+// css fix for SVG icon in Rancher 2.8 and 2.9
+const css = `
+  .side-menu .category div a > img {
+    display: block;
+    width: 42px;
+    font-size: 25px;
+    margin-right: 14px;
+  }
+`;
 
+styleSheet.textContent = css;
+document.head.appendChild(styleSheet);
 export function init($plugin: IPlugin, store: any) {
   const {
     product,
@@ -64,10 +76,27 @@ export function init($plugin: IPlugin, store: any) {
   // // headers(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.headers!);
   // // configureType(STACKSTATE_CERTIFICATE.name, STACKSTATE_CERTIFICATE.config);
   // // basicType([STACKSTATE_CERTIFICATE.name], 'SRE');
-  configureType(STACKSTATE_SETTINGS.name, STACKSTATE_SETTINGS.config);
-  headers(STACKSTATE_SETTINGS.name, STACKSTATE_SETTINGS.headers!);
+  // configureType(STACKSTATE_CONFIGURATION_TYPE, {
+  //   isCreatable:      true,
+  //   isRemovable:      true,
+  //   isEditable:       true,
+  //   showListMasthead: true,
+  //   canYaml:          true,
+  //   showState:        true,
+  //   showAge:          true,
+  //   namespaced:       false,
+  //   displayName:      'Configuration',
+  //   customRoute:      {
+  //     name:   'c-cluster-product-resource',
+  //     params: {
+  //       product:  STACKSTATE_PRODUCT_NAME,
+  //       cluster:  BLANK_CLUSTER,
+  //       resource: STACKSTATE_CONFIGURATION_TYPE,
+  //     },
+  //   }
+  // });
 
-  basicType([STACKSTATE_SETTINGS.name]);
+  basicType([STACKSTATE_CONFIGURATION_TYPE]);
 
   basicType([STS_DASHBOARD]);
 }

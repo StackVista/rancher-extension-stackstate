@@ -4,6 +4,7 @@ import {
   CONFIG_MAP, NAMESPACE, NODE, POD, SECRET, SERVICE, WORKLOAD_TYPES
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
+import { STACKSTATE_CONFIGURATION_TYPE } from '../models/stackstate.io.configuration';
 
 export const STS_POD = 'pod';
 export const STS_SERVICE = 'service';
@@ -43,7 +44,7 @@ export function mapKind(kind: string): string {
 }
 
 export async function loadStackStateSettings(store: any) {
-  const settings = await store.dispatch('management/findAll', { type: 'stackstate.io.setting' });
+  const settings = await store.dispatch('management/findAll', { type: STACKSTATE_CONFIGURATION_TYPE });
 
   if (isEmpty(settings)) {
     return;
@@ -59,7 +60,7 @@ export async function loadStackStateSettings(store: any) {
 }
 
 export async function loadConnectionInfo(store: any): Promise<void> {
-  const settings = await store.dispatch('management/findAll', { type: 'stackstate.io.setting' });
+  const settings = await store.dispatch('management/findAll', { type: STACKSTATE_CONFIGURATION_TYPE });
 
   if (isEmpty(settings)) {
     return;
@@ -74,6 +75,26 @@ export async function loadConnectionInfo(store: any): Promise<void> {
   });
 
   return stackstateSettings;
+}
+
+export async function checkConnection(store: any, credentials: ConnectionInfo): Promise<boolean> {
+  const creds = token(credentials.apiToken, credentials.serviceToken);
+
+  try {
+    const resp = await store.dispatch('management/request', {
+      url:     `meta/proxy/${ credentials.apiURL }/api/server/info`,
+      method:  'GET',
+      headers: { 'Content-Type': 'application/json', 'X-API-Auth-Header': creds },
+    });
+
+    if (resp._status !== 200) {
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 export async function loadComponentTypes(store: any): Promise<ComponentType[] | void> {

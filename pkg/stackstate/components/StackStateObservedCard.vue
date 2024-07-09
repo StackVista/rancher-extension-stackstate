@@ -1,8 +1,8 @@
 <script>
 import { getSnapshot, loadStackStateSettings } from '../modules/stackstate';
 import { isStackStateObserved } from '../modules/observed';
-import HealthState from './HealthState.vue';
-import HealthDisc from './HealthDisc.vue';
+import HealthState from './Health/HealthState.vue';
+import HealthDisc from './Health/HealthDisc.vue';
 
 export default {
   name:       'StackStateObservedCard',
@@ -21,6 +21,9 @@ export default {
     isObserved() {
       return this.observed.length > 0;
     },
+    isConfigured() {
+      return this.$store.getters['stackstate/hasCredentials'];
+    },
   },
   data() {
     return {
@@ -29,10 +32,12 @@ export default {
       deviating: 0,
       critical:  0,
       healthy:   0,
-      loading:   true,
     };
   },
   async fetch() {
+    if (!this.isConfigured) {
+      return;
+    }
     const obs = await isStackStateObserved(this.$store, this.resource.id);
     const creds = await loadStackStateSettings(this.$store);
 
@@ -47,7 +52,6 @@ export default {
       }
     }
     this.observed = obs;
-    this.loading = false;
   },
 };
 </script>
@@ -58,10 +62,17 @@ export default {
     </div>
     <span class="spacer">&nbsp;</span>
     <div class="col">
-      <div v-if="loading">
+      <div v-if="$fetchState.pending">
         <div>
           <span>
-            Connecting to Observability...
+            Connecting to Observability Plane...
+          </span>
+        </div>
+      </div>
+      <div v-else-if="!isConfigured">
+        <div>
+          <span>
+            Connection to StackState has not been configured, please go to the <a :href="`/stackstate/c/_/stackstate.io.dashboard`">StackState Configuration</a>
           </span>
         </div>
       </div>
@@ -100,6 +111,7 @@ export default {
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 <style lang="scss" scoped>
