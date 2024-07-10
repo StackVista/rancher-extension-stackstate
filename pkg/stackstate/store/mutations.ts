@@ -1,17 +1,20 @@
 import { ComponentType, ConnectionInfo } from '../types/component';
 
-import { StackStateConfig } from './index';
+import { ObservabilityState } from './index';
 
 export default {
-  updateComponentTypes(state: StackStateConfig, val: Map<string, string>) {
+  updateComponentTypes(state: ObservabilityState, val: Map<string, string>) {
     state.componentTypes = val;
   },
-  addComponentType(state: StackStateConfig, val: ComponentType) {
+  addComponentType(state: ObservabilityState, val: ComponentType) {
     state.componentTypes.set(val.id, val.name);
   },
-  setConnectionInfo(state: StackStateConfig, val: ConnectionInfo) {
+  setConnectionInfo(state: ObservabilityState, val: ConnectionInfo) {
     state.apiURL = val.apiURL;
     state.apiToken = val.apiToken;
     state.serviceToken = val.serviceToken;
+  },
+  setMissingCrd(state: ObservabilityState, val: boolean) {
+    state.missingCrd = val;
   },
 };

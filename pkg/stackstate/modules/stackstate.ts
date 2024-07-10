@@ -4,7 +4,7 @@ import {
   CONFIG_MAP, NAMESPACE, NODE, POD, SECRET, SERVICE, WORKLOAD_TYPES
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
-import { STACKSTATE_CONFIGURATION_TYPE } from '../models/stackstate.io.configuration';
+import { OBSERVABILITY_CONFIGURATION_TYPE } from '../models/observability.rancher.io.configuration';
 
 export const STS_POD = 'pod';
 export const STS_SERVICE = 'service';
@@ -44,7 +44,7 @@ export function mapKind(kind: string): string {
 }
 
 export async function loadStackStateSettings(store: any) {
-  const settings = await store.dispatch('management/findAll', { type: STACKSTATE_CONFIGURATION_TYPE });
+  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
   if (isEmpty(settings)) {
     return;
@@ -59,8 +59,19 @@ export async function loadStackStateSettings(store: any) {
   return stackstateSettings;
 }
 
+export function isCrdLoaded(store: any): boolean {
+  const loaded = store.getters['management/schemaFor'](OBSERVABILITY_CONFIGURATION_TYPE);
+
+  console.log('loaded', loaded);
+  if (loaded) {
+    return true;
+  }
+
+  return false;
+}
+
 export async function loadConnectionInfo(store: any): Promise<void> {
-  const settings = await store.dispatch('management/findAll', { type: STACKSTATE_CONFIGURATION_TYPE });
+  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
   if (isEmpty(settings)) {
     return;
@@ -70,7 +81,7 @@ export async function loadConnectionInfo(store: any): Promise<void> {
   if (isEmpty(stackstateSettings)) {
     return;
   }
-  store.dispatch('stackstate/setConnectionInfo', {
+  store.dispatch('observability/setConnectionInfo', {
     apiURL: stackstateSettings.spec.url, apiToken: stackstateSettings.spec.apiToken, serviceToken: stackstateSettings.spec.serviceToken
   });
 
@@ -98,9 +109,9 @@ export async function checkConnection(store: any, credentials: ConnectionInfo): 
 }
 
 export async function loadComponentTypes(store: any): Promise<ComponentType[] | void> {
-  const stackStateURL = await store.getters['stackstate/apiURL'];
-  const apiToken = await store.getters['stackstate/apiToken'];
-  const serviceToken = await store.getters['stackstate/serviceToken'];
+  const stackStateURL = await store.getters['observability/apiURL'];
+  const apiToken = await store.getters['observability/apiToken'];
+  const serviceToken = await store.getters['observability/serviceToken'];
 
   if (!stackStateURL || (!apiToken && !serviceToken)) {
     return;
@@ -119,16 +130,16 @@ export async function loadComponentTypes(store: any): Promise<ComponentType[] | 
   }
 
   for (const ct of allComponentTypes) {
-    store.dispatch('stackstate/addComponentType', { id: ct.id, name: ct.name });
+    store.dispatch('observability/addComponentType', { id: ct.id, name: ct.name });
   }
 
   return allComponentTypes;
 }
 
 export async function getSnapshot(store: any, stql: string, creds: any | undefined): Promise<any | void> {
-  const stackStateURL = creds ? creds.spec.url : await store.getters['stackstate/apiURL'];
-  const apiToken = creds ? creds.spec.apiToken : await store.getters['stackstate/apiToken'];
-  const serviceToken = creds ? creds.spec.serviceToken : await store.getters['stackstate/serviceToken'];
+  const stackStateURL = creds ? creds.spec.url : await store.getters['observability/apiURL'];
+  const apiToken = creds ? creds.spec.apiToken : await store.getters['observability/apiToken'];
+  const serviceToken = creds ? creds.spec.serviceToken : await store.getters['observability/serviceToken'];
 
   if (!stackStateURL || (!apiToken && !serviceToken)) {
     return;

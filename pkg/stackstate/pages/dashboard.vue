@@ -1,10 +1,13 @@
 <script>
 import Loading from '@shell/components/Loading';
 import ConfigurationView from '../components/Dashboard/ConfigurationView';
+import InstallCrdView from '../components/Dashboard/InstallCrdView';
 
 export default {
-  name:       'StackStateDashboard',
-  components: { Loading, ConfigurationView },
+  name:       'ObservabilityDashboard',
+  components: {
+    Loading, ConfigurationView, InstallCrdView
+  },
 
   data() {
     return {
@@ -14,11 +17,14 @@ export default {
   },
   computed: {
     stackStateURL() {
-      return this.$store.getters['stackstate/apiURL'];
+      return this.$store.getters['observability/apiURL'];
     },
 
     isConfigured() {
-      return this.$store.getters['stackstate/hasCredentials'];
+      return this.$store.getters['observability/hasCredentials'];
+    },
+    isCrdMissing() {
+      return this.$store.getters['observability/isCrdMissing'];
     },
   },
 };
@@ -31,19 +37,22 @@ export default {
         <img src="../rancher-observability.svg" alt="StackState logo" />
       </div>
       <div>
-        <h1>Rancher Prime Observability</h1>
+        <h1>{{ t('observability.name') }}</h1>
       </div>
-      <div>Welcome to Rancher Prime Observability powered by StackState by SUSE.</div>
-      <div>Using StackState by SUSE, you can monitor the health of all clusters managed by Rancher and the workloads running on them.</div>
+      <div>{{ t('observability.dashboard.description') }}</div>
     </div>
     <Loading v-if="loading" />
+    <div v-else-if="isCrdMissing">
+      <div><span>{{ t('observability.dashboard.error.crdmissing') }}</span></div>
+      <InstallCrdView />
+    </div>
     <div v-else-if="!isConfigured">
-      <div><span>The connection details for StackState by SUSE have not been configured yet. Please enter them here to start using Rancher Prime Observability.</span></div>
+      <div><span>{{ t('observability.dashboard.error.notconfigured') }}</span></div>
       <ConfigurationView mode="create" />
     </div>
     <div v-else>
       <div style="text-align: center;">
-        Rancher is connected to StackState at
+        {{ t('observability.dashboard.connected') }}
         <a :href="`https://${stackStateURL}/`">
           {{ stackStateURL }}</a>.
       </div>

@@ -7,20 +7,26 @@ import {
   NODE, POD, SERVICE, WORKLOAD_TYPES, NAMESPACE,
   SECRET,
   CONFIG_MAP,
-  STORAGE_CLASS,
   PV,
   PVC,
   MANAGEMENT,
 } from '@shell/config/types';
 
-import { loadComponentTypes, loadConnectionInfo } from './modules/stackstate';
+import { isCrdLoaded, loadComponentTypes, loadConnectionInfo } from './modules/stackstate';
 import extensionRouting from './routing/extension-routing';
-import stackstateStore from './store';
-import { StackStateHealth } from './types/headers';
+import observabilityStore from './store';
+import { ObservabilityHealth } from './types/headers';
 
 const onEnter: OnNavToPackage = async(store) => {
-  await loadComponentTypes(store);
+  const loaded = isCrdLoaded(store);
+
+  if (!loaded) {
+    await store.dispatch('observability/setMissingCrd', true);
+
+    return;
+  }
   await loadConnectionInfo(store);
+  await loadComponentTypes(store);
 };
 
 // Init the package
@@ -34,7 +40,7 @@ export default function(plugin: IPlugin): void {
   // Load a product
   plugin.addProduct(require('./product'));
 
-  plugin.addDashboardStore(stackstateStore.config.namespace, stackstateStore.specifics, stackstateStore.config);
+  plugin.addDashboardStore(observabilityStore.config.namespace, observabilityStore.specifics, observabilityStore.config);
 
   plugin.addTableColumn(
     TableColumnLocation.RESOURCE,
@@ -55,7 +61,7 @@ export default function(plugin: IPlugin): void {
         PVC,
       ],
     },
-    StackStateHealth
+    ObservabilityHealth
   );
 
   plugin.addCard(CardLocation.CLUSTER_DASHBOARD_CARD, {}, {
@@ -103,9 +109,9 @@ export default function(plugin: IPlugin): void {
   },
   {
     name:       'observability',
-    labelKey:   'sts.observability',
+    labelKey:   'observability.name',
     showHeader: false,
-    tooltip:    'Rancher Observability through StackState',
+    tooltip:    'Rancher Prime Observability through StackState',
     component:  () => import('./components/MonitorTab.vue'),
   });
 

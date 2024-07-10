@@ -1,7 +1,7 @@
 import { TableColumn } from '@rancher/shell/core/types';
 
-export const StackStateHealth: TableColumn = {
-  labelKey: 'sts.health',
+export const ObservabilityHealth: TableColumn = {
+  labelKey: 'observability.health',
   getValue: (row: any) => {
     return 'UNKNOWN';
   },
