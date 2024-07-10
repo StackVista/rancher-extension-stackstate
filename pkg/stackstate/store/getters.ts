@@ -1,11 +1,12 @@
-import { StackStateConfig } from './index';
+import { ObservabilityState } from './index';
 
 export default {
-  componentTypes: (state: StackStateConfig) => state.componentTypes,
-  apiURL:         (state: StackStateConfig) => state.apiURL,
-  apiToken:       (state: StackStateConfig) => state.apiToken,
-  serviceToken:   (state: StackStateConfig) => state.serviceToken,
-  hasCredentials: (state: StackStateConfig) => {
+  componentTypes: (state: ObservabilityState) => state.componentTypes,
+  apiURL:         (state: ObservabilityState) => state.apiURL,
+  apiToken:       (state: ObservabilityState) => state.apiToken,
+  serviceToken:   (state: ObservabilityState) => state.serviceToken,
+  hasCredentials: (state: ObservabilityState) => {
     return state.apiURL && (state.apiToken || state.serviceToken);
   },
+  isCrdMissing: (state: ObservabilityState) => state.missingCrd,
 };

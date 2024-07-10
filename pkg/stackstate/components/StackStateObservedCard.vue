@@ -22,7 +22,7 @@ export default {
       return this.observed.length > 0;
     },
     isConfigured() {
-      return this.$store.getters['stackstate/hasCredentials'];
+      return this.$store.getters['observability/hasCredentials'];
     },
   },
   data() {
@@ -65,14 +65,14 @@ export default {
       <div v-if="$fetchState.pending">
         <div>
           <span>
-            Connecting to Observability Plane...
+            {{ t('observability.clusterCard.connecting') }}
           </span>
         </div>
       </div>
       <div v-else-if="!isConfigured">
         <div>
           <span>
-            Connection to StackState has not been configured, please go to the <a :href="`/stackstate/c/_/stackstate.io.dashboard`">StackState Configuration</a>
+            {{ t('observability.clusterCard.notConnected') }} <a :href="`/observability/c/_/observability.rancher.io.dashboard`">{{ t('observability.name') }} Configuration</a>
           </span>
         </div>
       </div>
@@ -83,7 +83,7 @@ export default {
           <HealthState state="unobserved" color="grey" />
         </div>
         <div><span class="spacer">&nbsp;</span></div>
-        <div><span>Cluster is not observed by StackState. Please <a :href="`/c/${resource.id}/apps/charts/chart?repo-type=cluster&repo=rancher-partner-charts&chart=stackstate-k8s-agent`">install</a> the agent</span></div>
+        <div><span>Cluster is not observed by {{ t('observability.name') }}. Please <a :href="`/c/${resource.id}/apps/charts/chart?repo-type=cluster&repo=rancher-partner-charts&chart=stackstate-k8s-agent`">install</a> the agent</span></div>
       </div>
       <div v-else>
         <div>

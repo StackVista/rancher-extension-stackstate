@@ -3,7 +3,7 @@ import { LabeledInput } from '@components/Form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import { checkConnection } from '../../modules/stackstate';
 import { handleGrowl } from '../../utils/growl';
-import { STACKSTATE_CONFIGURATION_TYPE } from '../../models/stackstate.io.configuration';
+import { OBSERVABILITY_CONFIGURATION_TYPE } from '../../models/observability.rancher.io.configuration';
 
 export default {
   components: { LabeledInput, AsyncButton },
@@ -12,7 +12,23 @@ export default {
     stackStateURL:          '',
     stackStateServiceToken: '',
   }),
-  methods:    {
+  methods: {
+    async observabilityConfig() {
+      const configs = await this.$store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+
+      if (configs) {
+        for (const config of configs) {
+          if (config.metadata.name !== 'stackstate') {
+            continue;
+          }
+
+          return config;
+        }
+      }
+
+      return null;
+    },
+
     async save(btnCb) {
       const conn = await checkConnection(this.$store, { apiURL: this.stackStateURL, serviceToken: this.stackStateServiceToken });
 
@@ -35,12 +51,12 @@ export default {
         const config = {
           metadata:   { name: `stackstate`, namespace: 'default' },
           spec:     {},
-          type:     STACKSTATE_CONFIGURATION_TYPE,
+          type:     OBSERVABILITY_CONFIGURATION_TYPE,
         };
 
         newConfig = await this.$store.dispatch('management/create', config);
       } else {
-        newConfig = await this.$store.dispatch('management/find', { type: STACKSTATE_CONFIGURATION_TYPE, id: 'stackstate' });
+        newConfig = await this.observabilityConfig();
       }
 
       newConfig.spec.url = this.stackStateURL;
@@ -48,7 +64,7 @@ export default {
       try {
         await newConfig.save();
 
-        await this.$store.dispatch('stackstate/setConnectionInfo', {
+        await this.$store.dispatch('observability/setConnectionInfo', {
           apiURL:       this.stackStateURL,
           serviceToken: this.stackStateServiceToken,
         });
@@ -65,17 +81,11 @@ export default {
     },
   },
   async fetch() {
-    const configs = await this.$store.dispatch('management/findAll', { type: STACKSTATE_CONFIGURATION_TYPE });
+    const cfg = await this.observabilityConfig();
 
-    if (configs) {
-      for (const config of configs) {
-        if (config.metadata.name !== 'stackstate') {
-          continue;
-        }
-        this.stackStateURL = config.spec.url;
-        this.stackStateServiceToken = config.spec.serviceToken;
-        break;
-      }
+    if (cfg) {
+      this.stackStateURL = cfg.spec.url;
+      this.stackStateServiceToken = cfg.spec.serviceToken;
     }
   },
 };

@@ -69,7 +69,7 @@ export default {
 <template>
   <div v-if="!observed">
     <div class="card">
-      <span>Rancher Observability is not enabled for this cluster.</span>
+      <span>Rancher Prime Observability is not enabled for this cluster.</span>
     </div>
   </div>
   <div v-else-if="!hasMonitors">
