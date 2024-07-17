@@ -62,12 +62,7 @@ export async function loadStackStateSettings(store: any) {
 export function isCrdLoaded(store: any): boolean {
   const loaded = store.getters['management/schemaFor'](OBSERVABILITY_CONFIGURATION_TYPE);
 
-  console.log('loaded', loaded);
-  if (loaded) {
-    return true;
-  }
-
-  return false;
+  return loaded;
 }
 
 export async function loadConnectionInfo(store: any): Promise<void> {
@@ -93,9 +88,10 @@ export async function checkConnection(store: any, credentials: ConnectionInfo): 
 
   try {
     const resp = await store.dispatch('management/request', {
-      url:     `meta/proxy/${ credentials.apiURL }/api/server/info`,
-      method:  'GET',
-      headers: { 'Content-Type': 'application/json', 'X-API-Auth-Header': creds },
+      url:                  `meta/proxy/${ credentials.apiURL }/api/server/info`,
+      method:               'GET',
+      headers:              { 'Content-Type': 'application/json', 'X-API-Auth-Header': creds },
+      redirectUnauthorized: false,
     });
 
     if (resp._status !== 200) {
