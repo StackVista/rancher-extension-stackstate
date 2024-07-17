@@ -65,6 +65,14 @@ export function init($plugin: IPlugin, store: any) {
     }
   });
 
+  configureType(OBSERVABILITY_CONFIGURATION_TYPE, {
+    isCreatable: false,
+    isEditable:  false,
+    isRemovable: false,
+    showAge:     false,
+    showState:   false,
+    canYaml:     false,
+  });
   basicType([OBSERVABILITY_CONFIGURATION_TYPE]);
 
   basicType([OBSERVABILITY_DASHBOARD]);

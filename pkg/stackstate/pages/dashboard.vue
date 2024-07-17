@@ -2,6 +2,7 @@
 import Loading from '@shell/components/Loading';
 import ConfigurationView from '../components/Dashboard/ConfigurationView';
 import InstallCrdView from '../components/Dashboard/InstallCrdView';
+import { isCrdLoaded } from '../modules/stackstate';
 
 export default {
   name:       'ObservabilityDashboard',
@@ -24,7 +25,7 @@ export default {
       return this.$store.getters['observability/hasCredentials'];
     },
     isCrdMissing() {
-      return this.$store.getters['observability/isCrdMissing'];
+      return !isCrdLoaded(this.$store);
     },
   },
 };

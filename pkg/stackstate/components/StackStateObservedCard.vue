@@ -1,5 +1,5 @@
 <script>
-import { getSnapshot, loadStackStateSettings } from '../modules/stackstate';
+import { getSnapshot, loadStackStateSettings, isCrdLoaded } from '../modules/stackstate';
 import { isStackStateObserved } from '../modules/observed';
 import HealthState from './Health/HealthState.vue';
 import HealthDisc from './Health/HealthDisc.vue';
@@ -21,25 +21,38 @@ export default {
     isObserved() {
       return this.observed.length > 0;
     },
-    isConfigured() {
-      return this.$store.getters['observability/hasCredentials'];
-    },
   },
   data() {
     return {
-      observed:  undefined,
-      snapshot:  undefined,
-      deviating: 0,
-      critical:  0,
-      healthy:   0,
+      observed:     [],
+      snapshot:     undefined,
+      deviating:    0,
+      critical:     0,
+      healthy:      0,
+      isConfigured: true,
     };
   },
   async fetch() {
-    if (!this.isConfigured) {
+    this.isMissingCrd = !isCrdLoaded(this.$store);
+    if (this.isMissingCrd) {
+      this.isConfigured = false;
+
       return;
     }
-    const obs = await isStackStateObserved(this.$store, this.resource.id);
+
     const creds = await loadStackStateSettings(this.$store);
+
+    if (!creds) {
+      this.isConfigured = false;
+
+      return;
+    }
+
+    const obs = await isStackStateObserved(this.$store, this.resource.id);
+
+    if (!obs) {
+      return;
+    }
 
     this.snapshot = await getSnapshot(this.$store, `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${ this.resource.spec.displayName }"`, creds);
     for (const component of this.snapshot.viewSnapshotResponse.components) {
@@ -76,7 +89,7 @@ export default {
           </span>
         </div>
       </div>
-      <div v-else-if="!isObserved">
+      <div v-else-if="isConfigured && !isObserved">
         <div>
           <span>Cluster is</span>
           <span class="spacer">&nbsp;</span>

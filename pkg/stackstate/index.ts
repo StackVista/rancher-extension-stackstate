@@ -18,9 +18,7 @@ import observabilityStore from './store';
 import { ObservabilityHealth } from './types/headers';
 
 const onEnter: OnNavToPackage = async(store) => {
-  const loaded = isCrdLoaded(store);
-
-  if (!loaded) {
+  if (!isCrdLoaded(store)) {
     await store.dispatch('observability/setMissingCrd', true);
 
     return;
