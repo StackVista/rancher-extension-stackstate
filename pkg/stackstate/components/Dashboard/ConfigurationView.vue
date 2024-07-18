@@ -129,7 +129,7 @@ export default {
           color="info"
         >
           <div class="banner-info">
-            <p>{{ t("observability.dashboard.connected") }}</p>
+            <p>{{ t("observability.dashboard.connected") }}&nbsp;</p>
             <a :href="`https://${stackStateURL}/`"> {{ stackStateURL }}</a>
           </div>
         </Banner>

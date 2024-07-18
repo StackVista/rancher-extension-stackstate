@@ -52,7 +52,7 @@ export function mapKind(kind: string): string {
 export async function loadStackStateSettings(store: any) {
   const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
-  if (isEmpty(settings)) {
+  if (!settings || isEmpty(settings)) {
     return;
   }
 
@@ -60,7 +60,7 @@ export async function loadStackStateSettings(store: any) {
     (s: any) => s.metadata.name === 'stackstate'
   );
 
-  if (isEmpty(stackstateSettings)) {
+  if (!stackstateSettings || isEmpty(stackstateSettings)) {
     return;
   }
 
@@ -78,14 +78,14 @@ export function isCrdLoaded(store: any): boolean {
 export async function loadConnectionInfo(store: any): Promise<void> {
   const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
-  if (isEmpty(settings)) {
+  if (!settings || isEmpty(settings)) {
     return;
   }
   const stackstateSettings = settings.find(
     (s: any) => s.metadata.name === 'stackstate'
   );
 
-  if (isEmpty(stackstateSettings)) {
+  if (!stackstateSettings || isEmpty(stackstateSettings)) {
     return;
   }
   store.dispatch('observability/setConnectionInfo', {

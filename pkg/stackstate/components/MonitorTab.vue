@@ -49,7 +49,7 @@ export default {
   async fetch() {
     const obs = await isStackStateObserved(this.$store, this.clusterId);
 
-    this.observed = obs.length > 0;
+    this.observed = obs?.length > 0;
 
     if (!this.observed) {
       return;
@@ -59,6 +59,10 @@ export default {
     this.urn = this.componentIdentifier;
 
     const component = await loadComponent(this.$store, creds, this.urn);
+
+    if (!component) {
+      return;
+    }
 
     this.monitors = component.syncedCheckStates;
 
