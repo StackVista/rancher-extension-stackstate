@@ -1,16 +1,28 @@
 <script>
 import { mapGetters } from 'vuex';
 import LiveDate from '@shell/components/formatter/LiveDate.vue';
+import SortableTable from '@shell/components/SortableTable';
+
 import { loadComponent, mapKind, loadStackStateSettings } from '../modules/stackstate';
 import { isStackStateObserved } from '../modules/observed';
+import { MONITOR_HEADERS } from '../types/headers';
+
 import HealthState from './Health/HealthState.vue';
 
 export default {
   name:       'MonitorTab',
-  components: { HealthState, LiveDate },
-  props:      { resource: Object },
+  components: {
+    SortableTable, HealthState, LiveDate
+  },
+  props:      {
+    resource: {
+      type:     Object,
+      required: true,
+    }
+  },
   data() {
     return {
+      MONITOR_HEADERS,
       observed: false,
       urn:      '',
       url:      '',
@@ -81,53 +93,38 @@ export default {
       <span>{{ t('components.monitorTab.noMonitors') }}</span>
     </div>
   </div>
-  <div v-else class="sortable-table-list-container">
-    <table width="100%" class="sortable-table top-divider">
-      <thead>
-        <tr>
-          <th align="left" class="sortable" width="110px">
-            <div class="table-header-container">
-              <span>{{ t('components.monitorTab.state') }}</span>
-            </div>
-          </th>
-          <th align="left">
-            <div class="table-header-container">
-              <span>{{ t('components.monitorTab.monitor') }}</span>
-            </div>
-          </th>
-          <th align="left">
-            <div class="table-header-container">
-              <span>{{ t('components.monitorTab.lastUpdate') }}</span>
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="mon in monitors"
-          :key="mon.checkStateId"
-          class="main-row"
-        >
-          <td class="col-badge-state-formatter" align="center">
-            <HealthState :state="mon.health" />
-          </td>
-          <td>
-            <a :href="`https://${url}/#/components/${encodeURIComponent(urn)}`" target="_blank">{{ mon.name }}</a>
-          </td>
-          <td><LiveDate :value="mon.lastUpdateTimestamp" /></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  </div>
+  <SortableTable
+    v-else
+    :rows="monitors"
+    :headers="MONITOR_HEADERS"
+    :table-actions="false"
+    :row-actions="false"
+    key-field="checkStateId"
+    default-sort-by="state"
+    :paging="true"
+    :rows-per-page="40"
+  >
+    <template #col:state="{row}">
+      <td>
+        <HealthState :state="row.health" />
+      </td>
+    </template>
+
+    <template #col:monitor="{row}">
+      <td>
+        <a :href="`https://${url}/#/components/${encodeURIComponent(urn)}`" target="_blank">{{ row.name }}</a>
+      </td>
+    </template>
+
+    <template #col:lastUpdate="{row}">
+      <td>
+        <LiveDate :value="row.lastUpdateTimestamp" />
+      </td>
+    </template>
+  </SortableTable>
 </template>
+
 <style lang="scss" scoped>
-table.sortable-table {
-  border-collapse: collapse;
-  width: 100%;
-  outline: 1px solid var(--border);
-  background: var(--sortable-table-bg);
-}
 div.card {
   line-height: 19px;
   font-size: 14px;
@@ -137,27 +134,5 @@ div.card {
 
 span.spacer {
   margin-left: 4px;
-}
-
-.table-header-container span {
-  line-height: 28px;
-  height: 28px;
-  font-weight: 400;
-}
-
-thead tr {
-  background: var(--sortable-table-header-bg);
-  border-bottom: 1px solid var(--border);
-}
-
-th:first-of-type {
-  padding-left: 10px;
-  padding-right: 5px;
-  padding-top: 8px;
-  padding-bottom: 8px
-}
-
-th {
-  padding: 8px 5px;
 }
 </style>

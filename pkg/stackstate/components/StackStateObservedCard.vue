@@ -12,7 +12,12 @@ import HealthDisc from './Health/HealthDisc.vue';
 export default {
   name:       'StackStateObservedCard',
   components: { HealthState, HealthDisc },
-  props:      { resource: Object },
+  props:      {
+    resource: {
+      type:     Object,
+      required: true,
+    }
+  },
   computed:   {
     countDeviating() {
       return this.deviating;

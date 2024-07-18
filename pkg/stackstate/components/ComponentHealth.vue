@@ -9,7 +9,12 @@ import HealthState from './Health/HealthState.vue';
 export default {
   name:       'ComponentHealth',
   components: { HealthState },
-  props:      { resource: Object },
+  props:      {
+    resource: {
+      type:     Object,
+      required: true,
+    }
+  },
   data() {
     return {
       observed: false,
