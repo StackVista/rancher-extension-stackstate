@@ -26,6 +26,7 @@ observability:
     url: StackState URL
     serviceToken: StackState Service Token
     save: Save
+    urlError: "* URL cannot start with http:// or https://"
   errorMsg:
     connectionFailed: Connection to StackState failed
     failedSave: Failed to save configuration

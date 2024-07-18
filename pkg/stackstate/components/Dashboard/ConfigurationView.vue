@@ -26,7 +26,17 @@ export default {
     stackStateServiceToken: '',
     showSuccessfulSave:     false,
     showEditInterface:      false,
+    urlError:               false
   }),
+  watch: {
+    stackStateURL(neu) {
+      if (neu?.length && (neu.startsWith('http://') || neu.startsWith('https://'))) {
+        this.urlError = true;
+      } else {
+        this.urlError = false;
+      }
+    }
+  },
   computed: {
     isCreateMode() {
       return this.mode === 'create';
@@ -155,10 +165,19 @@ export default {
         >
           <LabeledInput
             v-model="stackStateURL"
-            class="mb-20"
             :label="t('observability.configuration.url')"
+            class="url-input"
+            :class="{'error': urlError }"
             required
           />
+          <div class="pt-10 pb-10">
+            <p
+              v-show="urlError"
+              class="url-error mb-10"
+            >
+              {{ t('observability.configuration.urlError') }}
+            </p>
+          </div>
           <LabeledInput
             v-model="stackStateServiceToken"
             class="mb-20"
@@ -167,6 +186,7 @@ export default {
             required
           />
           <div class="configuration-actions">
+            <!-- don't delete this empty view as it's necessary to align to the right the controls -->
             <div v-if="!showEditInterface"></div>
             <button
               v-if="showEditInterface"
@@ -175,7 +195,7 @@ export default {
             >
               {{ t("observability.dashboard.cancelEditConfig") }}
             </button>
-            <AsyncButton @click="save">
+            <AsyncButton :disabled="urlError" @click="save">
               {{ t("observability.configuration.save") }}
             </AsyncButton>
           </div>
@@ -189,6 +209,15 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+
+  .url-input.error::deep input {
+    border-color: var(--error) !important;
+  }
+
+  .url-error {
+    color: var(--error);
+    font-size: 13px;
+  }
 
   .row {
     justify-content: center;

@@ -52,31 +52,20 @@ export default {
 };
 </script>
 <template>
-  <div class="card">
+  <div class="health-block">
     <p>{{ t("components.componentHealth.title") }}</p>
     <HealthState class="health-state-block" :state="health" />
   </div>
-  <!-- <div class="card">
-    <div>
-      <span>{{ t("components.componentHealth.title") }}</span>
-      <span class="spacer">&nbsp;</span>
-      <HealthState :state="health" />
-    </div>
-  </div> -->
 </template>
 <style lang="scss" scoped>
-div.card {
+.health-block {
   line-height: 19px;
   font-size: 14px;
   align-items: center;
   display: flex;
 
   .health-state-block {
-    margin-left: 4px;
+    margin-left: 12px;
   }
-}
-
-span.spacer {
-  margin-left: 4px;
 }
 </style>
