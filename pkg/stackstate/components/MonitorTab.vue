@@ -25,7 +25,7 @@ export default {
     },
 
     hasMonitors() {
-      return this.monitors.length > 0;
+      return this.monitors?.length > 0;
     },
 
     componentIdentifier() {
@@ -37,11 +37,11 @@ export default {
 
       let identifier = `urn:kubernetes:/${ cluster }`;
 
-      if (this.resource.metadata.namespace) {
+      if (this.resource?.metadata?.namespace) {
         identifier += `:${ this.resource.metadata.namespace }`;
       }
 
-      identifier += `:${ mapKind(this.resource.type.toLowerCase()) }/${ this.resource.metadata.name }`;
+      identifier += `:${ mapKind(this.resource?.type?.toLowerCase()) }/${ this.resource?.metadata?.name }`;
 
       return identifier;
     },
@@ -69,12 +69,12 @@ export default {
 <template>
   <div v-if="!observed">
     <div class="card">
-      <span>Rancher Prime Observability is not enabled for this cluster.</span>
+      <span>{{ t('components.monitorTab.notEnabled') }}</span>
     </div>
   </div>
   <div v-else-if="!hasMonitors">
     <div class="card">
-      <span>No monitors found for this component.</span>
+      <span>{{ t('components.monitorTab.noMonitors') }}</span>
     </div>
   </div>
   <div v-else class="sortable-table-list-container">
@@ -83,17 +83,17 @@ export default {
         <tr>
           <th align="left" class="sortable" width="110px">
             <div class="table-header-container">
-              <span>State</span>
+              <span>{{ t('components.monitorTab.state') }}</span>
             </div>
           </th>
           <th align="left">
             <div class="table-header-container">
-              <span>Monitor</span>
+              <span>{{ t('components.monitorTab.monitor') }}</span>
             </div>
           </th>
           <th align="left">
             <div class="table-header-container">
-              <span>Last update</span>
+              <span>{{ t('components.monitorTab.lastUpdate') }}</span>
             </div>
           </th>
         </tr>

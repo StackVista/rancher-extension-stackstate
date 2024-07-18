@@ -1,23 +1,24 @@
 <script>
-import { mapGetters } from 'vuex';
-import { loadComponent, loadStackStateSettings } from '../modules/stackstate';
-import { buildUrn } from '../modules/urn';
-import { isStackStateObserved } from '../modules/observed';
-import HealthState from './Health/HealthState.vue';
+import { mapGetters } from "vuex";
+import { loadComponent, loadStackStateSettings } from "../modules/stackstate";
+import { buildUrn } from "../modules/urn";
+import { isStackStateObserved } from "../modules/observed";
+import { HEALTH_STATE_TYPES } from "../types/types";
+import HealthState from "./Health/HealthState.vue";
 
 export default {
-  name:       'ComponentHealth',
+  name: "ComponentHealth",
   components: { HealthState },
-  props:      { resource: Object },
+  props: { resource: Object },
   data() {
     return {
       observed: false,
-      health:              'NOT MONITORED',
-      urn:      '',
+      health: HEALTH_STATE_TYPES.NOT_MONITORED,
+      urn: "",
     };
   },
-  computed:   {
-    ...mapGetters(['currentCluster']),
+  computed: {
+    ...mapGetters(["currentCluster"]),
 
     clusterId() {
       return this.currentCluster?.id;
@@ -52,12 +53,16 @@ export default {
 </script>
 <template>
   <div class="card">
+    <p>{{ t("components.componentHealth.title") }}</p>
+    <HealthState class="health-state-block" :state="health" />
+  </div>
+  <!-- <div class="card">
     <div>
-      <span>Component health:</span>
+      <span>{{ t("components.componentHealth.title") }}</span>
       <span class="spacer">&nbsp;</span>
       <HealthState :state="health" />
     </div>
-  </div>
+  </div> -->
 </template>
 <style lang="scss" scoped>
 div.card {
@@ -65,6 +70,10 @@ div.card {
   font-size: 14px;
   align-items: center;
   display: flex;
+
+  .health-state-block {
+    margin-left: 4px;
+  }
 }
 
 span.spacer {

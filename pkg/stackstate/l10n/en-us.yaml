@@ -8,18 +8,45 @@ sts:
     label: "Cluster"
     namespace: "Namespace"
   clusters: "Clusters"
+components:
+  componentHealth: 
+    title: "Component health:"
+  monitorTab:
+    notEnabled: "Rancher Prime Observability is not enabled for this cluster."
+    noMonitors: "No monitors found for this component."
+    state: State
+    monitor: Monitor
+    lastUpdate: Last update
+  observedCard:
+
 observability:
   health: "Health"
   name: "Rancher Prime Observability"
+  configuration:
+    url: StackState URL
+    serviceToken: StackState Service Token
+    save: Save
+  errorMsg:
+    connectionFailed: Connection to StackState failed
+    failedSave: Failed to save configuration
+    failedCrd: Failed to install CRD
   dashboard:
     name: Dashboard
     description: Using Rancher Prime Observability, you can monitor the health of all clusters managed by Rancher and the workloads running on them.
+    editConfig: Edit Configuration
+    cancelEditConfig: Cancel
     error:
-      notconfigured: The connection details for have not been configured yet. Please enter them here to start using Rancher Prime Observability.
-      crdmissing: The Rancher Prime Observability CRD is not installed. Please press the button below to start using Rancher Prime Observability.
-    connected: "Rancher Prime Observability is connected to StackState at:"
+      notconfigured: "The connection details for have not been configured yet. Please enter the Stackstate URL and Service Token to start using Rancher Prime Observability:"
+      crdmissing: "The Rancher Prime Observability CRD is not installed. Please install it in order to proceed to configuration:"
+    connected: "Rancher Prime Observability is now connected to StackState at:"
     installcrd: Install CRD
-
+    saveSuccess: Configuration saved successfully!
   clusterCard:
+    clusterIs: Cluster is
+    notObserved: 'Cluster is not observed by Rancher Prime Observability. Please <a href="/c/{id}/apps/charts/chart?repo-type=cluster&repo=rancher-partner-charts&chart=stackstate-k8s-agent">install</a> the agent'
     connecting: "Connecting to Observability Plane..."
-    notConnected: Rancher Prime Observability has not been configured, please go to the
+    notConnected: 'Rancher Prime Observability has not been configured, please go to the <a href="/observability/c/_/observability.rancher.io.dashboard">Rancher Prime Observability Configuration</a>'
+    clusterHealth: "Cluster health:"
+    componentsHealth: "Components health:"
+    deviating: "Deviating:"
+    critical: "Critical:"
