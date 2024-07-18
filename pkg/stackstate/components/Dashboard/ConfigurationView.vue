@@ -1,10 +1,10 @@
 <script>
-import { LabeledInput } from "@components/Form/LabeledInput";
-import AsyncButton from "@shell/components/AsyncButton";
-import { Banner } from "@components/Banner";
-import { checkConnection } from "../../modules/stackstate";
-import { handleGrowl } from "../../utils/growl";
-import { OBSERVABILITY_CONFIGURATION_TYPE } from "../../types/types";
+import { LabeledInput } from '@components/Form/LabeledInput';
+import AsyncButton from '@shell/components/AsyncButton';
+import { Banner } from '@components/Banner';
+import { checkConnection } from '../../modules/stackstate';
+import { handleGrowl } from '../../utils/growl';
+import { OBSERVABILITY_CONFIGURATION_TYPE } from '../../types/types';
 
 export default {
   components: {
@@ -12,7 +12,7 @@ export default {
     AsyncButton,
     Banner,
   },
-  props: { mode: { type: String, default: "edit" } },
+  props: { mode: { type: String, default: 'edit' } },
   async fetch() {
     const cfg = await this.observabilityConfig();
 
@@ -22,25 +22,23 @@ export default {
     }
   },
   data: () => ({
-    stackStateURL: "",
-    stackStateServiceToken: "",
-    showSuccessfulSave: false,
-    showEditInterface: false,
+    stackStateURL:          '',
+    stackStateServiceToken: '',
+    showSuccessfulSave:     false,
+    showEditInterface:      false,
   }),
   computed: {
     isCreateMode() {
-      return this.mode === "create";
+      return this.mode === 'create';
     },
   },
   methods: {
     async observabilityConfig() {
-      const configs = await this.$store.dispatch("management/findAll", {
-        type: OBSERVABILITY_CONFIGURATION_TYPE,
-      });
+      const configs = await this.$store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
       if (configs) {
         for (const config of configs) {
-          if (config.metadata.name !== "stackstate") {
+          if (config.metadata.name !== 'stackstate') {
             continue;
           }
 
@@ -53,15 +51,15 @@ export default {
 
     async save(btnCb) {
       const conn = await checkConnection(this.$store, {
-        apiURL: this.stackStateURL,
+        apiURL:       this.stackStateURL,
         serviceToken: this.stackStateServiceToken,
       });
 
       if (!conn) {
         handleGrowl(this.$store, {
           error: {
-            message: this.t("observability.errorMsg.connectionFailed"),
-            type: "error",
+            message: this.t('observability.errorMsg.connectionFailed'),
+            type:    'error',
           },
         });
 
@@ -74,12 +72,12 @@ export default {
 
       if (this.isCreateMode) {
         const config = {
-          metadata: { name: `stackstate`, namespace: "default" },
-          spec: {},
-          type: OBSERVABILITY_CONFIGURATION_TYPE,
+          metadata: { name: `stackstate`, namespace: 'default' },
+          spec:     {},
+          type:     OBSERVABILITY_CONFIGURATION_TYPE,
         };
 
-        newConfig = await this.$store.dispatch("management/create", config);
+        newConfig = await this.$store.dispatch('management/create', config);
       } else {
         newConfig = await this.observabilityConfig();
       }
@@ -90,8 +88,8 @@ export default {
       try {
         await newConfig.save();
 
-        await this.$store.dispatch("observability/setConnectionInfo", {
-          apiURL: this.stackStateURL,
+        await this.$store.dispatch('observability/setConnectionInfo', {
+          apiURL:       this.stackStateURL,
           serviceToken: this.stackStateServiceToken,
         });
 
@@ -105,8 +103,8 @@ export default {
       } catch (err) {
         handleGrowl(this.$store, {
           error: {
-            message: this.t("observability.errorMsg.failedSave"),
-            type: "error",
+            message: this.t('observability.errorMsg.failedSave'),
+            type:    'error',
           },
         });
         btnCb(false);

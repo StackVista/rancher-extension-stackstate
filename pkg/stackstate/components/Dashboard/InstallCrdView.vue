@@ -1,29 +1,29 @@
 <script>
-import { mapGetters } from "vuex";
-import { Banner } from "@components/Banner";
-import { OBSERVABILITY_CRD } from "../../types/types";
-import { handleGrowl } from "../../utils/growl";
+import { mapGetters } from 'vuex';
+import { Banner } from '@components/Banner';
+import { OBSERVABILITY_CRD } from '../../types/types';
+import { handleGrowl } from '../../utils/growl';
 
 export default {
-  computed: { ...mapGetters(["currentCluster"]) },
+  computed:   { ...mapGetters(['currentCluster']) },
   components: { Banner },
-  methods: {
+  methods:    {
     async installCrd() {
       try {
-        const crd = await this.$store.dispatch("management/request", {
-          url: "/v1/apiextensions.k8s.io.customresourcedefinitions",
-          method: "POST",
-          data: OBSERVABILITY_CRD,
+        await this.$store.dispatch('management/request', {
+          url:    '/v1/apiextensions.k8s.io.customresourcedefinitions',
+          method: 'POST',
+          data:   OBSERVABILITY_CRD,
         });
 
-        await this.$store.dispatch("observability/setMissingCrd", false);
+        await this.$store.dispatch('observability/setMissingCrd', false);
       } catch (err) {
         handleGrowl(this.$store, {
           error: {
-            message: `${this.t("observability.errorMsg.failedCrd")} ${
-              err.message ? `: ${err.message}` : ""
+            message: `${ this.t('observability.errorMsg.failedCrd') } ${
+              err.message ? `: ${ err.message }` : ''
             }`,
-            type: "error",
+            type: 'error',
           },
         });
       }

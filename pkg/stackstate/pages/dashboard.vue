@@ -1,11 +1,11 @@
 <script>
-import Loading from "@shell/components/Loading";
-import ConfigurationView from "../components/Dashboard/ConfigurationView";
-import InstallCrdView from "../components/Dashboard/InstallCrdView";
-import { isCrdLoaded } from "../modules/stackstate";
+import Loading from '@shell/components/Loading';
+import ConfigurationView from '../components/Dashboard/ConfigurationView';
+import InstallCrdView from '../components/Dashboard/InstallCrdView';
+import { isCrdLoaded } from '../modules/stackstate';
 
 export default {
-  name: "ObservabilityDashboard",
+  name:       'ObservabilityDashboard',
   components: {
     Loading,
     ConfigurationView,
@@ -17,11 +17,11 @@ export default {
   },
   computed: {
     stackStateURL() {
-      return this.$store.getters["observability/apiURL"];
+      return this.$store.getters['observability/apiURL'];
     },
 
     isConfigured() {
-      return this.$store.getters["observability/hasCredentials"];
+      return this.$store.getters['observability/hasCredentials'];
     },
     isCrdMissing() {
       return !isCrdLoaded(this.$store);

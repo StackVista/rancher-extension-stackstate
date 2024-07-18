@@ -1,7 +1,6 @@
 import { ObservabilityState } from './index';
 
 export default {
-  componentTypes: (state: ObservabilityState) => state.componentTypes,
   apiURL:         (state: ObservabilityState) => state.apiURL,
   apiToken:       (state: ObservabilityState) => state.apiToken,
   serviceToken:   (state: ObservabilityState) => state.serviceToken,

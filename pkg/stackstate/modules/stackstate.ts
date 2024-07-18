@@ -1,5 +1,5 @@
-import { isEmpty } from "lodash";
-import { ComponentType, ConnectionInfo } from "types/component";
+import { isEmpty } from 'lodash';
+import { ConnectionInfo } from 'types/component';
 import {
   CONFIG_MAP,
   NAMESPACE,
@@ -8,24 +8,24 @@ import {
   SECRET,
   SERVICE,
   WORKLOAD_TYPES,
-} from "@shell/config/types";
-import { CLUSTER } from "@shell/store/prefs";
-import { OBSERVABILITY_CONFIGURATION_TYPE } from "../types/types";
+} from '@shell/config/types';
+import { CLUSTER } from '@shell/store/prefs';
+import { OBSERVABILITY_CONFIGURATION_TYPE } from '../types/types';
 
-export const STS_POD = "pod";
-export const STS_SERVICE = "service";
-export const STS_NODE = "node";
-export const STS_DAEMON_SET = "daemonset";
-export const STS_DEPLOYMENT = "deployment";
-export const STS_STATEFUL_SET = "statefulset";
-export const STS_CRON_JOB = "cronjob";
-export const STS_JOB = "job";
-export const STS_REPLICA_SET = "replicaset";
-export const STS_REPLICATION_CONTROLLER = "replication-controller";
-export const STS_CLUSTER = "cluster";
-export const STS_CONFIG_MAP = "configmap";
-export const STS_SECRET = "secret";
-export const STS_NAMESPACE = "namespace";
+export const STS_POD = 'pod';
+export const STS_SERVICE = 'service';
+export const STS_NODE = 'node';
+export const STS_DAEMON_SET = 'daemonset';
+export const STS_DEPLOYMENT = 'deployment';
+export const STS_STATEFUL_SET = 'statefulset';
+export const STS_CRON_JOB = 'cronjob';
+export const STS_JOB = 'job';
+export const STS_REPLICA_SET = 'replicaset';
+export const STS_REPLICATION_CONTROLLER = 'replication-controller';
+export const STS_CLUSTER = 'cluster';
+export const STS_CONFIG_MAP = 'configmap';
+export const STS_SECRET = 'secret';
+export const STS_NAMESPACE = 'namespace';
 
 // Map of kinds to their display names
 const KINDS = new Map<string, string>([
@@ -50,16 +50,14 @@ export function mapKind(kind: string): string {
 }
 
 export async function loadStackStateSettings(store: any) {
-  const settings = await store.dispatch("management/findAll", {
-    type: OBSERVABILITY_CONFIGURATION_TYPE,
-  });
+  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
   if (isEmpty(settings)) {
     return;
   }
 
   const stackstateSettings = settings.find(
-    (s: any) => s.metadata.name === "stackstate"
+    (s: any) => s.metadata.name === 'stackstate'
   );
 
   if (isEmpty(stackstateSettings)) {
@@ -70,7 +68,7 @@ export async function loadStackStateSettings(store: any) {
 }
 
 export function isCrdLoaded(store: any): boolean {
-  const loaded = store.getters["management/schemaFor"](
+  const loaded = store.getters['management/schemaFor'](
     OBSERVABILITY_CONFIGURATION_TYPE
   );
 
@@ -78,23 +76,21 @@ export function isCrdLoaded(store: any): boolean {
 }
 
 export async function loadConnectionInfo(store: any): Promise<void> {
-  const settings = await store.dispatch("management/findAll", {
-    type: OBSERVABILITY_CONFIGURATION_TYPE,
-  });
+  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
   if (isEmpty(settings)) {
     return;
   }
   const stackstateSettings = settings.find(
-    (s: any) => s.metadata.name === "stackstate"
+    (s: any) => s.metadata.name === 'stackstate'
   );
 
   if (isEmpty(stackstateSettings)) {
     return;
   }
-  store.dispatch("observability/setConnectionInfo", {
-    apiURL: stackstateSettings.spec.url,
-    apiToken: stackstateSettings.spec.apiToken,
+  store.dispatch('observability/setConnectionInfo', {
+    apiURL:       stackstateSettings.spec.url,
+    apiToken:     stackstateSettings.spec.apiToken,
     serviceToken: stackstateSettings.spec.serviceToken,
   });
 
@@ -108,12 +104,12 @@ export async function checkConnection(
   const creds = token(credentials.apiToken, credentials.serviceToken);
 
   try {
-    const resp = await store.dispatch("management/request", {
-      url: `meta/proxy/${credentials.apiURL}/api/server/info`,
-      method: "GET",
+    const resp = await store.dispatch('management/request', {
+      url:     `meta/proxy/${ credentials.apiURL }/api/server/info`,
+      method:  'GET',
       headers: {
-        "Content-Type": "application/json",
-        "X-API-Auth-Header": creds,
+        'Content-Type':      'application/json',
+        'X-API-Auth-Header': creds,
       },
       redirectUnauthorized: false,
     });
@@ -128,53 +124,14 @@ export async function checkConnection(
   }
 }
 
-export async function loadComponentTypes(
-  store: any
-): Promise<ComponentType[] | void> {
-  const stackStateURL = await store.getters["observability/apiURL"];
-  const apiToken = await store.getters["observability/apiToken"];
-  const serviceToken = await store.getters["observability/serviceToken"];
-
-  if (!stackStateURL || (!apiToken && !serviceToken)) {
-    return;
-  }
-
-  const creds = token(apiToken, serviceToken);
-
-  const allComponentTypes = await store.dispatch(`management/request`, {
-    url: `meta/proxy/${stackStateURL}/api/node/ComponentType`,
-    method: "GET",
-    headers: { "Content-Type": "application/json", "X-API-Auth-Header": creds },
-  });
-
-  if (isEmpty(allComponentTypes)) {
-    return;
-  }
-
-  for (const ct of allComponentTypes) {
-    store.dispatch("observability/addComponentType", {
-      id: ct.id,
-      name: ct.name,
-    });
-  }
-
-  return allComponentTypes;
-}
-
 export async function getSnapshot(
   store: any,
   stql: string,
   creds: any | undefined
 ): Promise<any | void> {
-  const stackStateURL = creds
-    ? creds.spec.url
-    : await store.getters["observability/apiURL"];
-  const apiToken = creds
-    ? creds.spec.apiToken
-    : await store.getters["observability/apiToken"];
-  const serviceToken = creds
-    ? creds.spec.serviceToken
-    : await store.getters["observability/serviceToken"];
+  const stackStateURL = creds ? creds.spec.url : await store.getters['observability/apiURL'];
+  const apiToken = creds ? creds.spec.apiToken : await store.getters['observability/apiToken'];
+  const serviceToken = creds ? creds.spec.serviceToken : await store.getters['observability/serviceToken'];
 
   if (!stackStateURL || (!apiToken && !serviceToken)) {
     return;
@@ -182,25 +139,25 @@ export async function getSnapshot(
 
   const httpToken = token(apiToken, serviceToken);
 
-  return store.dispatch("management/request", {
-    url: `meta/proxy/${stackStateURL}/api/snapshot`,
-    method: "POST",
+  return store.dispatch('management/request', {
+    url:     `meta/proxy/${ stackStateURL }/api/snapshot`,
+    method:  'POST',
     headers: {
-      "Content-Type": "application/json",
-      "X-API-Auth-Header": httpToken,
+      'Content-Type':      'application/json',
+      'X-API-Auth-Header': httpToken,
     },
     data: {
-      query: stql,
-      queryVersion: "1.0",
-      metadata: {
-        groupingEnabled: false,
+      query:        stql,
+      queryVersion: '1.0',
+      metadata:     {
+        groupingEnabled:       false,
         showIndirectRelations: false,
-        minGroupSize: 10,
-        groupedByLayer: false,
-        groupedByDomain: false,
-        groupedByRelation: false,
-        autoGrouping: false,
-        connectedComponents: false,
+        minGroupSize:          10,
+        groupedByLayer:        false,
+        groupedByDomain:       false,
+        groupedByRelation:     false,
+        autoGrouping:          false,
+        connectedComponents:   false,
         neighboringComponents: false,
       },
     },
@@ -214,15 +171,15 @@ export function loadComponent(
 ) {
   const creds = token(credentials.spec.apiToken, credentials.spec.serviceToken);
 
-  return store.dispatch("management/request", {
+  return store.dispatch('management/request', {
     url: `meta/proxy/${
       credentials.spec.url
-    }/api/components?identifier=${encodeURIComponent(identifier)}`,
-    method: "GET",
-    headers: { "Content-Type": "application/json", "X-API-Auth-Header": creds },
+    }/api/components?identifier=${ encodeURIComponent(identifier) }`,
+    method:  'GET',
+    headers: { 'Content-Type': 'application/json', 'X-API-Auth-Header': creds },
   });
 }
 
 function token(apiToken: string, serviceToken: string): string {
-  return apiToken ? `ApiToken ${apiToken}` : `ApiKey ${serviceToken}`;
+  return apiToken ? `ApiToken ${ apiToken }` : `ApiKey ${ serviceToken }`;
 }

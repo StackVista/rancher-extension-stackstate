@@ -5,7 +5,6 @@ import mutations from './mutations';
 import actions from './actions';
 
 export interface ObservabilityState {
-  componentTypes: Map<string, string>;
   apiURL?: string;
   apiToken?: string;
   serviceToken?: string;
@@ -16,7 +15,6 @@ const observabilityStoreFactory = (config: ObservabilityState): CoreStoreSpecifi
   return {
     state: (): ObservabilityState => {
       return {
-        componentTypes: config.componentTypes,
         apiURL:         config.apiURL,
         apiToken:       config.apiToken,
         serviceToken:   config.serviceToken,
@@ -33,7 +31,6 @@ const config: CoreStoreConfig = { namespace: OBSERVABILITY_PRODUCT_NAME };
 
 export default {
   specifics: observabilityStoreFactory({
-    componentTypes: new Map<string, string>(),
     apiURL:         '',
     apiToken:       '',
     serviceToken:   '',
