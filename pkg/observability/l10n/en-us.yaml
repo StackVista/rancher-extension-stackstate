@@ -9,7 +9,7 @@ sts:
     namespace: "Namespace"
   clusters: "Clusters"
 components:
-  componentHealth: 
+  componentHealth:
     title: "Component health:"
   monitorTab:
     notEnabled: "Rancher Prime Observability is not enabled for this cluster."
@@ -46,7 +46,7 @@ observability:
     clusterIs: Cluster is
     notObserved: 'Cluster is not observed by Rancher Prime Observability. Please <a href="/c/{id}/apps/charts/chart?repo-type=cluster&repo=rancher-partner-charts&chart=stackstate-k8s-agent">install</a> the agent'
     connecting: "Connecting to Observability Plane..."
-    notConnected: 'Rancher Prime Observability has not been configured, please go to the <a href="/observability/c/_/observability.rancher.io.dashboard">Rancher Prime Observability Configuration</a>'
+    notConnected: 'Rancher Prime Observability has not been configured, please go to the <a href="/dashboard/observability/c/_/observability.rancher.io.dashboard">Rancher Prime Observability Configuration</a>'
     clusterHealth: "Cluster health:"
     componentsHealth: "Components health:"
     deviating: "Deviating:"
