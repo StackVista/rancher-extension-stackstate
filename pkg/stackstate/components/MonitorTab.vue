@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex';
 import LiveDate from '@shell/components/formatter/LiveDate.vue';
 import SortableTable from '@shell/components/SortableTable';
 
-import { loadComponent, mapKind, loadStackStateSettings } from '../modules/stackstate';
+import { loadComponent, mapKind, loadStackStateSettings, isCrdLoaded } from '../modules/stackstate';
 import { isStackStateObserved } from '../modules/observed';
 import { MONITOR_HEADERS } from '../types/headers';
 
@@ -59,6 +59,10 @@ export default {
     },
   },
   async fetch() {
+    if (!isCrdLoaded(this.$store)) {
+      return;
+    }
+
     const obs = await isStackStateObserved(this.$store, this.clusterId);
 
     this.observed = obs?.length > 0;

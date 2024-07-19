@@ -1,7 +1,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import HealthState from '../components/Health/HealthState';
-import { loadStackStateSettings, loadComponent } from '../modules/stackstate';
+import { loadStackStateSettings, loadComponent, isCrdLoaded } from '../modules/stackstate';
 import { buildUrn } from '../modules/urn';
 import { HEALTH_STATE_TYPES } from '../types/types';
 
@@ -41,21 +41,21 @@ export default {
   },
   data() {
     return {
-      health:       '',
+      health:       HEALTH_STATE_TYPES.UNKNOWN,
       url:          '',
       componentUrn: '',
     };
   },
 
   async fetch() {
-    const creds = await loadStackStateSettings(this.$store);
+    if (!isCrdLoaded(this.$store)) {
+      return;
+    }
 
-    this.health = HEALTH_STATE_TYPES.UNKNOWN;
+    const creds = await loadStackStateSettings(this.$store);
 
     this.componentUrn = this.componentIdentifier;
     if (!this.componentUrn) {
-      this.health = HEALTH_STATE_TYPES.UNKNOWN;
-
       return;
     }
     const component = await loadComponent(
@@ -71,13 +71,17 @@ export default {
 </script>
 
 <template>
-  <a
-    v-if="componentUrn"
-    :href="`https://${url}/#/components/${encodeURIComponent(
-      componentIdentifier
-    )}`"
-    target="_blank"
-  >
+  <div v-if="componentUrn">
+    <a
+      :href="`https://${url}/#/components/${encodeURIComponent(
+        componentIdentifier
+      )}`"
+      target="_blank"
+    >
+      <HealthState :state="health" :color="color" />
+    </a>
+  </div>
+  <div v-else>
     <HealthState :state="health" :color="color" />
-  </a>
+  </div>
 </template>

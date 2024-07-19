@@ -1,6 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-import { loadComponent, loadStackStateSettings } from '../modules/stackstate';
+import { isCrdLoaded, loadComponent, loadStackStateSettings } from '../modules/stackstate';
 import { buildUrn } from '../modules/urn';
 import { isStackStateObserved } from '../modules/observed';
 import { HEALTH_STATE_TYPES } from '../types/types';
@@ -18,7 +18,7 @@ export default {
   data() {
     return {
       observed: false,
-      health:   HEALTH_STATE_TYPES.NOT_MONITORED,
+      health:   HEALTH_STATE_TYPES.UNKNOWN,
       urn:      '',
     };
   },
@@ -36,6 +36,9 @@ export default {
     },
   },
   async fetch() {
+    if (!isCrdLoaded(this.$store)) {
+      return;
+    }
     const obs = await isStackStateObserved(this.$store, this.clusterId);
 
     this.observed = obs.length > 0;
@@ -43,10 +46,11 @@ export default {
     if (!this.observed) {
       return;
     }
+
     const creds = await loadStackStateSettings(this.$store);
 
     this.urn = this.componentIdentifier;
-    if (!this.urn) {
+    if (!this.urn || !creds) {
       return;
     }
 
