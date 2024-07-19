@@ -8,4 +8,7 @@ export default {
     state.apiToken = val.apiToken;
     state.serviceToken = val.serviceToken;
   },
+  setMissingCrd(state: ObservabilityState, val: boolean) {
+    state.missingCrd = val;
+  }
 };

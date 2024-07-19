@@ -23,9 +23,15 @@ export default {
     isConfigured() {
       return this.$store.getters['observability/hasCredentials'];
     },
-    isCrdMissing() {
-      return !isCrdLoaded(this.$store);
+    missingCrd() {
+      return this.$store.getters['observability/isCrdMissing'];
     },
+  },
+  async fetch() {
+    const missingCrd = !isCrdLoaded(this.$store);
+
+    await this.$store.dispatch('observability/setMissingCrd', this.missingCrd);
+    this.loading = false;
   },
 };
 </script>
@@ -39,8 +45,8 @@ export default {
       <h1>{{ t("observability.name") }}</h1>
       <p>{{ t("observability.dashboard.description") }}</p>
     </div>
-    <Loading v-if="loading" />
-    <div v-else-if="isCrdMissing">
+    <Loading v-if="$fetchState.pending" />
+    <div v-else-if="missingCrd">
       <InstallCrdView class="mt-40" />
     </div>
     <div v-else-if="!isConfigured">
