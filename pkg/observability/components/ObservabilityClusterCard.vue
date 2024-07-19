@@ -10,7 +10,7 @@ import HealthState from './Health/HealthState.vue';
 import HealthDisc from './Health/HealthDisc.vue';
 
 export default {
-  name:       'StackStateObservedCard',
+  name:       'ObservabilityClusterCard',
   components: { HealthState, HealthDisc },
   props:      {
     resource: {

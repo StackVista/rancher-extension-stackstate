@@ -3,7 +3,6 @@ export const STACKSTATE_NAME = 'StackState';
 export const BLANK_CLUSTER = '_';
 
 export const OBSERVABILITY_DASHBOARD = 'observability.rancher.io.dashboard';
-export const DASHBOARD_PAGE = 'dashboard';
 
 export const OBSERVABILITY_CONFIGURATION_TYPE =
   'observability.rancher.io.configuration';

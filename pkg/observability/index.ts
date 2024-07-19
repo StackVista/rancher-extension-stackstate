@@ -81,7 +81,7 @@ export default function(plugin: IPlugin): void {
     {},
     {
       labelKey:  'sts.observed',
-      component: () => import('./components/StackStateObservedCard.vue'),
+      component: () => import('./components/ObservabilityClusterCard.vue'),
     }
   );
 
