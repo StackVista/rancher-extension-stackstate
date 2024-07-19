@@ -5,6 +5,9 @@ export const BLANK_CLUSTER = '_';
 export const OBSERVABILITY_DASHBOARD = 'observability.rancher.io.dashboard';
 export const DASHBOARD_PAGE = 'dashboard';
 
+export const OBSERVABILITY_CONFIGURATION_TYPE =
+  'observability.rancher.io.configuration';
+
 export const OBSERVABILITY_CRD = {
   apiVersion: 'apiextensions.k8s.io/v1',
   kind:       'CustomResourceDefinition',
@@ -25,20 +28,28 @@ export const OBSERVABILITY_CRD = {
                 properties: {
                   url:          { type: 'string' },
                   serviceToken: { type: 'string' },
-                  apiToken:     { type: 'string' }
-                }
-              }
-            }
-          }
-        }
-      }
+                  apiToken:     { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+      },
     ],
     scope: 'Namespaced',
     names: {
       plural:   'configurations',
       singular: 'configuration',
       kind:     'Configuration',
-      listKind: 'ConfigurationList'
-    }
-  }
+      listKind: 'ConfigurationList',
+    },
+  },
+};
+
+export const HEALTH_STATE_TYPES = {
+  UNKNOWN:       'UNKNOWN',
+  CLEAR:         'CLEAR',
+  DEVIATING:     'DEVIATING',
+  CRITICAL:      'CRITICAL',
+  NOT_MONITORED: 'NOT MONITORED',
 };

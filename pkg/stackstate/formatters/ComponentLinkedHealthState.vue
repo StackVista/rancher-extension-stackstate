@@ -1,8 +1,9 @@
 <script>
 import { mapGetters } from 'vuex';
 import HealthState from '../components/Health/HealthState';
-import { loadStackStateSettings, mapKind, loadComponent } from '../modules/stackstate';
+import { loadStackStateSettings, loadComponent, isCrdLoaded } from '../modules/stackstate';
 import { buildUrn } from '../modules/urn';
+import { HEALTH_STATE_TYPES } from '../types/types';
 
 export default {
   name:       'ComponentLinkedHealthState',
@@ -10,11 +11,11 @@ export default {
   props:      {
     value: {
       type:    String,
-      default: ''
+      default: '',
     },
     row: {
       type:     Object,
-      required: true
+      required: true,
     },
   },
 
@@ -36,35 +37,51 @@ export default {
       default:
         return '';
       }
-    }
+    },
   },
   data() {
     return {
-      health:       '',
+      health:       HEALTH_STATE_TYPES.UNKNOWN,
       url:          '',
-      componentUrn: ''
+      componentUrn: '',
     };
   },
 
   async fetch() {
-    const creds = await loadStackStateSettings(this.$store);
+    if (!isCrdLoaded(this.$store)) {
+      return;
+    }
 
-    this.health = 'UNKNOWN';
+    const creds = await loadStackStateSettings(this.$store);
 
     this.componentUrn = this.componentIdentifier;
     if (!this.componentUrn) {
-      this.health = 'UNKNOWN';
-
       return;
     }
-    const component = await loadComponent(this.$store, creds, this.componentUrn);
+    const component = await loadComponent(
+      this.$store,
+      creds,
+      this.componentUrn
+    );
 
     this.health = component.state.healthState;
     this.url = creds.spec.url;
-  }
+  },
 };
 </script>
 
 <template>
-  <a v-if="componentUrn" :href="`https://${url}/#/components/${encodeURIComponent(componentIdentifier)}`" target="_blank"><HealthState :state="health" :color="color" /></a>
+  <div v-if="componentUrn">
+    <a
+      :href="`https://${url}/#/components/${encodeURIComponent(
+        componentIdentifier
+      )}`"
+      target="_blank"
+    >
+      <HealthState :state="health" :color="color" />
+    </a>
+  </div>
+  <div v-else>
+    <HealthState :state="health" :color="color" />
+  </div>
 </template>

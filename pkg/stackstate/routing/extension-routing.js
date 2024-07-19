@@ -3,7 +3,7 @@ import ObservabilityDashboard from '../pages/dashboard.vue';
 
 const routes = [
   {
-    name:      `observability-c-cluster-dashboard`,
+    name:      `${ OBSERVABILITY_PRODUCT_NAME }-c-cluster-dashboard`,
     path:      `/${ OBSERVABILITY_PRODUCT_NAME }/c/:cluster/${ OBSERVABILITY_DASHBOARD }`,
     component: ObservabilityDashboard,
     meta:      {

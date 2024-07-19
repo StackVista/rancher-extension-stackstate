@@ -1,22 +1,28 @@
 <script>
 import { mapGetters } from 'vuex';
-import { loadComponent, loadStackStateSettings } from '../modules/stackstate';
+import { isCrdLoaded, loadComponent, loadStackStateSettings } from '../modules/stackstate';
 import { buildUrn } from '../modules/urn';
 import { isStackStateObserved } from '../modules/observed';
+import { HEALTH_STATE_TYPES } from '../types/types';
 import HealthState from './Health/HealthState.vue';
 
 export default {
   name:       'ComponentHealth',
   components: { HealthState },
-  props:      { resource: Object },
+  props:      {
+    resource: {
+      type:     Object,
+      required: true,
+    }
+  },
   data() {
     return {
       observed: false,
-      health:              'NOT MONITORED',
+      health:   HEALTH_STATE_TYPES.UNKNOWN,
       urn:      '',
     };
   },
-  computed:   {
+  computed: {
     ...mapGetters(['currentCluster']),
 
     clusterId() {
@@ -30,6 +36,9 @@ export default {
     },
   },
   async fetch() {
+    if (!isCrdLoaded(this.$store)) {
+      return;
+    }
     const obs = await isStackStateObserved(this.$store, this.clusterId);
 
     this.observed = obs.length > 0;
@@ -37,10 +46,11 @@ export default {
     if (!this.observed) {
       return;
     }
+
     const creds = await loadStackStateSettings(this.$store);
 
     this.urn = this.componentIdentifier;
-    if (!this.urn) {
+    if (!this.urn || !creds) {
       return;
     }
 
@@ -51,23 +61,20 @@ export default {
 };
 </script>
 <template>
-  <div class="card">
-    <div>
-      <span>Component health:</span>
-      <span class="spacer">&nbsp;</span>
-      <HealthState :state="health" />
-    </div>
+  <div class="health-block">
+    <p>{{ t("components.componentHealth.title") }}</p>
+    <HealthState class="health-state-block" :state="health" />
   </div>
 </template>
 <style lang="scss" scoped>
-div.card {
+.health-block {
   line-height: 19px;
   font-size: 14px;
   align-items: center;
   display: flex;
-}
 
-span.spacer {
-  margin-left: 4px;
+  .health-state-block {
+    margin-left: 12px;
+  }
 }
 </style>

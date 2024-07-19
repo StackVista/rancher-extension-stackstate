@@ -1,7 +1,9 @@
 <script>
+import { HEALTH_STATE_TYPES } from '../../types/types';
+
 export default {
   name:  'HealthDisc',
-  props: { state: { type: String, default: 'UNKNOWN' } },
+  props: { state: { type: String, default: HEALTH_STATE_TYPES.UNKNOWN } },
 };
 </script>
 <template>

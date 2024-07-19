@@ -1,13 +1,23 @@
 <script>
-import { getSnapshot, loadStackStateSettings, isCrdLoaded } from '../modules/stackstate';
+import {
+  getSnapshot,
+  loadStackStateSettings,
+  isCrdLoaded,
+} from '../modules/stackstate';
 import { isStackStateObserved } from '../modules/observed';
+import { HEALTH_STATE_TYPES } from '../types/types';
 import HealthState from './Health/HealthState.vue';
 import HealthDisc from './Health/HealthDisc.vue';
 
 export default {
   name:       'StackStateObservedCard',
   components: { HealthState, HealthDisc },
-  props:      { resource: Object },
+  props:      {
+    resource: {
+      type:     Object,
+      required: true,
+    }
+  },
   computed:   {
     countDeviating() {
       return this.deviating;
@@ -30,6 +40,7 @@ export default {
       critical:     0,
       healthy:      0,
       isConfigured: true,
+      HEALTH_STATE_TYPES,
     };
   },
   async fetch() {
@@ -54,7 +65,11 @@ export default {
       return;
     }
 
-    this.snapshot = await getSnapshot(this.$store, `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${ this.resource.spec.displayName }"`, creds);
+    this.snapshot = await getSnapshot(
+      this.$store,
+      `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${ this.resource.spec.displayName }"`,
+      creds
+    );
     for (const component of this.snapshot.viewSnapshotResponse.components) {
       if (component.state.healthState === 'DEVIATING') {
         this.deviating++;
@@ -69,109 +84,88 @@ export default {
 };
 </script>
 <template>
-  <div class="card">
-    <div>
-      <span><div class="logo" /></span>
-    </div>
-    <span class="spacer">&nbsp;</span>
-    <div class="col">
-      <div v-if="$fetchState.pending">
-        <div>
-          <span>
-            {{ t('observability.clusterCard.connecting') }}
-          </span>
-        </div>
-      </div>
-      <div v-else-if="!isConfigured">
-        <div>
-          <span>
-            {{ t('observability.clusterCard.notConnected') }} <a :href="`/observability/c/_/observability.rancher.io.dashboard`">{{ t('observability.name') }} Configuration</a>
-          </span>
-        </div>
-      </div>
+  <div class="stackstate-card">
+    <div class="logo" />
+    <div class="stackstate-card-content">
+      <p v-if="$fetchState.pending">
+        {{ t("observability.clusterCard.connecting") }}
+      </p>
+      <p
+        v-else-if="!isConfigured"
+        v-clean-html="t('observability.clusterCard.notConnected', {}, true)"
+      />
       <div v-else-if="isConfigured && !isObserved">
-        <div>
-          <span>Cluster is</span>
-          <span class="spacer">&nbsp;</span>
-          <HealthState state="unobserved" color="grey" />
-        </div>
-        <div><span class="spacer">&nbsp;</span></div>
-        <div><span>Cluster is not observed by {{ t('observability.name') }}. Please <a :href="`/c/${resource.id}/apps/charts/chart?repo-type=cluster&repo=rancher-partner-charts&chart=stackstate-k8s-agent`">install</a> the agent</span></div>
+        <p class="mb-20">
+          {{ t("observability.clusterCard.clusterIs") }}
+          <HealthState class="state-badge" state="unobserved" color="grey" />
+        </p>
+        <p
+          v-clean-html="
+            t(
+              'observability.clusterCard.notObserved',
+              { id: resource.id },
+              true
+            )
+          "
+        />
       </div>
       <div v-else>
-        <div>
-          <span>
-            Cluster health:
-          </span>
-          <span class="spacer">&nbsp;</span>
+        <p class="mb-20">
+          {{ t("observability.clusterCard.clusterHealth") }}
           <HealthState state="observed" color="green" />
-        </div>
-        <div><span class="spacer">&nbsp;</span></div>
+        </p>
         <div>
-          <span>Component healths:</span>
-          <div>
-            <HealthDisc state="DEVIATING" />
-            Deviating:
-            <span class="spacer">&nbsp;</span>
-            {{ countDeviating }}
-          </div>
-          <div>
-            <HealthDisc state="CRITICAL" />
-            Critical:
-            <span class="spacer">&nbsp;</span>
-            {{ countCritical }}
-          </div>
+          <p>{{ t("observability.clusterCard.componentsHealth") }}</p>
+          <p>
+            <HealthDisc :state="HEALTH_STATE_TYPES.DEVIATING" />
+            {{ t("observability.clusterCard.deviating") }}
+            <span class="item-count">{{ countDeviating }}</span>
+          </p>
+          <p>
+            <HealthDisc :state="HEALTH_STATE_TYPES.CRITICAL" />
+            {{ t("observability.clusterCard.critical") }}
+            <span class="item-count">{{ countCritical }}</span>
+          </p>
         </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 <style lang="scss" scoped>
-div.card {
+.stackstate-card {
   line-height: 19px;
   font-size: 14px;
   align-items: center;
   display: flex;
-}
+  margin-top: 30px;
 
-span.header {
-  font-size: 18px;
-}
-
-div.coldiv {
-  padding-top: 10px;
-}
-
-div.col {
-  display: flex;
-  flex-direction: column;
-}
-
-span.spacer {
-  margin-left: 4px;
-}
-
-  .alert {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
+  .logo {
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 100px;
+    height: 100px;
+    margin-right: 16px;
   }
 
-div.logo {
-  background-size: contain;
-  background-repeat: no-repeat;
-  width: 100px;
-  height: 100px;
+  .stackstate-card-content {
+    display: flex;
+    flex-direction: column;
+
+    .state-badge {
+      margin-left: 6px;
+    }
+
+    .item-count {
+      margin-left: 8px;
+    }
+  }
 }
 
 .theme-light div.logo {
-  background-image: url('../sts-color.svg');
+  background-image: url("../sts-color.svg");
 }
 
 .theme-dark div.logo {
-  background-image: url('../sts.svg');
+  background-image: url("../sts.svg");
 }
 </style>
