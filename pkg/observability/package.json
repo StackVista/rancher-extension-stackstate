@@ -1,14 +1,16 @@
 {
-  "name": "stackstate",
+  "name": "observability",
   "description": "Rancher Prime Observability Extension",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "license": "Apache-2.0",
+  "author": "SUSE",
   "private": false,
   "rancher": {
     "annotations": {
       "catalog.cattle.io/rancher-version": ">= v2.8.4"
     }
   },
+  "icon": "https://raw.githubusercontent.com/stackvista/rancer-extension-stackstate/main/pkg/observability/rancher-observability.svg",
   "scripts": {
     "dev": "./node_modules/.bin/nuxt dev",
     "nuxt": "./node_modules/.bin/nuxt"
