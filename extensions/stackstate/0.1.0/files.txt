@@ -1,9 +1,0 @@
-plugin/img/sts-color.ff0814a4.svg
-plugin/img/sts.687d4636.svg
-plugin/package.json
-plugin/stackstate-0.1.0.umd.min.1.js
-plugin/stackstate-0.1.0.umd.min.1.js.map
-plugin/stackstate-0.1.0.umd.min.2.js
-plugin/stackstate-0.1.0.umd.min.2.js.map
-plugin/stackstate-0.1.0.umd.min.js
-plugin/stackstate-0.1.0.umd.min.js.map

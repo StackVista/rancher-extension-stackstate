@@ -1,2 +1,0 @@
-(("undefined"!==typeof self?self:this)["webpackJsonpstackstate_0_3_0"]=("undefined"!==typeof self?self:this)["webpackJsonpstackstate_0_3_0"]||[]).push([[2],{"1bb6":function(e,s){const t=[{sts:{observed:"Rancher Prime Observability",settings:{label:"Settings"},dashboard:"Dashboard",cluster:{observed:"Observed",label:"Cluster",namespace:"Namespace"},clusters:"Clusters",certificate:{label:"Certificate",namespace:"Namespace",health:"Health"},certificates:"Certificates",health:"Health"}}];e.exports=t.length<=1?t[0]:t}}]);
-//# sourceMappingURL=stackstate-0.3.0.umd.min.2.js.map
