@@ -1,11 +1,17 @@
 <script>
 import {
+  REPO_TYPE,
+  REPO,
+  CHART,
+  FROM_CLUSTER,
+} from '@shell/config/query-params';
+import {
   getSnapshot,
   loadStackStateSettings,
   isCrdLoaded,
 } from '../modules/stackstate';
 import { isStackStateObserved } from '../modules/observed';
-import { HEALTH_STATE_TYPES } from '../types/types';
+import { HEALTH_STATE_TYPES, OBSERVABILITY_PRODUCT_NAME, BLANK_CLUSTER } from '../types/types';
 import HealthState from './Health/HealthState.vue';
 import HealthDisc from './Health/HealthDisc.vue';
 
@@ -31,16 +37,31 @@ export default {
     isObserved() {
       return this.observed.length > 0;
     },
+    chartRoute() {
+      return {
+        name:   'c-cluster-apps-charts-chart',
+        params: { [FROM_CLUSTER]: this.resource?.id },
+        query:  {
+          [REPO_TYPE]: 'cluster',
+          [REPO]:      'rancher-partner-charts',
+          [CHART]:     'stackstate-k8s-agent',
+        }
+      };
+    }
   },
   data() {
     return {
-      observed:     [],
-      snapshot:     undefined,
-      deviating:    0,
-      critical:     0,
-      healthy:      0,
-      isConfigured: true,
+      observed:                [],
+      snapshot:                undefined,
+      deviating:               0,
+      critical:                0,
+      healthy:                 0,
+      isConfigured:            true,
       HEALTH_STATE_TYPES,
+      extensionDashboardRoute: {
+        name:   `${ OBSERVABILITY_PRODUCT_NAME }-c-cluster-dashboard`,
+        params: { [FROM_CLUSTER]: BLANK_CLUSTER },
+      }
     };
   },
   async fetch() {
@@ -90,24 +111,27 @@ export default {
       <p v-if="$fetchState.pending">
         {{ t("observability.clusterCard.connecting") }}
       </p>
-      <p
+      <div
         v-else-if="!isConfigured"
-        v-clean-html="t('observability.clusterCard.notConnected', {}, true)"
-      />
+        class="flex-text"
+      >
+        <p>{{ t('observability.clusterCard.notConnectedPrepend') }}</p>
+        <router-link :to="extensionDashboardRoute">
+          {{ t('observability.clusterCard.notConnectedObservability') }}
+        </router-link>
+      </div>
       <div v-else-if="isConfigured && !isObserved">
         <p class="mb-20">
           {{ t("observability.clusterCard.clusterIs") }}
           <HealthState class="state-badge" state="unobserved" color="grey" />
         </p>
-        <p
-          v-clean-html="
-            t(
-              'observability.clusterCard.notObserved',
-              { id: resource.id },
-              true
-            )
-          "
-        />
+        <div class="flex-text">
+          <p>{{ t('observability.clusterCard.notObservedPrepend') }}</p>
+          <router-link :to="chartRoute">
+            {{ t('observability.clusterCard.notObservedInstall') }}
+          </router-link>
+          <p>{{ t('observability.clusterCard.notObservedPostpend') }}</p>
+        </div>
       </div>
       <div v-else>
         <p class="mb-20">
@@ -153,6 +177,14 @@ export default {
 
     .state-badge {
       margin-left: 6px;
+    }
+
+    .flex-text {
+      display: flex;
+
+      a {
+        margin: 0 3px;
+      }
     }
 
     .item-count {
