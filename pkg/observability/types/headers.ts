@@ -5,7 +5,6 @@ export const ObservabilityHealth: TableColumn = {
   getValue: (row: any) => {
     return 'UNKNOWN';
   },
-  sort:          ['stateSort'],
   formatter:     'ComponentLinkedHealthState',
   width:         100,
   formatterOpts: { arbitrary: true }

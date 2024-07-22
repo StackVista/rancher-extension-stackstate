@@ -77,6 +77,7 @@ export default {
         componentIdentifier
       )}`"
       target="_blank"
+      rel="nofollow noopener noreferrer"
     >
       <HealthState :state="health" :color="color" />
     </a>
