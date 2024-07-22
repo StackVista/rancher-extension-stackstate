@@ -169,6 +169,7 @@ export default {
     width: 100px;
     height: 100px;
     margin-right: 16px;
+    background-image: url("../rancher-observability.svg");
   }
 
   .stackstate-card-content {
@@ -193,11 +194,8 @@ export default {
   }
 }
 
-.theme-light div.logo {
-  background-image: url("../sts-color.svg");
-}
-
 .theme-dark div.logo {
-  background-image: url("../sts.svg");
+  background-image: url("../rancher-observability.svg");
+  filter: invert(1);
 }
 </style>
