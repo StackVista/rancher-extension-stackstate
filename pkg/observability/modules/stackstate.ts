@@ -170,6 +170,7 @@ export async function getSnapshot(
         autoGrouping:          false,
         connectedComponents:   false,
         neighboringComponents: false,
+        showFullComponent:     false,
       },
     },
   });
