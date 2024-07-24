@@ -2,7 +2,7 @@
 import { LabeledInput } from '@components/Form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import { Banner } from '@components/Banner';
-import { checkConnection } from '../../modules/stackstate';
+import { checkConnection, ensureObservabilityUrlWhitelisted } from '../../modules/stackstate';
 import { handleGrowl } from '../../utils/growl';
 import { OBSERVABILITY_CONFIGURATION_TYPE } from '../../types/types';
 
@@ -60,6 +60,21 @@ export default {
     },
 
     async save(btnCb) {
+      const whitelisted = await ensureObservabilityUrlWhitelisted(this.$store, this.stackStateURL);
+
+      if (!whitelisted) {
+        handleGrowl(this.$store, {
+          error: {
+            message: this.t('observability.errorMsg.urlNotWhitelisted'),
+            type:    'error',
+          },
+        });
+
+        btnCb(false);
+
+        return;
+      }
+
       const conn = await checkConnection(this.$store, {
         apiURL:       this.stackStateURL,
         serviceToken: this.stackStateServiceToken,

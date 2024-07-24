@@ -2,8 +2,10 @@ import { isEmpty } from 'lodash';
 import { ConnectionInfo } from 'types/component';
 import {
   CONFIG_MAP,
+  MANAGEMENT,
   NAMESPACE,
   NODE,
+  NORMAN,
   POD,
   SECRET,
   SERVICE,
@@ -67,6 +69,9 @@ export async function loadStackStateSettings(store: any) {
   return stackstateSettings;
 }
 
+/**
+ * Check if the CRD is loaded
+ */
 export function isCrdLoaded(store: any): boolean {
   const loaded = store.getters['management/schemaFor'](
     OBSERVABILITY_CONFIGURATION_TYPE
@@ -97,6 +102,12 @@ export async function loadConnectionInfo(store: any): Promise<void> {
   return stackstateSettings;
 }
 
+/**
+ * Check whether the connection credentials are valid.
+ * @param store The Vue Store
+ * @param credentials The Credentials to validate.
+ * @returns
+ */
 export async function checkConnection(
   store: any,
   credentials: ConnectionInfo
@@ -159,6 +170,7 @@ export async function getSnapshot(
         autoGrouping:          false,
         connectedComponents:   false,
         neighboringComponents: false,
+        showFullComponent:     false,
       },
     },
   });
@@ -182,4 +194,50 @@ export function loadComponent(
 
 function token(apiToken: string, serviceToken: string): string {
   return apiToken ? `ApiToken ${ apiToken }` : `ApiKey ${ serviceToken }`;
+}
+
+/**
+ * Ensure that there is a NodeDriver called 'stackstate' that has the URL whitelisted, so that the
+ * Metadata Proxy can call out to the StackState API.
+ *
+ * NOTE: Be aware that this goes through Norman APIs, not the Steve ones.
+ *
+ * @param store
+ * @param url
+ * @returns
+ */
+export async function ensureObservabilityUrlWhitelisted(store: any, url: string): Promise<boolean> {
+  async function newNodeDriver(store: any): Promise<any> {
+    const emptyDriver = {
+      name:   `stackstate`,
+      type: 'nodeDriver',
+    };
+
+    return await store.dispatch('rancher/create', emptyDriver);
+  }
+
+  const nodeDrivers = await store.dispatch('rancher/findAll', { type: 'nodeDriver' }, { root: true });
+
+  const stackStateDriver = nodeDrivers.find((driver: any) => driver.name === 'stackstate') || await newNodeDriver(store);
+
+  if (!stackStateDriver.whitelistDomains) {
+    stackStateDriver.whitelistDomains = [];
+  }
+
+  // Already in the whitelist
+  if (stackStateDriver.whitelistDomains.find((domain: string) => domain === url)) {
+    return true;
+  }
+
+  stackStateDriver.state = 'inactive';
+  stackStateDriver.url = 'local://';
+  stackStateDriver.whitelistDomains.push(url);
+
+  try {
+    await stackStateDriver.save();
+
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
