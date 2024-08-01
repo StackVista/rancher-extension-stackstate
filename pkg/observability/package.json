@@ -1,7 +1,7 @@
 {
   "name": "observability",
   "description": "Tech Preview - Rancher Prime Observability Extension",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "license": "Apache-2.0",
   "author": "SUSE",
   "private": false,
