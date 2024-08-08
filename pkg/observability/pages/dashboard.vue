@@ -2,7 +2,6 @@
 import Loading from '@shell/components/Loading';
 import ConfigurationView from '../components/Dashboard/ConfigurationView';
 import InstallCrdView from '../components/Dashboard/InstallCrdView';
-import { isCrdLoaded } from '../modules/stackstate';
 
 export default {
   name:       'ObservabilityDashboard',
@@ -28,8 +27,6 @@ export default {
     },
   },
   async fetch() {
-    const missingCrd = !isCrdLoaded(this.$store);
-
     await this.$store.dispatch('observability/setMissingCrd', this.missingCrd);
     this.loading = false;
   },

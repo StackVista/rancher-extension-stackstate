@@ -1,11 +1,9 @@
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { ConnectionInfo } from 'types/component';
 import {
   CONFIG_MAP,
-  MANAGEMENT,
   NAMESPACE,
   NODE,
-  NORMAN,
   POD,
   SECRET,
   SERVICE,
@@ -206,26 +204,37 @@ function token(apiToken: string, serviceToken: string): string {
  * @param url
  * @returns
  */
-export async function ensureObservabilityUrlWhitelisted(store: any, url: string): Promise<boolean> {
+export async function ensureObservabilityUrlWhitelisted(
+  store: any,
+  url: string
+): Promise<boolean> {
   async function newNodeDriver(store: any): Promise<any> {
     const emptyDriver = {
-      name:   `stackstate`,
+      name: `stackstate`,
       type: 'nodeDriver',
     };
 
     return await store.dispatch('rancher/create', emptyDriver);
   }
 
-  const nodeDrivers = await store.dispatch('rancher/findAll', { type: 'nodeDriver' }, { root: true });
+  const nodeDrivers = await store.dispatch(
+    'rancher/findAll',
+    { type: 'nodeDriver' },
+    { root: true }
+  );
 
-  const stackStateDriver = nodeDrivers.find((driver: any) => driver.name === 'stackstate') || await newNodeDriver(store);
+  const stackStateDriver =
+    nodeDrivers.find((driver: any) => driver.name === 'stackstate') ||
+    (await newNodeDriver(store));
 
   if (!stackStateDriver.whitelistDomains) {
     stackStateDriver.whitelistDomains = [];
   }
 
   // Already in the whitelist
-  if (stackStateDriver.whitelistDomains.find((domain: string) => domain === url)) {
+  if (
+    stackStateDriver.whitelistDomains.find((domain: string) => domain === url)
+  ) {
     return true;
   }
 

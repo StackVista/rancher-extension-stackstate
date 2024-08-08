@@ -19,12 +19,10 @@ export default {
         await this.$store.dispatch('observability/setMissingCrd', false);
       } catch (err) {
         handleGrowl(this.$store, {
-          error: {
-            message: `${ this.t('observability.errorMsg.failedCrd') } ${
-              err.message ? `: ${ err.message }` : ''
-            }`,
-            type: 'error',
-          },
+          message: `${ this.t('observability.errorMsg.failedCrd') } ${
+            err.message ? `: ${ err.message }` : ''
+          }`,
+          type: 'error',
         });
       }
     },

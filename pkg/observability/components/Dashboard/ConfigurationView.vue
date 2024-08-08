@@ -64,10 +64,8 @@ export default {
 
       if (!whitelisted) {
         handleGrowl(this.$store, {
-          error: {
-            message: this.t('observability.errorMsg.urlNotWhitelisted'),
-            type:    'error',
-          },
+          message: this.t('observability.errorMsg.urlNotWhitelisted'),
+          type:    'error',
         });
 
         btnCb(false);
@@ -82,10 +80,8 @@ export default {
 
       if (!conn) {
         handleGrowl(this.$store, {
-          error: {
-            message: this.t('observability.errorMsg.connectionFailed'),
-            type:    'error',
-          },
+          message: this.t('observability.errorMsg.connectionFailed'),
+          type:    'error',
         });
 
         btnCb(false);
@@ -127,10 +123,8 @@ export default {
         btnCb(true);
       } catch (err) {
         handleGrowl(this.$store, {
-          error: {
-            message: this.t('observability.errorMsg.failedSave'),
-            type:    'error',
-          },
+          message: this.t('observability.errorMsg.failedSave'),
+          type:    'error',
         });
         btnCb(false);
       }
