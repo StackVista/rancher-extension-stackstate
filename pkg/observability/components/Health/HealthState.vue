@@ -4,7 +4,7 @@ import { HEALTH_STATE_TYPES } from '../../types/types';
 export default {
   name:  'HealthState',
   props: {
-    state: { type: String, default: HEALTH_STATE_TYPES.UNKNOWN },
+    state: { type: String, default: null },
     color: { type: String, default: null },
   },
 
@@ -23,47 +23,44 @@ export default {
         case HEALTH_STATE_TYPES.UNKNOWN:
         case HEALTH_STATE_TYPES.NOT_MONITORED:
           return 'grey';
+        default:
+          return 'skeleton';
         }
       }
-
-      return this.state;
     },
   },
 };
 </script>
 <template>
-  <span>
-    <div :class="`healthstate-${badgeColor}`">
-      <span>{{ state }}</span>
-    </div>
+  <span :class="`healthstate healthstate-${badgeColor}`">
+    {{ state ?? "LOADING" }}
   </span>
 </template>
 
 <style lang="scss" scoped>
 .healthstate-green {
   color: rgb(43, 158, 64);
-  border-color: rgb(43, 158, 64);
 }
 
 .healthstate-orange {
   color: rgb(255, 138, 30);
-  border-color: rgb(255, 138, 30);
 }
 
 .healthstate-red {
-  border-color: rgb(235, 87, 87);
   color: rgb(235, 87, 87);
 }
 
 .healthstate-grey {
-  border-color: rgb(135, 142, 152);
   color: rgb(135, 142, 152);
 }
 
-.healthstate-orange,
-.healthstate-red,
-.healthstate-grey,
-.healthstate-green {
+.healthstate-skeleton {
+  cursor: wait;
+  color: rgb(217, 217, 217);
+  background-color: rgb(217, 217, 217);
+}
+
+.healthstate {
   display: inline-block;
   border-width: 1px;
   border-style: solid;

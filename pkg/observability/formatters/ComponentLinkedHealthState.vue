@@ -41,9 +41,10 @@ export default {
   },
   data() {
     return {
-      health:       HEALTH_STATE_TYPES.UNKNOWN,
-      url:          '',
-      componentUrn: '',
+      HEALTH_STATE_TYPES,
+      isLoading: true,
+      error:     null,
+      data:      null
     };
   },
 
@@ -52,37 +53,49 @@ export default {
       return;
     }
 
-    const creds = await loadStackStateSettings(this.$store);
+    const componentIdentifier = this.componentIdentifier;
 
-    this.componentUrn = this.componentIdentifier;
-    if (!this.componentUrn) {
+    if (!componentIdentifier) {
+      this.isLoading = false;
+
       return;
     }
-    const component = await loadComponent(
-      this.$store,
-      creds,
-      this.componentUrn
-    );
 
-    this.health = component.state.healthState;
-    this.url = creds.spec.url;
+    try {
+      const settings = await loadStackStateSettings(this.$store);
+
+      const component = await loadComponent(
+        this.$store,
+        settings,
+        componentIdentifier
+      );
+
+      this.data = {
+        health: component.state.healthState,
+        href:   `https://${ settings.spec.url }/#/components/${ encodeURIComponent(
+          componentIdentifier
+        ) }`
+      };
+    } catch (error) {
+      this.error = error;
+    } finally {
+      this.isLoading = false;
+    }
   },
 };
 </script>
 
 <template>
-  <div v-if="componentUrn">
-    <a
-      :href="`https://${url}/#/components/${encodeURIComponent(
-        componentIdentifier
-      )}`"
-      target="_blank"
-      rel="nofollow noopener noreferrer"
-    >
-      <HealthState :state="health" :color="color" />
-    </a>
-  </div>
-  <div v-else>
-    <HealthState :state="health" :color="color" />
-  </div>
+  <HealthState v-if="isLoading" :color="color" />
+
+  <a
+    v-else-if="data"
+    :href="data.href"
+    target="_blank"
+    rel="nofollow noopener noreferrer"
+  >
+    <HealthState :state="data.health" :color="color" />
+  </a>
+
+  <HealthState v-else :state="HEALTH_STATE_TYPES.UNKNOWN" :color="color" />
 </template>
