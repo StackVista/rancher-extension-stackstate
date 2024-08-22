@@ -20,6 +20,7 @@
     "@types/node": "^16"
   },
   "scripts": {
+    "lint": "eslint --ext .ts,.js,.vue",
     "dev": "NODE_ENV=dev vue-cli-service serve",
     "build": "vue-cli-service build",
     "clean": "./node_modules/@rancher/shell/scripts/clean",
