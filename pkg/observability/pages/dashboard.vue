@@ -36,7 +36,7 @@ export default {
 <template>
   <div class="dashboard">
     <div class="banner mt-40 mb-40">
-      <div v-html class="mb-20">
+      <div class="mb-20">
         <img src="../rancher-observability.svg" alt="StackState logo" />
       </div>
       <h1>{{ t("observability.name") }}</h1>
