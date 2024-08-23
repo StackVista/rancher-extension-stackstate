@@ -141,12 +141,12 @@ export default {
         <div>
           <p>{{ t("observability.clusterCard.componentsHealth") }}</p>
           <p>
-            <HealthDisc :state="HEALTH_STATE_TYPES.DEVIATING" />
+            <HealthDisc :health="HEALTH_STATE_TYPES.DEVIATING" />
             {{ t("observability.clusterCard.deviating") }}
             <span class="item-count">{{ countDeviating }}</span>
           </p>
           <p>
-            <HealthDisc :state="HEALTH_STATE_TYPES.CRITICAL" />
+            <HealthDisc :health="HEALTH_STATE_TYPES.CRITICAL" />
             {{ t("observability.clusterCard.critical") }}
             <span class="item-count">{{ countCritical }}</span>
           </p>
