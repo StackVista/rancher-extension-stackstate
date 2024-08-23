@@ -110,7 +110,7 @@ export default {
   >
     <template #col:state="{row}">
       <td>
-        <HealthState :state="row.health" />
+        <HealthState :health="row.health" />
       </td>
     </template>
 

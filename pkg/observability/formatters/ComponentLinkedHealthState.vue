@@ -94,8 +94,8 @@ export default {
     target="_blank"
     rel="nofollow noopener noreferrer"
   >
-    <HealthState :state="data.health" :color="color" />
+    <HealthState :health="data.health" :color="color" />
   </a>
 
-  <HealthState v-else :state="HEALTH_STATE_TYPES.UNKNOWN" :color="color" />
+  <HealthState v-else :health="HEALTH_STATE_TYPES.UNKNOWN" :color="color" />
 </template>

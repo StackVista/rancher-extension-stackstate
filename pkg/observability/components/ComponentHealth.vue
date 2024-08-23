@@ -63,7 +63,7 @@ export default {
 <template>
   <div class="health-block">
     <p>{{ t("components.componentHealth.title") }}</p>
-    <HealthState class="health-state-block" :state="health" />
+    <HealthState class="health-state-block" :health="health" />
   </div>
 </template>
 <style lang="scss" scoped>

@@ -4,28 +4,28 @@ import { HEALTH_STATE_TYPES } from '../../types/types';
 export default {
   name:  'HealthState',
   props: {
-    state: { type: String, default: null },
-    color: { type: String, default: null },
+    health: { type: String, default: null },
+    color:  { type: String, default: null },
   },
 
   computed: {
     badgeColor() {
       if (this.color) {
         return this.color;
-      } else {
-        switch (this.state) {
-        case HEALTH_STATE_TYPES.CLEAR:
-          return 'green';
-        case HEALTH_STATE_TYPES.DEVIATING:
-          return 'orange';
-        case HEALTH_STATE_TYPES.CRITICAL:
-          return 'red';
-        case HEALTH_STATE_TYPES.UNKNOWN:
-        case HEALTH_STATE_TYPES.NOT_MONITORED:
-          return 'grey';
-        default:
-          return 'skeleton';
-        }
+      }
+
+      switch (this.health) {
+      case HEALTH_STATE_TYPES.CLEAR:
+        return 'green';
+      case HEALTH_STATE_TYPES.DEVIATING:
+        return 'orange';
+      case HEALTH_STATE_TYPES.CRITICAL:
+        return 'red';
+      case HEALTH_STATE_TYPES.UNKNOWN:
+      case HEALTH_STATE_TYPES.NOT_MONITORED:
+        return 'grey';
+      default:
+        return 'skeleton';
       }
     },
   },
@@ -33,7 +33,7 @@ export default {
 </script>
 <template>
   <span :class="`healthstate healthstate-${badgeColor}`">
-    {{ state ?? "LOADING" }}
+    {{ health ?? "LOADING" }}
   </span>
 </template>
 
