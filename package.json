@@ -1,25 +1,28 @@
 {
   "name": "rancher-extension-stackstate",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "license": "Apache-2.0",
-  "private": false,
+  "private": true,
   "engines": {
     "node": ">=12"
   },
+  "workspaces": [
+    "pkg/*"
+  ],
   "dependencies": {
-    "@rancher/shell": "^0.5.3",
-    "core-js": "3.21.1",
-    "css-loader": "6.7.3",
+    "@rancher/components": "0.2.1-alpha.0",
+    "@rancher/shell": "^2.0.1",
     "@types/lodash": "4.14.184",
-    "@rancher/components": "0.2.1-alpha.0"
+    "core-js": "3.21.1"
   },
   "resolutions": {
     "**/webpack": "4",
     "@types/node": "^16"
   },
   "scripts": {
-    "dev": "NODE_ENV=dev ./node_modules/.bin/vue-cli-service serve",
-    "build": "./node_modules/.bin/vue-cli-service build",
+    "lint": "eslint --ext .ts,.js,.vue",
+    "dev": "NODE_ENV=dev vue-cli-service serve",
+    "build": "vue-cli-service build",
     "clean": "./node_modules/@rancher/shell/scripts/clean",
     "build-pkg": "./node_modules/@rancher/shell/scripts/build-pkg.sh",
     "serve-pkgs": "./node_modules/@rancher/shell/scripts/serve-pkgs",

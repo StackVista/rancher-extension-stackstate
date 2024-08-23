@@ -123,7 +123,7 @@ export default {
       <div v-else-if="isConfigured && !isObserved">
         <p class="mb-20">
           {{ t("observability.clusterCard.clusterIs") }}
-          <HealthState class="state-badge" state="unobserved" color="grey" />
+          <HealthState class="state-badge" health="unobserved" color="grey" />
         </p>
         <div class="flex-text">
           <p>{{ t('observability.clusterCard.notObservedPrepend') }}</p>
@@ -136,17 +136,17 @@ export default {
       <div v-else>
         <p class="mb-20">
           {{ t("observability.clusterCard.clusterHealth") }}
-          <HealthState state="observed" color="green" />
+          <HealthState health="observed" color="green" />
         </p>
         <div>
           <p>{{ t("observability.clusterCard.componentsHealth") }}</p>
           <p>
-            <HealthDisc :state="HEALTH_STATE_TYPES.DEVIATING" />
+            <HealthDisc :health="HEALTH_STATE_TYPES.DEVIATING" />
             {{ t("observability.clusterCard.deviating") }}
             <span class="item-count">{{ countDeviating }}</span>
           </p>
           <p>
-            <HealthDisc :state="HEALTH_STATE_TYPES.CRITICAL" />
+            <HealthDisc :health="HEALTH_STATE_TYPES.CRITICAL" />
             {{ t("observability.clusterCard.critical") }}
             <span class="item-count">{{ countCritical }}</span>
           </p>
