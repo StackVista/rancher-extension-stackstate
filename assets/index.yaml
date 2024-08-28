@@ -1,0 +1,25 @@
+apiVersion: v1
+entries:
+  observability:
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/kube-version: '>= 1.16.0-0'
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= 2.9.0 < 2.10.0'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
+      catalog.cattle.io/ui-extensions-version: '>= 2.0.1'
+    apiVersion: v2
+    appVersion: 0.5.0
+    created: "2024-08-28T19:58:41.571944+02:00"
+    description: Tech Preview - Rancher Prime Observability Extension
+    digest: 55a2bb824ffe2a31c8dfd1862b5d3a18d0d0135361b9d2c63502348f35e62303
+    icon: https://raw.githubusercontent.com/stackvista/rancher-extension-stackstate/main/pkg/observability/rancher-observability.svg
+    name: observability
+    type: application
+    urls:
+    - assets/observability/observability-0.5.0.tgz
+    version: 0.5.0
+generated: "2024-08-28T19:58:41.57145+02:00"
