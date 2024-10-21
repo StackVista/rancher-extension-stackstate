@@ -173,7 +173,7 @@ export default {
           class="configuration-inputs"
         >
           <LabeledInput
-            v-model="stackStateURL"
+            v-model:value="stackStateURL"
             :label="t('observability.configuration.url')"
             class="url-input"
             :class="{'error': urlError }"
@@ -188,7 +188,7 @@ export default {
             </p>
           </div>
           <LabeledInput
-            v-model="stackStateServiceToken"
+            v-model:value="stackStateServiceToken"
             class="mb-20"
             type="password"
             :label="t('observability.configuration.serviceToken')"
