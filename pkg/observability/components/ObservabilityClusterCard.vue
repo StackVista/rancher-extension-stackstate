@@ -47,8 +47,8 @@ export default {
         params: { [FROM_CLUSTER]: this.resource?.id },
         query: {
           [REPO_TYPE]: "cluster",
-          [REPO]: "suse-observability-stackstate",
-          [CHART]: "suse-observability-values",
+          [REPO]: "rancher-partner-charts",
+          [CHART]: "stackstate-k8s-agent",
         },
       };
     },
