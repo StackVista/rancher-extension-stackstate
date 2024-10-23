@@ -4,27 +4,27 @@ import {
   REPO,
   CHART,
   FROM_CLUSTER,
-} from "@shell/config/query-params";
+} from '@shell/config/query-params';
 import {
   getSnapshot,
   loadStackStateSettings,
   isCrdLoaded,
-} from "../modules/stackstate";
-import { isStackStateObserved } from "../modules/observed";
+} from '../modules/stackstate';
+import { isStackStateObserved } from '../modules/observed';
 import {
   HEALTH_STATE_TYPES,
   OBSERVABILITY_PRODUCT_NAME,
   BLANK_CLUSTER,
-} from "../types/types";
-import HealthState from "./Health/HealthState.vue";
-import HealthDisc from "./Health/HealthDisc.vue";
+} from '../types/types';
+import HealthState from './Health/HealthState.vue';
+import HealthDisc from './Health/HealthDisc.vue';
 
 export default {
-  name: "ObservabilityClusterCard",
+  name:       'ObservabilityClusterCard',
   components: { HealthState, HealthDisc },
-  props: {
+  props:      {
     resource: {
-      type: Object,
+      type:     Object,
       required: true,
     },
   },
@@ -43,27 +43,27 @@ export default {
     },
     chartRoute() {
       return {
-        name: "c-cluster-apps-charts-chart",
+        name:   'c-cluster-apps-charts-chart',
         params: { [FROM_CLUSTER]: this.resource?.id },
-        query: {
-          [REPO_TYPE]: "cluster",
-          [REPO]: "rancher-partner-charts",
-          [CHART]: "stackstate-k8s-agent",
+        query:  {
+          [REPO_TYPE]: 'cluster',
+          [REPO]:      'rancher-partner-charts',
+          [CHART]:     'stackstate-k8s-agent',
         },
       };
     },
   },
   data() {
     return {
-      observed: [],
-      snapshot: undefined,
-      deviating: 0,
-      critical: 0,
-      healthy: 0,
-      isConfigured: true,
+      observed:                [],
+      snapshot:                undefined,
+      deviating:               0,
+      critical:                0,
+      healthy:                 0,
+      isConfigured:            true,
       HEALTH_STATE_TYPES,
       extensionDashboardRoute: {
-        name: `${OBSERVABILITY_PRODUCT_NAME}-c-cluster-dashboard`,
+        name:   `${ OBSERVABILITY_PRODUCT_NAME }-c-cluster-dashboard`,
         params: { [FROM_CLUSTER]: BLANK_CLUSTER },
       },
     };
@@ -92,15 +92,15 @@ export default {
 
     this.snapshot = await getSnapshot(
       this.$store,
-      `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${this.resource.spec.displayName}"`,
+      `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${ this.resource.spec.displayName }"`,
       creds
     );
     for (const component of this.snapshot.viewSnapshotResponse.components) {
-      if (component.state.healthState === "DEVIATING") {
+      if (component.state.healthState === 'DEVIATING') {
         this.deviating++;
-      } else if (component.state.healthState === "CRITICAL") {
+      } else if (component.state.healthState === 'CRITICAL') {
         this.critical++;
-      } else if (component.state.healthState === "HEALTHY") {
+      } else if (component.state.healthState === 'HEALTHY') {
         this.healthy++;
       }
     }
