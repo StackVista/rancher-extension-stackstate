@@ -14,7 +14,7 @@
     "@rancher/shell": "^3.0.0-rc.9"
   },
   "scripts": {
-    "lint": "eslint --ext .ts,.js,.vue",
+    "lint": "./node_modules/@rancher/shell/node_modules/.bin/eslint --ext .ts,.js,.vue",
     "dev": "NODE_ENV=dev vue-cli-service serve",
     "build": "vue-cli-service build",
     "clean": "./node_modules/@rancher/shell/scripts/clean",
