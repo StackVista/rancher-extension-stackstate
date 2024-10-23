@@ -13,9 +13,6 @@
     "@rancher/components": "0.2.1-alpha.0",
     "@rancher/shell": "^3.0.0-rc.9"
   },
-  "devDependencies": {
-    "@nuxtjs/eslint-config-typescript": "6.0.1"
-  },
   "scripts": {
     "lint": "eslint --ext .ts,.js,.vue",
     "dev": "NODE_ENV=dev vue-cli-service serve",
