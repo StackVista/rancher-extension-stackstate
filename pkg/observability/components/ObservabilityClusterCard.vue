@@ -11,7 +11,11 @@ import {
   isCrdLoaded,
 } from '../modules/stackstate';
 import { isStackStateObserved } from '../modules/observed';
-import { HEALTH_STATE_TYPES, OBSERVABILITY_PRODUCT_NAME, BLANK_CLUSTER } from '../types/types';
+import {
+  HEALTH_STATE_TYPES,
+  OBSERVABILITY_PRODUCT_NAME,
+  BLANK_CLUSTER,
+} from '../types/types';
 import HealthState from './Health/HealthState.vue';
 import HealthDisc from './Health/HealthDisc.vue';
 
@@ -22,9 +26,9 @@ export default {
     resource: {
       type:     Object,
       required: true,
-    }
+    },
   },
-  computed:   {
+  computed: {
     countDeviating() {
       return this.deviating;
     },
@@ -45,9 +49,9 @@ export default {
           [REPO_TYPE]: 'cluster',
           [REPO]:      'rancher-partner-charts',
           [CHART]:     'stackstate-k8s-agent',
-        }
+        },
       };
-    }
+    },
   },
   data() {
     return {
@@ -61,7 +65,7 @@ export default {
       extensionDashboardRoute: {
         name:   `${ OBSERVABILITY_PRODUCT_NAME }-c-cluster-dashboard`,
         params: { [FROM_CLUSTER]: BLANK_CLUSTER },
-      }
+      },
     };
   },
   async fetch() {
@@ -111,13 +115,10 @@ export default {
       <p v-if="$fetchState.pending">
         {{ t("observability.clusterCard.connecting") }}
       </p>
-      <div
-        v-else-if="!isConfigured"
-        class="flex-text"
-      >
-        <p>{{ t('observability.clusterCard.notConnectedPrepend') }}</p>
+      <div v-else-if="!isConfigured" class="flex-text">
+        <p>{{ t("observability.clusterCard.notConnectedPrepend") }}</p>
         <router-link :to="extensionDashboardRoute">
-          {{ t('observability.clusterCard.notConnectedObservability') }}
+          {{ t("observability.clusterCard.notConnectedObservability") }}
         </router-link>
       </div>
       <div v-else-if="isConfigured && !isObserved">
@@ -126,11 +127,11 @@ export default {
           <HealthState class="state-badge" health="unobserved" color="grey" />
         </p>
         <div class="flex-text">
-          <p>{{ t('observability.clusterCard.notObservedPrepend') }}</p>
+          <p>{{ t("observability.clusterCard.notObservedPrepend") }}</p>
           <router-link :to="chartRoute">
-            {{ t('observability.clusterCard.notObservedInstall') }}
+            {{ t("observability.clusterCard.notObservedInstall") }}
           </router-link>
-          <p>{{ t('observability.clusterCard.notObservedPostpend') }}</p>
+          <p>{{ t("observability.clusterCard.notObservedPostpend") }}</p>
         </div>
       </div>
       <div v-else>
