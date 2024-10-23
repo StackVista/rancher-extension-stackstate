@@ -11,9 +11,7 @@ module.exports = {
   "extends": [
     "standard",
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "@vue/typescript/recommended",
-    "plugin:vue/vue3-recommended",
+    "@nuxtjs/eslint-config-typescript",
     "plugin:cypress/recommended"
   ],
   "rules": {
