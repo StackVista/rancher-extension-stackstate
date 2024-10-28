@@ -7,10 +7,10 @@ import {
 } from '@shell/config/query-params';
 import {
   getSnapshot,
-  loadStackStateSettings,
+  loadSuseObservabilitySettings,
   isCrdLoaded,
-} from '../modules/stackstate';
-import { isStackStateObserved } from '../modules/observed';
+} from '../modules/suseObservability';
+import { isObserved } from '../modules/observed';
 import { HEALTH_STATE_TYPES, OBSERVABILITY_PRODUCT_NAME, BLANK_CLUSTER } from '../types/types';
 import HealthState from './Health/HealthState.vue';
 import HealthDisc from './Health/HealthDisc.vue';
@@ -72,7 +72,7 @@ export default {
       return;
     }
 
-    const creds = await loadStackStateSettings(this.$store);
+    const creds = await loadSuseObservabilitySettings(this.$store);
 
     if (!creds) {
       this.isConfigured = false;
@@ -80,7 +80,7 @@ export default {
       return;
     }
 
-    const obs = await isStackStateObserved(this.$store, this.resource.id);
+    const obs = await isObserved(this.$store, this.resource.id);
 
     if (!obs) {
       return;
@@ -105,9 +105,9 @@ export default {
 };
 </script>
 <template>
-  <div class="stackstate-card">
+  <div class="observability-card">
     <div class="logo" />
-    <div class="stackstate-card-content">
+    <div class="observability-card-content">
       <p v-if="$fetchState.pending">
         {{ t("observability.clusterCard.connecting") }}
       </p>
@@ -156,7 +156,7 @@ export default {
   </div>
 </template>
 <style lang="scss" scoped>
-.stackstate-card {
+.observability-card {
   line-height: 19px;
   font-size: 14px;
   align-items: center;
@@ -172,7 +172,7 @@ export default {
     background-image: url("../rancher-observability.svg");
   }
 
-  .stackstate-card-content {
+  .observability-card-content {
     display: flex;
     flex-direction: column;
 

@@ -10,7 +10,7 @@ import {
   WORKLOAD_TYPES,
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
-import { OBSERVABILITY_CONFIGURATION_TYPE } from '../types/types';
+import { OBSERVABILITY_CONFIGURATION_TYPE, OBSERVABILITY_CLUSTERREPO } from '../types/types';
 
 export const STS_POD = 'pod';
 export const STS_SERVICE = 'service';
@@ -49,22 +49,22 @@ export function mapKind(kind: string): string {
   return KINDS.get(kind) || kind;
 }
 
-export async function loadStackStateSettings(store: any) {
+export async function loadSuseObservabilitySettings(store: any) {
   const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
   if (!settings || isEmpty(settings)) {
     return;
   }
 
-  const stackstateSettings = settings.find(
-    (s: any) => s.metadata.name === 'stackstate'
+  const suseObservabilitySettings = settings.find(
+    (s: any) => s.metadata.name === 'stackstate' || s.metadata.name === 'suse-observability'
   );
 
-  if (!stackstateSettings || isEmpty(stackstateSettings)) {
+  if (!suseObservabilitySettings || isEmpty(suseObservabilitySettings)) {
     return;
   }
 
-  return stackstateSettings;
+  return suseObservabilitySettings;
 }
 
 /**
@@ -78,26 +78,57 @@ export function isCrdLoaded(store: any): boolean {
   return loaded;
 }
 
+export async function isSuseObservabilityRepoPresent(store: any): Promise<Boolean> {
+  console.log('Checking if Observability Repo is present');
+  const repos = await store.dispatch('management/findAll', { type: 'catalog.cattle.io.clusterrepo' });
+
+  console.log('Checking if Observability Repo is present', repos);
+  if (!repos || isEmpty(repos)) {
+    return false;
+  }
+
+  const suseObservabilityRepo = repos.find(
+    (s: any) => s.metadata.name === 'stackstate' || s.metadata.name === 'suse-observability'
+  );
+
+  console.log('Checking if Observability Repo is present', suseObservabilityRepo);
+
+  return suseObservabilityRepo && !isEmpty(suseObservabilityRepo);
+}
+
+export async function createObservabilityRepoIfNotPresent(store: any) {
+  console.log('Creating Observability Repo if needed');
+  if (!(await isSuseObservabilityRepoPresent(store))) {
+    console.log('Creating Observability Repo');
+    await store.dispatch('management/request', {
+      url:    '/v1/catalog.cattle.io.clusterrepos',
+      method: 'POST',
+      data:   OBSERVABILITY_CLUSTERREPO,
+    });
+    console.log('Created Observability Repo');
+  }
+}
+
 export async function loadConnectionInfo(store: any): Promise<void> {
   const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
   if (!settings || isEmpty(settings)) {
     return;
   }
-  const stackstateSettings = settings.find(
-    (s: any) => s.metadata.name === 'stackstate'
+  const suseObservabilitySettings = settings.find(
+    (s: any) => s.metadata.name === 'stackstate' || s.metadata.name === 'suse-observability'
   );
 
-  if (!stackstateSettings || isEmpty(stackstateSettings)) {
+  if (!suseObservabilitySettings || isEmpty(suseObservabilitySettings)) {
     return;
   }
   store.dispatch('observability/setConnectionInfo', {
-    apiURL:       stackstateSettings.spec.url,
-    apiToken:     stackstateSettings.spec.apiToken,
-    serviceToken: stackstateSettings.spec.serviceToken,
+    apiURL:       suseObservabilitySettings.spec.url,
+    apiToken:     suseObservabilitySettings.spec.apiToken,
+    serviceToken: suseObservabilitySettings.spec.serviceToken,
   });
 
-  return stackstateSettings;
+  return suseObservabilitySettings;
 }
 
 /**
@@ -138,18 +169,18 @@ export async function getSnapshot(
   stql: string,
   creds: any | undefined
 ): Promise<any | void> {
-  const stackStateURL = creds ? creds.spec.url : await store.getters['observability/apiURL'];
+  const suseObservabilityURL = creds ? creds.spec.url : await store.getters['observability/apiURL'];
   const apiToken = creds ? creds.spec.apiToken : await store.getters['observability/apiToken'];
   const serviceToken = creds ? creds.spec.serviceToken : await store.getters['observability/serviceToken'];
 
-  if (!stackStateURL || (!apiToken && !serviceToken)) {
+  if (!suseObservabilityURL || (!apiToken && !serviceToken)) {
     return;
   }
 
   const httpToken = token(apiToken, serviceToken);
 
   return store.dispatch('management/request', {
-    url:     `meta/proxy/${ stackStateURL }/api/snapshot`,
+    url:     `meta/proxy/${ suseObservabilityURL }/api/snapshot`,
     method:  'POST',
     headers: {
       'Content-Type':      'application/json',
@@ -195,8 +226,8 @@ function token(apiToken: string, serviceToken: string): string {
 }
 
 /**
- * Ensure that there is a NodeDriver called 'stackstate' that has the URL whitelisted, so that the
- * Metadata Proxy can call out to the StackState API.
+ * Ensure that there is a NodeDriver called 'suse-observability' (previously 'stackstate') that has the URL whitelisted, so that the
+ * Metadata Proxy can call out to the SUSE Observability API.
  *
  * NOTE: Be aware that this goes through Norman APIs, not the Steve ones.
  *
@@ -210,7 +241,7 @@ export async function ensureObservabilityUrlWhitelisted(
 ): Promise<boolean> {
   async function newNodeDriver(store: any): Promise<any> {
     const emptyDriver = {
-      name: `stackstate`,
+      name: `suse-observability`,
       type: 'nodeDriver',
     };
 
@@ -223,27 +254,28 @@ export async function ensureObservabilityUrlWhitelisted(
     { root: true }
   );
 
-  const stackStateDriver =
-    nodeDrivers.find((driver: any) => driver.name === 'stackstate') ||
+  // ensure backwards compatibility by checking for 'stackstate' as well
+  const suseObservabilityDriver =
+    nodeDrivers.find((driver: any) => driver.name === 'stackstate' || driver.name === 'suse-observability') ||
     (await newNodeDriver(store));
 
-  if (!stackStateDriver.whitelistDomains) {
-    stackStateDriver.whitelistDomains = [];
+  if (!suseObservabilityDriver.whitelistDomains) {
+    suseObservabilityDriver.whitelistDomains = [];
   }
 
   // Already in the whitelist
   if (
-    stackStateDriver.whitelistDomains.find((domain: string) => domain === url)
+    suseObservabilityDriver.whitelistDomains.find((domain: string) => domain === url)
   ) {
     return true;
   }
 
-  stackStateDriver.state = 'inactive';
-  stackStateDriver.url = 'local://';
-  stackStateDriver.whitelistDomains.push(url);
+  suseObservabilityDriver.state = 'inactive';
+  suseObservabilityDriver.url = 'local://';
+  suseObservabilityDriver.whitelistDomains.push(url);
 
   try {
-    await stackStateDriver.save();
+    await suseObservabilityDriver.save();
 
     return true;
   } catch (e) {

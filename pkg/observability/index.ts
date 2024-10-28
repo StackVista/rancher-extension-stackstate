@@ -22,13 +22,18 @@ import {
 
 import {
   isCrdLoaded,
+  isSuseObservabilityRepoPresent,
   loadConnectionInfo,
-} from './modules/stackstate';
+} from './modules/suseObservability';
 import extensionRouting from './routing/extension-routing';
 import observabilityStore from './store';
 import { ObservabilityHealth } from './types/headers';
 
 const onEnter: OnNavToPackage = async(store) => {
+  if (!await isSuseObservabilityRepoPresent(store)) {
+    await store.dispatch('observability/setRepoPresent', false);
+  }
+
   if (!isCrdLoaded(store)) {
     await store.dispatch('observability/setMissingCrd', true);
 
@@ -131,7 +136,7 @@ export default function(plugin: IPlugin): void {
       name:       'observability',
       labelKey:   'observability.name',
       showHeader: false,
-      tooltip:    'Rancher Prime Observability through StackState',
+      tooltip:    'SUSE Rancher Prime Observability',
       component:  () => import('./components/MonitorTab.vue'),
     }
   );

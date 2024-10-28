@@ -2,7 +2,7 @@
 import { LabeledInput } from '@components/Form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import { Banner } from '@components/Banner';
-import { checkConnection, ensureObservabilityUrlWhitelisted } from '../../modules/stackstate';
+import { checkConnection, ensureObservabilityUrlWhitelisted } from '../../modules/suseObservability';
 import { handleGrowl } from '../../utils/growl';
 import { OBSERVABILITY_CONFIGURATION_TYPE } from '../../types/types';
 
@@ -17,19 +17,19 @@ export default {
     const cfg = await this.observabilityConfig();
 
     if (cfg) {
-      this.stackStateURL = cfg.spec.url;
-      this.stackStateServiceToken = cfg.spec.serviceToken;
+      this.suseObservabilityURL = cfg.spec.url;
+      this.suseObservabilityServiceToken = cfg.spec.serviceToken;
     }
   },
   data: () => ({
-    stackStateURL:          '',
-    stackStateServiceToken: '',
-    showSuccessfulSave:     false,
-    showEditInterface:      false,
-    urlError:               false
+    suseObservabilityURL:          '',
+    suseObservabilityServiceToken: '',
+    showSuccessfulSave:            false,
+    showEditInterface:             false,
+    urlError:                      false
   }),
   watch: {
-    stackStateURL(neu) {
+    suseObservabilityURL(neu) {
       if (neu?.length && (neu.startsWith('http://') || neu.startsWith('https://'))) {
         this.urlError = true;
       } else {
@@ -48,7 +48,8 @@ export default {
 
       if (configs) {
         for (const config of configs) {
-          if (config.metadata.name !== 'stackstate') {
+          // Only return the config if it's the (old) stackstate or (new) suse-observability config
+          if (config.metadata.name !== 'stackstate' && config.metadata.name !== 'suse-observability') {
             continue;
           }
 
@@ -60,7 +61,7 @@ export default {
     },
 
     async save(btnCb) {
-      const whitelisted = await ensureObservabilityUrlWhitelisted(this.$store, this.stackStateURL);
+      const whitelisted = await ensureObservabilityUrlWhitelisted(this.$store, this.suseObservabilityURL);
 
       if (!whitelisted) {
         handleGrowl(this.$store, {
@@ -74,8 +75,8 @@ export default {
       }
 
       const conn = await checkConnection(this.$store, {
-        apiURL:       this.stackStateURL,
-        serviceToken: this.stackStateServiceToken,
+        apiURL:       this.suseObservabilityURL,
+        serviceToken: this.suseObservabilityServiceToken,
       });
 
       if (!conn) {
@@ -93,7 +94,7 @@ export default {
 
       if (this.isCreateMode) {
         const config = {
-          metadata: { name: `stackstate`, namespace: 'default' },
+          metadata: { name: `suse-observability`, namespace: 'default' },
           spec:     {},
           type:     OBSERVABILITY_CONFIGURATION_TYPE,
         };
@@ -103,15 +104,15 @@ export default {
         newConfig = await this.observabilityConfig();
       }
 
-      newConfig.spec.url = this.stackStateURL;
-      newConfig.spec.serviceToken = this.stackStateServiceToken;
+      newConfig.spec.url = this.suseObservabilityURL;
+      newConfig.spec.serviceToken = this.suseObservabilityServiceToken;
 
       try {
         await newConfig.save();
 
         await this.$store.dispatch('observability/setConnectionInfo', {
-          apiURL:       this.stackStateURL,
-          serviceToken: this.stackStateServiceToken,
+          apiURL:       this.suseObservabilityURL,
+          serviceToken: this.suseObservabilityServiceToken,
         });
 
         this.showEditInterface = false;
@@ -149,7 +150,7 @@ export default {
         >
           <div class="banner-info">
             <p>{{ t("observability.dashboard.connected") }}&nbsp;</p>
-            <a :href="`https://${stackStateURL}/`"> {{ stackStateURL }}</a>
+            <a :href="`https://${suseObservabilityURL}/`"> {{ suseObservabilityURL }}</a>
           </div>
         </Banner>
 
@@ -173,7 +174,7 @@ export default {
           class="configuration-inputs"
         >
           <LabeledInput
-            v-model="stackStateURL"
+            v-model="suseObservabilityURL"
             :label="t('observability.configuration.url')"
             class="url-input"
             :class="{'error': urlError }"
@@ -188,7 +189,7 @@ export default {
             </p>
           </div>
           <LabeledInput
-            v-model="stackStateServiceToken"
+            v-model="suseObservabilityServiceToken"
             class="mb-20"
             type="password"
             :label="t('observability.configuration.serviceToken')"

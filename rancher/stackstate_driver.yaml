@@ -1,8 +1,0 @@
-apiVersion: management.cattle.io/v3
-kind: NodeDriver
-metadata:
-  name: stackstate
-spec:
-  whitelistDomains:
-  - "*.stackstate.com"
-  - "*.stackstate.io"
