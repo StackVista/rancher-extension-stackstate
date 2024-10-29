@@ -1,7 +1,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Banner } from '@components/Banner';
-import { createObservabilityRepoIfNotPresent, isSuseObservabilityRepoPresent } from '../../modules/suseObservability';
+import { createObservabilityRepoIfNotPresent } from '../../modules/suseObservability';
 import { OBSERVABILITY_CRD } from '../../types/types';
 import { handleGrowl } from '../../utils/growl';
 

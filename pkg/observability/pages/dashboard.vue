@@ -1,6 +1,5 @@
 <script>
 import Loading from '@shell/components/Loading';
-import { isSuseObservabilityRepoPresent } from '../modules/suseObservability';
 import ConfigurationView from '../components/Dashboard/ConfigurationView';
 import InstallView from '../components/Dashboard/InstallView';
 

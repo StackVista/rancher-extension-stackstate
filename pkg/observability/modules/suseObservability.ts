@@ -11,6 +11,7 @@ import {
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
 import { OBSERVABILITY_CONFIGURATION_TYPE, OBSERVABILITY_CLUSTERREPO } from '../types/types';
+import { logger } from '../utils/logger';
 
 export const STS_POD = 'pod';
 export const STS_SERVICE = 'service';
@@ -79,10 +80,10 @@ export function isCrdLoaded(store: any): boolean {
 }
 
 export async function isSuseObservabilityRepoPresent(store: any): Promise<Boolean> {
-  console.log('Checking if Observability Repo is present');
+  logger.log('Checking if Observability Repo is present');
   const repos = await store.dispatch('management/findAll', { type: 'catalog.cattle.io.clusterrepo' });
 
-  console.log('Checking if Observability Repo is present', repos);
+  logger.log('Checking if Observability Repo is present', repos);
   if (!repos || isEmpty(repos)) {
     return false;
   }
@@ -91,21 +92,21 @@ export async function isSuseObservabilityRepoPresent(store: any): Promise<Boolea
     (s: any) => s.metadata.name === 'stackstate' || s.metadata.name === 'suse-observability'
   );
 
-  console.log('Checking if Observability Repo is present', suseObservabilityRepo);
+  logger.log('Checking if Observability Repo is present', suseObservabilityRepo);
 
   return suseObservabilityRepo && !isEmpty(suseObservabilityRepo);
 }
 
 export async function createObservabilityRepoIfNotPresent(store: any) {
-  console.log('Creating Observability Repo if needed');
+  logger.log('Creating Observability Repo if needed');
   if (!(await isSuseObservabilityRepoPresent(store))) {
-    console.log('Creating Observability Repo');
+    logger.log('Creating Observability Repo');
     await store.dispatch('management/request', {
       url:    '/v1/catalog.cattle.io.clusterrepos',
       method: 'POST',
       data:   OBSERVABILITY_CLUSTERREPO,
     });
-    console.log('Created Observability Repo');
+    logger.log('Created Observability Repo');
   }
 }
 

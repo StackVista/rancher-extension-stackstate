@@ -7,8 +7,6 @@ export const OBSERVABILITY_CONFIGURATION_TYPE =
   'observability.rancher.io.configuration';
 
 export const OBSERVABILITY_CLUSTERREPO = {
-  // apiVersion: 'catalog.cattle.io/v1',
-  // kind:       'ClusterRepo',
   type:     'catalog.cattle.io.clusterrepo',
   metadata:   { name: 'suse-observability' },
   spec:     {
