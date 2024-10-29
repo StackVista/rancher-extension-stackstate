@@ -2,7 +2,7 @@
 import { LabeledInput } from '@components/Form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import { Banner } from '@components/Banner';
-import { checkConnection, ensureObservabilityUrlWhitelisted } from '../../modules/suseObservability';
+import { loadSuseObservabilitySettings, checkConnection, ensureObservabilityUrlWhitelisted } from '../../modules/suseObservability';
 import { handleGrowl } from '../../utils/growl';
 import { OBSERVABILITY_CONFIGURATION_TYPE } from '../../types/types';
 
@@ -14,12 +14,7 @@ export default {
   },
   props: { mode: { type: String, default: 'edit' } },
   async fetch() {
-    const cfg = await this.observabilityConfig();
-
-    if (cfg) {
-      this.suseObservabilityURL = cfg.spec.url;
-      this.suseObservabilityServiceToken = cfg.spec.serviceToken;
-    }
+    await this.fetchFormValues();
   },
   data: () => ({
     suseObservabilityURL:          '',
@@ -35,7 +30,8 @@ export default {
       } else {
         this.urlError = false;
       }
-    }
+    },
+
   },
   computed: {
     isCreateMode() {
@@ -43,21 +39,20 @@ export default {
     },
   },
   methods: {
-    async observabilityConfig() {
-      const configs = await this.$store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+    async fetchFormValues() {
+      const settings = await loadSuseObservabilitySettings(this.$store);
 
-      if (configs) {
-        for (const config of configs) {
-          // Only return the config if it's the (old) stackstate or (new) suse-observability config
-          if (config.metadata.name !== 'stackstate' && config.metadata.name !== 'suse-observability') {
-            continue;
-          }
-
-          return config;
-        }
+      if (settings) {
+        this.suseObservabilityURL = settings.spec.url;
+        this.suseObservabilityServiceToken = settings.spec.serviceToken;
       }
+    },
 
-      return null;
+    async cancel() {
+      this.showEditInterface = false;
+
+      // reset the form values when the user cancels the edit
+      await this.fetchFormValues();
     },
 
     async save(btnCb) {
@@ -101,7 +96,7 @@ export default {
 
         newConfig = await this.$store.dispatch('management/create', config);
       } else {
-        newConfig = await this.observabilityConfig();
+        newConfig = await loadSuseObservabilitySettings(this.$store);
       }
 
       newConfig.spec.url = this.suseObservabilityURL;
@@ -149,8 +144,9 @@ export default {
           color="info"
         >
           <div class="banner-info">
-            <p>{{ t("observability.dashboard.connected") }}&nbsp;</p>
-            <a :href="`https://${suseObservabilityURL}/`"> {{ suseObservabilityURL }}</a>
+            <p>{{ t("observability.dashboard.connected") }}</p>
+            <!-- reserve a line when the url is an empty string so UI won't jump on change -->
+            <a :href="`https://${suseObservabilityURL}/`">{{ suseObservabilityURL || '&nbsp;' }}</a>
           </div>
         </Banner>
 
@@ -201,7 +197,7 @@ export default {
             <button
               v-if="showEditInterface"
               class="btn role-secondary"
-              @click="showEditInterface = !showEditInterface"
+              @click="cancel"
             >
               {{ t("observability.dashboard.cancelEditConfig") }}
             </button>
@@ -242,9 +238,8 @@ export default {
 
   .banner-info {
     padding: 15px 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    max-width: 480px;
   }
 
   .configuration-actions {

@@ -58,12 +58,19 @@ export interface ObservabilitySettings {
   metadata: Record<string, string>;
 }
 
+function isSuseObservabilityName(name: string): boolean {
+  // match either the legacy (stackstate) or new (suse-observability) name
+  return name === 'stackstate' || name === 'suse-observability';
+}
+
+function isSuseObservabilitySettings(settings: ObservabilitySettings): boolean {
+  return isSuseObservabilityName(settings.metadata.name);
+}
+
 export async function loadSuseObservabilitySettings(store: any): Promise<undefined | ObservabilitySettings> {
   const settings: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
-  return settings?.find(
-    ({ metadata }) => metadata.name === 'stackstate' || metadata.name === 'suse-observability'
-  );
+  return settings?.find(isSuseObservabilitySettings);
 }
 
 /**
@@ -84,9 +91,7 @@ export async function isSuseObservabilityRepoPresent(store: any): Promise<boolea
 
   logger.log('Checking if Observability Repo is present', repos);
 
-  const isPresent = repos?.some(
-    ({ metadata }) => metadata.name === 'stackstate' || metadata.name === 'suse-observability'
-  ) ?? false;
+  const isPresent = repos?.some(isSuseObservabilitySettings) ?? false;
 
   logger.log('Checking if Observability Repo is present', isPresent);
 
@@ -109,9 +114,7 @@ export async function createObservabilityRepoIfNotPresent(store: any) {
 export async function loadConnectionInfo(store: any): Promise<void> {
   const settings: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
-  const suseObservabilitySettings = settings?.find(
-    ({ metadata }) => metadata.name === 'stackstate' || metadata.name === 'suse-observability'
-  );
+  const suseObservabilitySettings = settings?.find(isSuseObservabilitySettings);
 
   if (suseObservabilitySettings) {
     await store.dispatch('observability/setConnectionInfo', {
@@ -243,9 +246,8 @@ export async function ensureObservabilityUrlWhitelisted(
     { root: true }
   );
 
-  // ensure backwards compatibility by checking for 'stackstate' as well
   const suseObservabilityDriver =
-    nodeDrivers.find((driver: any) => driver.name === 'stackstate' || driver.name === 'suse-observability') ||
+    nodeDrivers.find((driver: any) => isSuseObservabilityName(driver.name) ) ||
     (await newNodeDriver(store));
 
   if (!suseObservabilityDriver.whitelistDomains) {
