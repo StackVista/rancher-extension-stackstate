@@ -72,9 +72,9 @@ export default {
       return;
     }
 
-    const creds = await loadSuseObservabilitySettings(this.$store);
+    const settings = await loadSuseObservabilitySettings(this.$store);
 
-    if (!creds) {
+    if (!settings) {
       this.isConfigured = false;
 
       return;
@@ -89,7 +89,7 @@ export default {
     this.snapshot = await getSnapshot(
       this.$store,
       `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${ this.resource.spec.displayName }"`,
-      creds
+      settings
     );
     for (const component of this.snapshot.viewSnapshotResponse.components) {
       if (component.state.healthState === 'DEVIATING') {

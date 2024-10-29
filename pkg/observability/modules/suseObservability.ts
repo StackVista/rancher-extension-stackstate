@@ -1,4 +1,3 @@
-import isEmpty from 'lodash/isEmpty';
 import { ConnectionInfo } from 'types/component';
 import {
   CONFIG_MAP,
@@ -50,22 +49,21 @@ export function mapKind(kind: string): string {
   return KINDS.get(kind) || kind;
 }
 
-export async function loadSuseObservabilitySettings(store: any) {
-  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
-
-  if (!settings || isEmpty(settings)) {
-    return;
+export interface ObservabilitySettings {
+  spec: {
+    url: string;
+    apiToken: string;
+    serviceToken: string;
   }
+  metadata: Record<string, string>;
+}
 
-  const suseObservabilitySettings = settings.find(
-    (s: any) => s.metadata.name === 'stackstate' || s.metadata.name === 'suse-observability'
+export async function loadSuseObservabilitySettings(store: any): Promise<undefined | ObservabilitySettings> {
+  const settings: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+
+  return settings?.find(
+    ({ metadata }) => metadata.name === 'stackstate' || metadata.name === 'suse-observability'
   );
-
-  if (!suseObservabilitySettings || isEmpty(suseObservabilitySettings)) {
-    return;
-  }
-
-  return suseObservabilitySettings;
 }
 
 /**
@@ -79,22 +77,20 @@ export function isCrdLoaded(store: any): boolean {
   return loaded;
 }
 
-export async function isSuseObservabilityRepoPresent(store: any): Promise<Boolean> {
+export async function isSuseObservabilityRepoPresent(store: any): Promise<boolean> {
   logger.log('Checking if Observability Repo is present');
-  const repos = await store.dispatch('management/findAll', { type: 'catalog.cattle.io.clusterrepo' });
+
+  const repos: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: 'catalog.cattle.io.clusterrepo' });
 
   logger.log('Checking if Observability Repo is present', repos);
-  if (!repos || isEmpty(repos)) {
-    return false;
-  }
 
-  const suseObservabilityRepo = repos.find(
-    (s: any) => s.metadata.name === 'stackstate' || s.metadata.name === 'suse-observability'
-  );
+  const isPresent = repos?.some(
+    ({ metadata }) => metadata.name === 'stackstate' || metadata.name === 'suse-observability'
+  ) ?? false;
 
-  logger.log('Checking if Observability Repo is present', suseObservabilityRepo);
+  logger.log('Checking if Observability Repo is present', isPresent);
 
-  return suseObservabilityRepo && !isEmpty(suseObservabilityRepo);
+  return isPresent;
 }
 
 export async function createObservabilityRepoIfNotPresent(store: any) {
@@ -111,25 +107,19 @@ export async function createObservabilityRepoIfNotPresent(store: any) {
 }
 
 export async function loadConnectionInfo(store: any): Promise<void> {
-  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+  const settings: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
-  if (!settings || isEmpty(settings)) {
-    return;
-  }
-  const suseObservabilitySettings = settings.find(
-    (s: any) => s.metadata.name === 'stackstate' || s.metadata.name === 'suse-observability'
+  const suseObservabilitySettings = settings?.find(
+    ({ metadata }) => metadata.name === 'stackstate' || metadata.name === 'suse-observability'
   );
 
-  if (!suseObservabilitySettings || isEmpty(suseObservabilitySettings)) {
-    return;
+  if (suseObservabilitySettings) {
+    await store.dispatch('observability/setConnectionInfo', {
+      apiURL:       suseObservabilitySettings.spec.url,
+      apiToken:     suseObservabilitySettings.spec.apiToken,
+      serviceToken: suseObservabilitySettings.spec.serviceToken,
+    });
   }
-  store.dispatch('observability/setConnectionInfo', {
-    apiURL:       suseObservabilitySettings.spec.url,
-    apiToken:     suseObservabilitySettings.spec.apiToken,
-    serviceToken: suseObservabilitySettings.spec.serviceToken,
-  });
-
-  return suseObservabilitySettings;
 }
 
 /**
@@ -168,11 +158,11 @@ export async function checkConnection(
 export async function getSnapshot(
   store: any,
   stql: string,
-  creds: any | undefined
+  settings: undefined | ObservabilitySettings
 ): Promise<any | void> {
-  const suseObservabilityURL = creds ? creds.spec.url : await store.getters['observability/apiURL'];
-  const apiToken = creds ? creds.spec.apiToken : await store.getters['observability/apiToken'];
-  const serviceToken = creds ? creds.spec.serviceToken : await store.getters['observability/serviceToken'];
+  const suseObservabilityURL = settings ? settings.spec.url : await store.getters['observability/apiURL'];
+  const apiToken = settings ? settings.spec.apiToken : await store.getters['observability/apiToken'];
+  const serviceToken = settings ? settings.spec.serviceToken : await store.getters['observability/serviceToken'];
 
   if (!suseObservabilityURL || (!apiToken && !serviceToken)) {
     return;
@@ -208,15 +198,13 @@ export async function getSnapshot(
 
 export function loadComponent(
   store: any,
-  credentials: any,
+  { spec }: ObservabilitySettings,
   identifier: string
 ) {
-  const creds = token(credentials.spec.apiToken, credentials.spec.serviceToken);
+  const creds = token(spec.apiToken, spec.serviceToken);
 
   return store.dispatch('management/request', {
-    url: `meta/proxy/${
-      credentials.spec.url
-    }/api/components?identifier=${ encodeURIComponent(identifier) }`,
+    url:     `meta/proxy/${ spec.url }/api/components?identifier=${ encodeURIComponent(identifier) }`,
     method:  'GET',
     headers: { 'Content-Type': 'application/json', 'X-API-Auth-Header': creds },
   });

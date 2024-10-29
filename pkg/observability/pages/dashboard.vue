@@ -15,10 +15,6 @@ export default {
     return { loading: false };
   },
   computed: {
-    suseObservabilityURL() {
-      return this.$store.getters['observability/apiURL'];
-    },
-
     isConfigured() {
       return this.$store.getters['observability/hasCredentials'];
     },

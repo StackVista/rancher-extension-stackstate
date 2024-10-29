@@ -70,11 +70,11 @@ export default {
     if (!this.observed) {
       return;
     }
-    const creds = await loadSuseObservabilitySettings(this.$store);
+    const settings = await loadSuseObservabilitySettings(this.$store);
 
     this.urn = this.componentIdentifier;
 
-    const component = await loadComponent(this.$store, creds, this.urn);
+    const component = await loadComponent(this.$store, settings, this.urn);
 
     if (!component) {
       return;
@@ -82,7 +82,7 @@ export default {
 
     this.monitors = component.syncedCheckStates;
 
-    this.url = creds.spec.url;
+    this.url = settings.spec.url;
   },
 };
 </script>

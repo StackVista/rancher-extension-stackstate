@@ -47,14 +47,14 @@ export default {
       return;
     }
 
-    const creds = await loadSuseObservabilitySettings(this.$store);
+    const settings = await loadSuseObservabilitySettings(this.$store);
 
     this.urn = this.componentIdentifier;
-    if (!this.urn || !creds) {
+    if (!this.urn || !settings) {
       return;
     }
 
-    const component = await loadComponent(this.$store, creds, this.urn);
+    const component = await loadComponent(this.$store, settings, this.urn);
 
     this.health = component.state.healthState;
   },
