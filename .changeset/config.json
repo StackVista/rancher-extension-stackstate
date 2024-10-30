@@ -1,9 +1,5 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.3/schema.json",
-  "changelog": [
-    "@changesets/changelog-github",
-    { "repo": "StackVista/rancher-extension-stackstate" }
-  ],
   "baseBranch": "main",
   "access": "restricted",
   "commit": false,
