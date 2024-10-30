@@ -39,7 +39,7 @@ observability:
     cancelEditConfig: Cancel
     error:
       notconfigured: "The connection details for have not been configured yet. Please enter the Stackstate URL and Service Token to start using Rancher Prime Observability:"
-      crdmissing: "Rancher Prime Observability is not fully installed yet. Please install it in order to proceed to configuration:"
+      crdmissing: "Rancher Prime Observability Extension is not fully installed yet. Please install it in order to proceed to configuration:"
     connected: "Rancher Prime is now connected to SUSE Observability at:"
     installcrd: Install
     saveSuccess: Configuration saved successfully!
