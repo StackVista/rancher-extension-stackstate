@@ -4,20 +4,18 @@
   "license": "Apache-2.0",
   "private": true,
   "engines": {
-    "node": ">=12"
+    "node": ">=20"
   },
   "workspaces": [
     "pkg/*"
   ],
   "dependencies": {
     "@rancher/components": "0.2.1-alpha.0",
-    "@rancher/shell": "^2.0.1",
-    "@types/lodash": "4.14.184",
-    "core-js": "3.21.1"
+    "@rancher/shell": "^3.0.0-rc.9"
   },
-  "resolutions": {
-    "**/webpack": "4",
-    "@types/node": "^16"
+  "devDependencies": {
+    "@nuxtjs/eslint-config-typescript": "6.0.1",
+    "@types/lodash": "4.14.184"
   },
   "scripts": {
     "lint": "eslint --ext .ts,.js,.vue",
