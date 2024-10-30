@@ -1,19 +1,14 @@
 <script>
-import Loading from '@shell/components/Loading';
 import ConfigurationView from '../components/Dashboard/ConfigurationView';
 import InstallView from '../components/Dashboard/InstallView';
 
 export default {
   name:       'ObservabilityDashboard',
   components: {
-    Loading,
     ConfigurationView,
     InstallView,
   },
 
-  data() {
-    return { loading: false };
-  },
   computed: {
     isConfigured() {
       return this.$store.getters['observability/hasCredentials'];
@@ -24,11 +19,6 @@ export default {
     observabilityRepoPresent() {
       return this.$store.getters['observability/isRepoPresent'];
     },
-  },
-  async fetch() {
-    await this.$store.dispatch('observability/setMissingCrd', this.missingCrd);
-    await this.$store.dispatch('observability/setRepoPresent', this.observabilityRepoPresent);
-    this.loading = false;
   },
 };
 </script>
@@ -42,16 +32,8 @@ export default {
       <h1>{{ t("observability.name") }}</h1>
       <p>{{ t("observability.dashboard.description") }}</p>
     </div>
-    <Loading v-if="$fetchState.pending" />
-    <div v-else-if="(missingCrd || !observabilityRepoPresent) ">
-      <InstallView class="mt-40" />
-    </div>
-    <div v-else-if="!isConfigured">
-      <ConfigurationView mode="create" />
-    </div>
-    <div v-else>
-      <ConfigurationView mode="edit" />
-    </div>
+    <InstallView v-if="(missingCrd || !observabilityRepoPresent)" class="mt-40" />
+    <ConfigurationView v-else :mode="isConfigured ? 'edit' : 'create'" />
   </div>
 </template>
 
