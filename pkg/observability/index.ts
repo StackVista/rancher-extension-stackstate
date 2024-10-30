@@ -136,7 +136,6 @@ export default function(plugin: IPlugin): void {
       name:       'observability',
       labelKey:   'observability.name',
       showHeader: false,
-      tooltip:    'SUSE Rancher Prime Observability',
       component:  () => import('./components/MonitorTab.vue'),
     }
   );
