@@ -85,3 +85,4 @@ jobs:
           title: ${{ env.RELEASE_TITLE }}
           commit: ${{ env.RELEASE_TITLE}}
           publish: echo "Create Release"
+          branch: main
