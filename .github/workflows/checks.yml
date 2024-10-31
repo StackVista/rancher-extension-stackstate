@@ -70,7 +70,7 @@ jobs:
         # TODO uncomment the following line
         # if: github.repository_owner == 'StackVista' && github.event_name == 'push'
         run: |
-          export BASE_BRANCH = jq -r '.baseBranch' .changeset/config.json
+          export BASE_BRANCH =$(jq -r '.baseBranch' .changeset/config.json)
 
           if [ $BASE_BRANCH == ${{ github.ref_name }} ]; then
             yarn changeset status --output changeset-status.json
