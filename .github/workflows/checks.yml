@@ -70,6 +70,9 @@ jobs:
         if: github.repository_owner == 'StackVista' && github.event_name == 'push'
         run: |
           BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
+
+          echo "Base branch: $BASE_BRANCH"
+
           if [[ "$BASE_BRANCH" == "${{ github.ref_name }}" ]]; then
             yarn changeset status --output changeset-status.json
             RELEASE_TITLE=$(jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' changeset-status.json)
