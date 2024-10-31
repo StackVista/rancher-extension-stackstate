@@ -17,8 +17,6 @@ env:
   CI: true
   # TODO make empty
   RELEASE_TITLE: "TODO MAKE empty"
-  # TODO drop it
-  BASE_BRANCH: ""
 
 jobs:
   pipeline:
@@ -78,7 +76,6 @@ jobs:
             yarn changeset status --output changeset-status.json
             export RELEASE_TITLE=$(jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' changeset-status.json)
 
-            echo "BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
             echo "RELEASE_TITLE=$RELEASE_TITLE" >> $GITHUB_ENV
           fi
 
@@ -93,4 +90,4 @@ jobs:
           commit: ${{ env.RELEASE_TITLE }}
           publish: echo ${{ env.RELEASE_TITLE }}
           # TODO delete it
-          branch: ${{ env.BASE_BRANCH }}
+          branch: v0.2.x
