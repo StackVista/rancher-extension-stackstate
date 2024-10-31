@@ -61,7 +61,10 @@ jobs:
         run: yarn build-pkg observability
 
       - name: Generate changeset status
-        run: yarn changeset status --since=$(jq -r '.baseBranch' .changeset/config.json)
+        run: |
+          yarn changeset status \
+          --since $(jq -r '.baseBranch' .changeset/config.json) \
+          --output /tmp/changeset-status.json
 
       - name: Print release title
         run: jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' /tmp/changeset-status.json
