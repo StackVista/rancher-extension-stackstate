@@ -37,6 +37,7 @@ jobs:
           files_yaml: |
             eslint_config:
               - .eslintrc.js
+              - .eslintignore
               - yarn.lock
             eslint_target:
               - "**/*.{ts,js,vue}"
