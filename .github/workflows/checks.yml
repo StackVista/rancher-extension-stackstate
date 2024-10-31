@@ -78,8 +78,9 @@ jobs:
             echo "RELEASE_TITLE=$RELEASE_TITLE" >> $GITHUB_ENV
           fi
 
-      # creates a PR if there are changesets or publishes the changesets if the PR is merged
-      - name: Create Release Pull Request OR Publish
+      # creates a PR if there are changesets or creates a release if the PR is merged
+      # creating a release triggers the `build-extension-charts` workflow
+      - name: Create a Release Pull Request OR Publish a Release
         if: env.RELEASE_TITLE != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -87,4 +88,4 @@ jobs:
         with:
           title: ${{ env.RELEASE_TITLE }}
           commit: ${{ env.RELEASE_TITLE }}
-          publish: echo ${{ env.RELEASE_TITLE }}
+          publish: echo "${{ env.RELEASE_TITLE }}"
