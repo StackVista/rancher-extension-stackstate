@@ -59,7 +59,7 @@ jobs:
         run: yarn build-pkg observability
 
       - name: Generate changeset status
-        run: yarn changeset status --since=origin/v0.2.x
+        run: yarn changeset status
         # run: yarn changeset status --since=$(jq -r '.baseBranch' .changeset/config.json)
 
       - name: Print release title
