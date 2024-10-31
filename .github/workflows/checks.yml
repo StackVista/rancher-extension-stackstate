@@ -68,7 +68,9 @@ jobs:
       - name: Assign release title
         if: github.repository_owner == 'StackVista'
         run: |
-          yarn changeset status --output changeset-status.json
+          yarn changeset status \
+            --since origin/$(jq -r '.baseBranch' .changeset/config.json) \
+            --output changeset-status.json
           export TITLE=$(jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' changeset-status.json)
           echo "RELEASE_TITLE=$TITLE" >> $GITHUB_ENV
 
