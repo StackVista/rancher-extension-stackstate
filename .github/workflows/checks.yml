@@ -15,7 +15,8 @@ on:
 
 env:
   CI: true
-  RELEASE_TITLE: ""
+  # TODO make empty
+  RELEASE_TITLE: "Test"
 
 jobs:
   pipeline:
@@ -72,7 +73,7 @@ jobs:
 
           echo "Base branch: $BASE_BRANCH"
 
-          if [[ "$BASE_BRANCH" == "${{ github.ref_name }}" ]]; then
+          if [[ "$BASE_BRANCH" == "origin/${{ github.ref_name }}" ]]; then
             yarn changeset status --output changeset-status.json
             RELEASE_TITLE=$(jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' changeset-status.json)
             echo "RELEASE_TITLE=$RELEASE_TITLE" >> $GITHUB_ENV
@@ -88,3 +89,5 @@ jobs:
           title: ${{ env.RELEASE_TITLE }}
           commit: ${{ env.RELEASE_TITLE }}
           publish: echo ${{ env.RELEASE_TITLE }}
+          # TODO delete
+          branch: v0.2.x
