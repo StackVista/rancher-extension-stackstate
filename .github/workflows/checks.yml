@@ -64,10 +64,10 @@ jobs:
         run: |
           yarn changeset status \
           --since $(jq -r '.baseBranch' .changeset/config.json) \
-          --output /tmp/changeset-status.json
+          --output changeset-status.json
 
       - name: Print release title
-        run: jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' /tmp/changeset-status.json
+        run: jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' changeset-status.json
 
       # creates a PR if there are changesets or publishes the changesets if the PR is merged
       - name: Create Release Pull Request OR Publish
