@@ -62,14 +62,12 @@ jobs:
       - name: Create Release Pull Request OR Publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHANGESET_BASE_BRANCH: jq -r '.baseBranch' .changeset/config.json
-          RELEASE_TITLE: |
-            yarn changeset status --since=${{ env.CHANGESET_BASE_BRANCH }} --output=/tmp/changeset-status.json
-            jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' /tmp/changeset-status.json
+          # CHANGESET_BASE_BRANCH: jq -r '.baseBranch' .changeset/config.json
+          # RELEASE_TITLE: |
+          #   yarn changeset status --since=${{ env.CHANGESET_BASE_BRANCH }} --output=/tmp/changeset-status.json
+          #   jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' /tmp/changeset-status.json
         # prevents this step from running on forks AND only on pushes and .changeset.baseBranch is the target branch
-        if: github.repository_owner == 'StackVista'  && env.CHANGESET_BASE_BRANCH == "origin/${{ github.ref_name }}"
+        if: github.repository_owner == 'StackVista'
         uses: changesets/action@v1
         with:
-          title: ${{ env.RELEASE_TITLE }}
-          commit: ${{ env.RELEASE_TITLE}}
           publish: echo "Create Release"
