@@ -15,8 +15,7 @@ on:
 
 env:
   CI: true
-  # TODO make empty
-  RELEASE_TITLE: "Test"
+  RELEASE_TITLE: ""
 
 jobs:
   pipeline:
@@ -89,5 +88,3 @@ jobs:
           title: ${{ env.RELEASE_TITLE }}
           commit: ${{ env.RELEASE_TITLE }}
           publish: echo ${{ env.RELEASE_TITLE }}
-          # TODO delete
-          branch: v0.2.x
