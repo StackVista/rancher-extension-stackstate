@@ -22,20 +22,8 @@ jobs:
     name: Checks
     runs-on: ubuntu-latest
     permissions:
-      actions: write
-      attestations: write
-      checks: write
-      contents: write
-      deployments: write
-      id-token: write
-      issues: write
-      discussions: write
-      packages: write
-      pages: write
+      contents: read
       pull-requests: write
-      repository-projects: write
-      security-events: write
-      statuses: write
 
     steps:
       - name: Checkout repository
