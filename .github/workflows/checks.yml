@@ -40,6 +40,10 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile --prefer-offline
 
+      - name: Check if there are any uncommitted changes
+        run: |
+          git diff --name-only --exit-code --relative || (echo "\nUncommitted changes found up there 👆" && exit 1)
+
       - name: Detect file changes
         id: changed-files
         uses: tj-actions/changed-files@v41
