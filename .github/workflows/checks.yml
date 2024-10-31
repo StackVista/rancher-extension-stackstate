@@ -15,8 +15,7 @@ on:
 
 env:
   CI: true
-  # TODO make empty
-  RELEASE_TITLE: "TODO MAKE empty"
+  RELEASE_TITLE: ""
 
 jobs:
   pipeline:
@@ -68,15 +67,16 @@ jobs:
 
       - name: Assign release title
         # prevents this step from running on forks AND only on pushes and .changeset.baseBranch is the target branch
-        if: github.repository_owner == 'StackVista' && github.event_name == 'push'
+        # TODO uncomment the following line
+        # if: github.repository_owner == 'StackVista' && github.event_name == 'push'
         run: |
           export BASE_BRANCH = jq -r '.baseBranch' .changeset/config.json
 
           if [ $BASE_BRANCH == ${{ github.ref_name }} ]; then
             yarn changeset status --output changeset-status.json
-            export RELEASE_TITLE=$(jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' changeset-status.json)
+            export TITLE=$(jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' changeset-status.json)
 
-            echo "RELEASE_TITLE=$RELEASE_TITLE" >> $GITHUB_ENV
+            echo "RELEASE_TITLE=$TITLE" >> $GITHUB_ENV
           fi
 
       # creates a PR if there are changesets or publishes the changesets if the PR is merged
