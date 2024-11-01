@@ -78,7 +78,7 @@ jobs:
           #if [[ "$BASE_BRANCH" == "origin/${{ github.ref_name }}" ]]; then
           yarn changeset status --output changeset-status.json
 
-          MESSAGE=$(jq -r '.releases[0] as $pkg | if $pkg then "🚀 Bumping `\($pkg.name)@\($pkg.oldVersion) → \($pkg.newVersion)`" else "Publishing release..." end' changeset-status.json)
+          MESSAGE=$(jq -r '.releases[0] as $pkg | if $pkg then "🚀 Bumping `\($pkg.name)@\($pkg.oldVersion) -> \($pkg.newVersion)`" else empty end' changeset-status.json)
           echo "message=$MESSAGE >> $GITHUB_OUTPUT
 
           # TODO NOW uncomment if
