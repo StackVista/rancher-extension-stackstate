@@ -108,7 +108,8 @@ jobs:
   build-extension-charts:
     uses: rancher/dashboard/.github/workflows/build-extension-charts.yml@master
     needs: pipeline
-    if: ${{ needs.pipeline.outputs.published == 'true' }}
+    # TODO replace with 'true'
+    if: ${{ needs.pipeline.outputs.published == 'false' }}
     permissions:
       actions: write
       contents: write
