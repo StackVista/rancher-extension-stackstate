@@ -3,7 +3,8 @@ name: Checks
 on:
   pull_request:
     paths-ignore:
-      - "**.md"
+      - "*.md"
+      - "pkg/**/*.md"
 
   push:
     branches:
