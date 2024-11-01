@@ -67,7 +67,8 @@ jobs:
       - name: Set release title
         id: release-title
         # prevents this step from running on forks AND only on pushes and .changeset.baseBranch is the target branch
-        if: github.repository_owner == 'StackVista' && github.event_name == 'push'
+        # TODO NOW uncomment
+        # if: github.repository_owner == 'StackVista' && github.event_name == 'push'
         run: |
           BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
 
