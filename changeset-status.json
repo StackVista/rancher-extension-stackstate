@@ -1,0 +1,25 @@
+{
+  "changesets": [
+    {
+      "releases": [
+        {
+          "name": "observability",
+          "type": "patch"
+        }
+      ],
+      "summary": "Copy CI checks from the main branch",
+      "id": "old-pugs-flash"
+    }
+  ],
+  "releases": [
+    {
+      "name": "observability",
+      "type": "patch",
+      "oldVersion": "0.2.0",
+      "changesets": [
+        "old-pugs-flash"
+      ],
+      "newVersion": "0.2.1"
+    }
+  ]
+}
