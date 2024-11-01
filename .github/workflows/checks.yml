@@ -91,4 +91,6 @@ jobs:
         with:
           title: ${{ steps.release-details.outputs.message }}
           commit: ${{ steps.release-details.outputs.message }}
+          # define the publish command, so changeset creates a release in GitHub
+          # the build-extension-charts workflow will be triggered by the release event
           publish: echo "${{ steps.release-details.outputs.message }}"
