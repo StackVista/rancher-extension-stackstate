@@ -72,7 +72,7 @@ jobs:
           echo "Base branch: $BASE_BRANCH"
 
           if [[ "$BASE_BRANCH" == "${{ github.ref_name }}" ]]; then
-            OUTPUT=$(mktemp)
+            OUTPUT=$(mktemp /tmp/changeset-output.XXXXXX.json)
 
             yarn changeset status --output "$OUTPUT"
 
