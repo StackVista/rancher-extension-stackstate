@@ -72,13 +72,7 @@ jobs:
           echo "Base branch: $BASE_BRANCH"
 
           if [[ "$BASE_BRANCH" == "${{ github.ref_name }}" ]]; then
-            OUTPUT=$(mktemp /tmp/changeset-output.XXXXXX.json)
-
-            if [ ! -f "$OUTPUT" ]; then
-              echo "Failed to create temp file at: $OUTPUT"
-              exit 1
-            fi
-            echo "Temporary file created at: $OUTPUT"
+            OUTPUT=${{runner.temp}}/changeset-status.json
 
             yarn changeset status --output "$OUTPUT"
 
