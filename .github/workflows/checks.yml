@@ -1,0 +1,55 @@
+name: Checks
+
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+  push:
+    branches:
+      - main
+
+env:
+  CI: true
+
+jobs:
+  pipeline:
+    name: Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      - name: Detect file changes
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files_yaml: |
+            eslint_config:
+              - .eslintrc.js
+              - .eslintignore
+              - yarn.lock
+            eslint_target:
+              - "**/*.{ts,js,vue}"
+
+      - name: Lint all files
+        id: lint-all
+        if: ${{ github.event_name == 'push' || steps.changed-files.outputs.eslint_config_any_changed == 'true' }}
+        run: yarn lint .
+
+      - name: Lint changed files
+        if: ${{ steps.lint-all.outcome == 'skipped' && steps.changed-files.outputs.eslint_target_any_changed == 'true' }}
+        run: yarn lint ${{ steps.changed-files.outputs.eslint_target_all_changed_files }} --no-error-on-unmatched-pattern
+
+      - name: Build observability package
+        run: yarn build-pkg observability
