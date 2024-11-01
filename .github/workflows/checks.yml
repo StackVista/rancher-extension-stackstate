@@ -74,13 +74,14 @@ jobs:
 
           echo "Base branch: $BASE_BRANCH"
 
-          if [[ "$BASE_BRANCH" == "origin/${{ github.ref_name }}" ]]; then
-            yarn changeset status --output changeset-status.json
+          # TODO NOW uncomment if
+          #if [[ "$BASE_BRANCH" == "origin/${{ github.ref_name }}" ]]; then
+          yarn changeset status --output changeset-status.json
 
-            RELEASE_TITLE=$(jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' changeset-status.json)
+          RELEASE_TITLE=$(jq -r '"Release " + ([.releases[] | "`\(.name)@\(.oldVersion) -> \(.newVersion)`"] | join(", "))' changeset-status.json)
 
-            echo "value=$RELEASE_TITLE" >> $GITHUB_OUTPUT
-          fi
+          echo "value=$RELEASE_TITLE" >> $GITHUB_OUTPUT
+          #fi
 
       # creates a PR if there are changesets or creates a release if the PR is merged
       # creating a release triggers the `build-extension-charts` workflow
@@ -94,3 +95,5 @@ jobs:
           title: ${{ steps.release-title.outputs.value }}
           commit: ${{ steps.release-title.outputs.value }}
           publish: echo "${{ steps.release-title.outputs.value }}"
+          # TODO delete
+          branch: v0.2.x
