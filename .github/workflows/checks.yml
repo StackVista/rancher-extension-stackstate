@@ -74,7 +74,18 @@ jobs:
           if [[ "$BASE_BRANCH" == "${{ github.ref_name }}" ]]; then
             OUTPUT=$(mktemp /tmp/changeset-output.XXXXXX.json)
 
+            if [ ! -f "$OUTPUT" ]; then
+              echo "Failed to create temp file at: $OUTPUT"
+              exit 1
+            fi
+            echo "Temporary file created at: $OUTPUT"
+
             yarn changeset status --output "$OUTPUT"
+
+            if [ ! -s "$OUTPUT" ]; then
+              echo "Error: Temporary file is empty after running 'yarn changeset status'"
+              exit 1
+            fi
 
             MESSAGE=$(jq -r '.releases[0] as $pkg | if $pkg then "🚀 Bumping `\($pkg.name)@\($pkg.oldVersion) → \($pkg.newVersion)`" else "Publishing release..." end' "$OUTPUT")
 
