@@ -20,9 +20,6 @@ jobs:
   pipeline:
     name: Checks
     runs-on: ubuntu-latest
-    outputs:
-      tagged_release: ${{ steps.release-details.outputs.tagged_release }}
-      published: ${{ steps.changeset.outputs.published }}
 
     steps:
       - name: Checkout repository
@@ -82,17 +79,14 @@ jobs:
           yarn changeset status --output changeset-status.json
 
           MESSAGE=$(jq -r '.releases[0] as $pkg | if $pkg then "🚀 Bumping `\($pkg.name)@\($pkg.oldVersion) → \($pkg.newVersion)`" else "Publishing release..." end' changeset-status.json)
-          TAGGED_RELEASE=$(jq -r '.releases[0] as $pkg | if $pkg then "\($pkg.name)-\($pkg.newVersion)" else empty end' changeset-status.json)
 
           echo "message=$MESSAGE" >> $GITHUB_OUTPUT
-          echo "tagged_release=$TAGGED_RELEASE" >> $GITHUB_OUTPUT
           # TODO NOW uncomment if
           #fi
 
       # creates a PR if there are changesets or creates a release if the PR is merged
       # creating a release triggers the `build-extension-charts` workflow
       - name: Create a Release Pull Request OR Publish a Release
-        id: changeset
         # run only if the release-details output is not empty
         if: steps.release-details.outputs.message
         env:
@@ -104,17 +98,3 @@ jobs:
           publish: echo "${{ steps.release-details.outputs.message }}"
           # TODO delete
           branch: v0.2.x
-
-  build-extension-charts:
-    uses: rancher/dashboard/.github/workflows/build-extension-charts.yml@release-2.8
-    needs: pipeline
-    # TODO replace with 'true'
-    if: ${{ needs.pipeline.outputs.published == 'false' }}
-    permissions:
-      actions: write
-      contents: write
-      deployments: write
-      pages: write
-    with:
-      target_branch: gh-pages
-      tagged_release: ${{ needs.pipeline.outputs.tagged_release }}
