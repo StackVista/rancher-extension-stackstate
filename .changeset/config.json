@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.3/schema.json",
-  "baseBranch": "origin/main",
+  "baseBranch": "main",
   "access": "restricted",
   "commit": false,
   "updateInternalDependencies": "patch",
