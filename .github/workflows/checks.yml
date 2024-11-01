@@ -28,6 +28,12 @@ jobs:
           # TODO delete
           fetch-depth: 0
 
+      - name: print ref_name
+        run: echo ${{ github.ref_name }}
+
+      - name: rename ref_name
+        run: echo ${{ replace(github.ref_name, '/', '///') }}
+
       - name: Install Node
         uses: actions/setup-node@v3
         with:
