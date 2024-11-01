@@ -81,7 +81,9 @@ jobs:
             fi
             echo "Temporary file created at: $OUTPUT"
 
+            ls -l "$OUTPUT"
             chmod +r "$OUTPUT" || exit 1
+            ls -l "$OUTPUT"
 
             yarn changeset status --output "$OUTPUT"
 
