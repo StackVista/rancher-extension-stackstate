@@ -118,10 +118,20 @@ jobs:
           # the build-extension-charts workflow will be triggered by the release event
           publish: yarn changeset tag
 
-      - name: Publish Helm charts
+      - name: Extract published version
+        id: changesets-output
         if: steps.changesets.outputs.published == 'true'
+        run: |
+          # Extract the first package name and version
+          TAGGED_RELEASE=$(jq -r '.[0].name + "@" + .[0].version' <<< "${{ steps.changesets.outputs.publishedPackages }}")
+
+          # Output the tagged release
+          echo "tagged_release=$TAGGED_RELEASE" >> $GITHUB_OUTPUT
+
+      - name: Publish Helm charts
+        if: steps.changesets-output.outputs.tagged_release
         uses: ./.github/actions/publish
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tagged_release: "${{ steps.release-details.outputs.name }}@${{ steps.release-details.outputs.new-version }}"
+          tagged_release: "${{ steps.changesets-output.outputs.tagged_release }}"
           target_branch: gh-pages
