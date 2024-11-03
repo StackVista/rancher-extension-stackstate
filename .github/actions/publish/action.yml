@@ -6,6 +6,9 @@ inputs:
   target_branch:
     description: The branch to push the charts to
     required: true
+  GITHUB_TOKEN:
+    description: The GitHub token
+    required: true
 
 runs:
   using: composite
@@ -40,5 +43,5 @@ runs:
       with:
         charts_dir: ./charts/*
       env:
-        CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        CR_TOKEN: "${{ inputs.GITHUB_TOKEN }}"
         CR_SKIP_EXISTING: true
