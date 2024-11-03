@@ -121,7 +121,7 @@ jobs:
 
       - name: Publish Helm charts
         if: steps.changesets.outputs.published == 'true'
-        uses: ./.github/actions/setup-env
+        uses: ./.github/actions/publish
         with:
           tagged_release: "${{ steps.release-details.outputs.name }}@${{ steps.release-details.outputs.new-version }}"
           target_branch: gh-pages
