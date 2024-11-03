@@ -91,9 +91,9 @@ jobs:
             fi
 
             if jq -e '.releases | length > 0' "$OUTPUT" > /dev/null; then
-              PACKAGE_NAME=$(jq -r '.releases[0].name' changeset-status.json)
-              OLD_VERSION=$(jq -r '.releases[0].oldVersion' changeset-status.json)
-              NEW_VERSION=$(jq -r '.releases[0].newVersion' changeset-status.json)
+              PACKAGE_NAME=$(jq -r '.releases[0].name' "$OUTPUT")
+              OLD_VERSION=$(jq -r '.releases[0].oldVersion' "$OUTPUT")
+              NEW_VERSION=$(jq -r '.releases[0].newVersion' "$OUTPUT")
 
               echo "name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
               echo "old-version=$OLD_VERSION" >> $GITHUB_OUTPUT
