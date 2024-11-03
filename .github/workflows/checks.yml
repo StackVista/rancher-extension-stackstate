@@ -112,8 +112,11 @@ jobs:
         id: changesets-output
         if: steps.changesets.outputs.published == 'true'
         run: |
+          # Capture the output in a variable
+          published_packages="${{ steps.changesets.outputs.publishedPackages }}"
+
           # Extract the first package name and version
-          TAGGED_RELEASE=$(jq -r '.[0] | "\(.name)@\(.version)"' <<< "${{ steps.changesets.outputs.publishedPackages }}")
+          TAGGED_RELEASE=$(jq -r '.[0] | "\(.name)@\(.version)"' <<< "$published_packages")
 
           # Output the tagged release
           echo "tagged_release=$TAGGED_RELEASE" >> $GITHUB_OUTPUT
