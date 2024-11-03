@@ -1,0 +1,44 @@
+name: Generate and publish Helm charts
+inputs:
+  tagged_release:
+    description: The tag of the release
+    required: true
+  target_branch:
+    description: The branch to push the charts to
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Build all packages
+      shell: bash
+      run: |
+        yarn publish-pkgs \
+          -s ${{ github.repository }} \
+          -b ${{ inputs.target_branch }} \
+          -t ${{ inputs.tagged_release }}
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.8.0
+
+    - name: Checkout to target branch
+      uses: actions/checkout@v4
+      with:
+        ref: "${{ inputs.target_branch }}"
+
+    - name: Commit and push changes
+      shell: bash
+      run: |
+        git add ./{assets,charts,extensions,index.yaml}
+        git commit -a -m "CI Build Artifacts"
+        git push
+
+    - name: Run chart-releaser
+      uses: helm/chart-releaser-action@v1.4.1
+      with:
+        charts_dir: ./charts/*
+      env:
+        CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        CR_SKIP_EXISTING: true

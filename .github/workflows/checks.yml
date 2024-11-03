@@ -90,22 +90,36 @@ jobs:
               exit 1
             fi
 
-            MESSAGE=$(jq -r '.releases[0] as $pkg | if $pkg then "🚀 Release `\($pkg.name)@\($pkg.oldVersion) → \($pkg.newVersion)`" else "Publishing release..." end' "$OUTPUT")
+            if jq -e '.releases | length > 0' changeset-status.json > /dev/null; then
+              PACKAGE_NAME=$(jq -r '.releases[0].name' changeset-status.json)
+              OLD_VERSION=$(jq -r '.releases[0].oldVersion' changeset-status.json)
+              NEW_VERSION=$(jq -r '.releases[0].newVersion' changeset-status.json)
 
-            echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+              echo "name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+              echo "old-version=$OLD_VERSION" >> $GITHUB_OUTPUT
+              echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            fi
           fi
 
-      # creates a PR if there are changesets or creates a release if the PR is merged
-      # creating a release triggers the `build-extension-charts` workflow
+      # creates a PR if there are changesets or assign the new tag if the PR is merged
       - name: Create a Release Pull Request OR Publish a Release
+        id: changesets
         # run only if the release-details output is not empty
-        if: steps.release-details.outputs.message
+        if: steps.release-details.outputs.name
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MESSAGE: "🚀 Release `${{ steps.release-details.outputs.name }}@${{ steps.release-details.outputs.old-version }} → ${{ steps.release-details.outputs.new-version }}`"
         uses: changesets/action@v1
         with:
-          title: ${{ steps.release-details.outputs.message }}
-          commit: ${{ steps.release-details.outputs.message }}
+          title: ${{ env.MESSAGE }}
+          commit: ${{ env.MESSAGE }}
           # define the publish command, so changeset creates a release in GitHub
           # the build-extension-charts workflow will be triggered by the release event
-          publish: yarn run publish
+          publish: yarn changeset tag
+
+      - name: Publish Helm charts
+        if: steps.changesets.outputs.published == 'true'
+        uses: ./.github/actions/setup-env
+        with:
+          tagged_release: "${{ steps.release-details.outputs.name }}@${{ steps.release-details.outputs.new-version }}"
+          target_branch: gh-pages
