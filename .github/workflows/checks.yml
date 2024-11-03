@@ -107,16 +107,4 @@ jobs:
           commit: ${{ steps.release-details.outputs.message }}
           # define the publish command, so changeset creates a release in GitHub
           # the build-extension-charts workflow will be triggered by the release event
-          publish: |
-            yarn changeset tag
-
-            # duplicate release tags for the build-extension-charts workflow
-            for tag in $(git tag --list '*@*'); do
-              # Replace '@' with '-'
-              new_tag=${tag//@/-}
-              
-              echo "Renaming tag: $tag -> $new_tag"
-              
-              # Create the new tag
-              git tag "$new_tag" "$tag"
-            done
+          publish: yarn run publish
