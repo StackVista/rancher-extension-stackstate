@@ -11,21 +11,8 @@ defaults:
     working-directory: ./
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-    outputs:
-      tagged_release: ${{ steps.release-details.outputs.tagged_release }}
-    steps:
-      - name: Format release details
-        id: release-details
-        # Replace @ with -
-        run: |
-          TAG="${${{ github.ref_name }}//@/-}" 
-          echo "tagged_release=$TAG" >> $GITHUB_OUTPUT
-
   build-extension-charts:
-    uses: rancher/dashboard/.github/workflows/build-extension-charts.yml@release-2.8
-    needs: prepare
+    uses: rancher/dashboard/.github/workflows/build-extension-charts.yml@master
     permissions:
       actions: write
       contents: write
@@ -33,4 +20,4 @@ jobs:
       pages: write
     with:
       target_branch: gh-pages
-      tagged_release: ${{ needs.prepare.outputs.tagged_release }}
+      tagged_release: ${{ github.ref_name }}
