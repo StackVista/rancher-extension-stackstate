@@ -81,11 +81,8 @@ jobs:
             fi
             echo "Temporary file created at: $OUTPUT"
 
-            ls -l "$OUTPUT"
-            chmod +r "$OUTPUT" || exit 1
-            ls -l "$OUTPUT"
-
-            yarn changeset status --output "$OUTPUT"
+            # the status command uses path.join so the path should be relative
+            yarn changeset status --output $(realpath --relative-to . $OUTPUT)
 
             if [ ! -s "$OUTPUT" ]; then
               echo "Error: Temporary file is empty after running 'yarn changeset status'"
