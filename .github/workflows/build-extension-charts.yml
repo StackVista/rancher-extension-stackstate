@@ -5,6 +5,7 @@ on:
   release:
     types:
       - released
+      - created
 
 defaults:
   run:
