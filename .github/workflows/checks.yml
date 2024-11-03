@@ -90,7 +90,7 @@ jobs:
               exit 1
             fi
 
-            if jq -e '.releases | length > 0' changeset-status.json > /dev/null; then
+            if jq -e '.releases | length > 0' "$OUTPUT" > /dev/null; then
               PACKAGE_NAME=$(jq -r '.releases[0].name' changeset-status.json)
               OLD_VERSION=$(jq -r '.releases[0].oldVersion' changeset-status.json)
               NEW_VERSION=$(jq -r '.releases[0].newVersion' changeset-status.json)
@@ -98,6 +98,8 @@ jobs:
               echo "name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
               echo "old-version=$OLD_VERSION" >> $GITHUB_OUTPUT
               echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            else
+              echo "No changesets found"
             fi
           fi
 
