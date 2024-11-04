@@ -22,16 +22,14 @@ runs:
           -b "${{ inputs.target_branch }}" \
           -t "${{ inputs.tagged_release }}"
 
-    # the checkout action resets the working directory
-    # so we need to move the build artifacts to a temporary directory
+    # Move build artifacts to a temporary directory due to checkout reset
     - name: Move Build Artifacts to Temporary Directory
       id: artifacts
       shell: bash
       run: |
-        DIR=$(mktemp -d ${{runner.temp}}/XXXXXX)
-        mv tmp/* $DIR
-
-        echo "dir=$DIR" >> $GITHUB_ENV
+        TEMP_DIR=$(mktemp -d "${RUNNER_TEMP}/build_artifacts_XXXXXX")
+        mv tmp/* "$TEMP_DIR"
+        echo "dir=$TEMP_DIR" >> $GITHUB_OUTPUT
 
     - name: Set Up Helm CLI
       uses: azure/setup-helm@v3
@@ -43,7 +41,7 @@ runs:
       with:
         ref: "${{ inputs.target_branch }}"
 
-    - name: Move Build Artifacts back to Working Directory
+    - name: Restore Build Artifacts to Working Directory
       shell: bash
       run: |
         mv ${{ steps.artifacts.outputs.dir }}/* .
