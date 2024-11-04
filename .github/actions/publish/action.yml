@@ -1,4 +1,5 @@
 name: Generate and publish Helm charts
+
 inputs:
   tagged_release:
     description: The tag of the release
@@ -13,40 +14,40 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Build all packages
+    - name: Build and Publish Packages
       shell: bash
       run: |
         yarn publish-pkgs \
-          -s ${{ github.repository }} \
-          -b ${{ inputs.target_branch }} \
-          -t ${{ inputs.tagged_release }}
+          -s "${{ github.repository }}" \
+          -b "${{ inputs.target_branch }}" \
+          -t "${{ inputs.tagged_release }}"
 
-    - name: Move the output to the root directory
+    - name: Move Build Output to Root Directory
       shell: bash
       run: mv tmp/* .
 
-    - name: List the untracked files
+    - name: Verify Untracked Files
       run: git status
 
-    - name: Setup Helm
+    - name: Set Up Helm CLI
       uses: azure/setup-helm@v3
       with:
         version: v3.8.0
 
-    - name: Checkout to target branch
+    - name: Checkout Target Branch
       uses: actions/checkout@v4
       with:
         ref: "${{ inputs.target_branch }}"
 
-    - name: Commit and push changes
+    - name: Commit and Push Changes
       shell: bash
       run: |
         git add ./{assets,charts,extensions,index.yaml}
-        git commit -a -m "CI Build Artifacts"
+        git commit -m "CI: Publish Helm charts for ${{ inputs.tagged_release }}"
         git status
         git push
 
-    - name: Run chart-releaser
+    - name: Release Helm Charts
       uses: helm/chart-releaser-action@v1.4.1
       with:
         charts_dir: ./charts/*
