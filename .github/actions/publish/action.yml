@@ -44,7 +44,7 @@ runs:
     - name: Restore Build Artifacts to Working Directory
       shell: bash
       run: |
-        mv ${{ steps.artifacts.outputs.dir }}/* .
+        rsync -av --ignore-existing "${{ steps.artifacts.outputs.dir }}/" .
 
     - name: Verify Untracked Files
       shell: bash
