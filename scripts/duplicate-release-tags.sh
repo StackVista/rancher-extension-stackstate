@@ -16,11 +16,11 @@ for tag in $(git tag -l '*@*'); do
 
   # Check if the new tag already exists
   if [[ -z $(git tag -l "$new_tag") ]]; then
-    echo "✅ Creating tag: $tag -> $new_tag"
+    echo "✅ creating tag: $tag -> $new_tag"
     git tag "$new_tag" "$tag"
     is_new_tag_created=true # Set the flag to true when a tag is renamed
   else
-    echo "Tag $new_tag already exists. Skipping..."
+    echo "⏩ skipping tag: $new_tag"
   fi
 done
 
