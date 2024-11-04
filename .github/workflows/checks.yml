@@ -118,7 +118,7 @@ jobs:
           TAGGED_RELEASE=$(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r '.[0] | "\(.name)-\(.version)"')
           echo "tagged_release=$TAGGED_RELEASE" >> $GITHUB_OUTPUT
 
-      - name: Build and Publish Helm Packages
+      - name: Preare Build Artifact
         if: steps.changesets-output.outputs.tagged_release
         run: |
           yarn publish-pkgs \
