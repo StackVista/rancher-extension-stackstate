@@ -27,6 +27,7 @@ runs:
       run: mv tmp/* .
 
     - name: Verify Untracked Files
+      shell: bash
       run: git status
 
     - name: Set Up Helm CLI
