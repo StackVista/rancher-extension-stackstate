@@ -58,7 +58,7 @@ jobs:
   build:
     name: Build and Version
     runs-on: ubuntu-latest
-    # only on pushes and .changeset.baseBranch is the target branch so it does not run on PRs
+    # runs only on pushes so it does not run on PRs
     if: github.event_name == 'push'
     outputs:
       tagged_release: ${{ steps.changesets-output.outputs.tagged_release }}
@@ -79,7 +79,7 @@ jobs:
 
       - name: Determine Release Details
         id: release-details
-        # only on pushes and .changeset.baseBranch is the target branch
+        # runs only when the .changeset.baseBranch is the target branch
         if: steps.changeset-config.outputs.base_branch == '${{ github.ref_name }}'
         run: |
           OUTPUT=$(mktemp ${{runner.temp}}/changeset-output.XXXXXX.json)
