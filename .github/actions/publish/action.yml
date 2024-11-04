@@ -21,6 +21,13 @@ runs:
           -b ${{ inputs.target_branch }} \
           -t ${{ inputs.tagged_release }}
 
+    - name: Move the output to the root directory
+      shell: bash
+      run: mv tmp/* .
+
+    - name: List the untracked files
+      run: git status
+
     - name: Setup Helm
       uses: azure/setup-helm@v3
       with:
@@ -36,6 +43,7 @@ runs:
       run: |
         git add ./{assets,charts,extensions,index.yaml}
         git commit -a -m "CI Build Artifacts"
+        git status
         git push
 
     - name: Run chart-releaser

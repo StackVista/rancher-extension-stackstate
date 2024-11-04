@@ -20,12 +20,6 @@ jobs:
   pipeline:
     name: Checks
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: write
-      deployments: write
-      pages: write
-      pull-requests: write
 
     steps:
       - name: Checkout repository
