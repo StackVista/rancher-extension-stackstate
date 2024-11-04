@@ -145,6 +145,11 @@ jobs:
         with:
           ref: "${{ env.HELM_CHART_BRANCH }}"
 
+      - name: Configure Git User
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
       - name: Set Up Helm CLI
         uses: azure/setup-helm@v3
         with:
