@@ -1,4 +1,4 @@
-name: Checks
+name: Check and/or Publish
 
 on:
   pull_request:
@@ -15,14 +15,17 @@ on:
 
 env:
   CI: true
+  HELM_CHART_BRANCH: gh-pages
 
 jobs:
   pipeline:
-    name: Checks
+    name: Checks and Build
     runs-on: ubuntu-latest
+    outputs:
+      tagged_release: ${{ steps.changesets-output.outputs.tagged_release }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -33,14 +36,14 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: yarn install --frozen-lockfile --prefer-offline
 
-      - name: Check for uncommitted changes
+      - name: Check for Uncommitted Changes
         run: |
-          git diff --name-only --exit-code --relative || (echo "\nUncommitted changes found up there 👆" && exit 1)
+          git diff --name-only --exit-code --relative || (echo "\nUncommitted changes found 👆" && exit 1)
 
-      - name: Detect file changes
+      - name: Detect File Changes
         id: changed-files
         uses: tj-actions/changed-files@v41
         with:
@@ -49,7 +52,7 @@ jobs:
               - .eslintrc.js
               - yarn.lock
             eslint_target:
-              - "**/*.{ts,js,vue}"
+              - '**/*.{ts,js,vue}'
 
       - name: Lint all files
         if: ${{ github.event_name == 'push' || steps.changed-files.outputs.eslint_config_any_changed == 'true' }}
@@ -59,10 +62,10 @@ jobs:
         if: ${{ steps.lint-all.outcome == 'skipped' && steps.changed-files.outputs.eslint_target_any_changed == 'true' }}
         run: yarn lint ${{ steps.changed-files.outputs.eslint_target_all_changed_files }} --no-error-on-unmatched-pattern
 
-      - name: Build observability package
+      - name: Build Observability Package
         run: yarn build-pkg observability
 
-      - name: Read release details
+      - name: Determine Release Details
         id: release-details
         # prevents this step from running on forks AND only on pushes and .changeset.baseBranch is the target branch
         # TODO use StackVista instead of owanturist
@@ -95,7 +98,7 @@ jobs:
           fi
 
       # creates a PR if there are changesets or assign the new tag if the PR is merged
-      - name: Create a Release Pull Request OR Publish a Release
+      - name: Create Release Pull Request or Publish
         id: changesets
         # run only if the release-details output is not empty
         if: steps.release-details.outputs.message
@@ -108,21 +111,68 @@ jobs:
           # define the publish command, so changeset creates a release in GitHub
           publish: yarn release-tag
 
-      - name: Extract published version
+      - name: Extract Published Version
         id: changesets-output
         if: steps.changesets.outputs.published == 'true'
         run: |
           # Extract the first package name and version and format as `name-version`
           # ! The publish-pkgs script expects `name-version` but not `name@version` so `release-tag` creates both
           TAGGED_RELEASE=$(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r '.[0] | "\(.name)-\(.version)"')
-
-          # Output the tagged release
           echo "tagged_release=$TAGGED_RELEASE" >> $GITHUB_OUTPUT
 
-      - name: Publish Helm charts
+      - name: Build and Publish Helm Packages
+        if: steps.changesets-output.outputs.tagged_release
+        run: |
+          yarn publish-pkgs \
+            -s "${{ github.repository }}" \
+            -b "${{ env.HELM_CHART_BRANCH }}" \
+            -t "${{ steps.changesets-output.outputs.tagged_release }}"
+
+      - name: Upload Charts Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: charts
+          path: tmp
+
+      - name: Publish Helm Charts to GitHub Pages
         if: steps.changesets-output.outputs.tagged_release
         uses: ./.github/actions/publish
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tagged_release: "${{ steps.changesets-output.outputs.tagged_release }}"
-          target_branch: gh-pages
+          target_branch: "${{ env.HELM_CHART_BRANCH }}"
+
+  release:
+    name: Helm Release
+    needs: pipeline
+    if: needs.pipeline.outputs.tagged_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Target Branch
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ env.HELM_CHART_BRANCH }}"
+
+      - name: Set Up Helm CLI
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.8.0
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: charts
+
+      - name: Commit and Push Changes
+        run: |
+          git add ./{assets,charts,extensions,index.yaml}
+          git commit -m "CI: Publish Helm charts for ${{ needs.pipeline.outputs.tagged_release }}"
+          git push
+
+      - name: Run Helm Chart Releaser
+        uses: helm/chart-releaser-action@v1.4.1
+        with:
+          charts_dir: ./charts/*
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_SKIP_EXISTING: true
