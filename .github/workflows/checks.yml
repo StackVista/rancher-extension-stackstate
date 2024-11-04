@@ -132,14 +132,6 @@ jobs:
           name: charts
           path: tmp
 
-      - name: Publish Helm Charts to GitHub Pages
-        if: steps.changesets-output.outputs.tagged_release
-        uses: ./.github/actions/publish
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tagged_release: "${{ steps.changesets-output.outputs.tagged_release }}"
-          target_branch: "${{ env.HELM_CHART_BRANCH }}"
-
   release:
     name: Helm Release
     needs: pipeline
