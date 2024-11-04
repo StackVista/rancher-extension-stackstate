@@ -22,9 +22,9 @@ runs:
           -b "${{ inputs.target_branch }}" \
           -t "${{ inputs.tagged_release }}"
 
-    - name: Move Build Output to Root Directory
-      shell: bash
-      run: mv tmp/* .
+    # - name: Move Build Output to Root Directory
+    #   shell: bash
+    #   run: mv tmp/* .
 
     - name: Verify Untracked Files
       shell: bash
