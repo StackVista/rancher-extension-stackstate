@@ -106,7 +106,7 @@ jobs:
           title: ${{ steps.release-details.outputs.message }}
           commit: ${{ steps.release-details.outputs.message }}
           # define the publish command, so changeset creates a release in GitHub
-          publish: yarn changeset tag
+          publish: yarn release-tag
 
       - name: Extract published version
         id: changesets-output

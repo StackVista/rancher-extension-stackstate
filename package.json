@@ -27,7 +27,7 @@
     "build-pkg": "./node_modules/@rancher/shell/scripts/build-pkg.sh",
     "serve-pkgs": "./node_modules/@rancher/shell/scripts/serve-pkgs",
     "publish-pkgs": "./node_modules/@rancher/shell/scripts/extension/publish",
-    "parse-tag-name": "./node_modules/@rancher/shell/scripts/extension/parse-tag-name"
+    "release-tag": "changeset tag && ./scripts/duplicate-release-tags.sh"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9"
