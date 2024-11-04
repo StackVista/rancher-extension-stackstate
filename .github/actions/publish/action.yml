@@ -22,13 +22,14 @@ runs:
           -b "${{ inputs.target_branch }}" \
           -t "${{ inputs.tagged_release }}"
 
-    # - name: Move Build Output to Root Directory
-    #   shell: bash
-    #   run: mv tmp/* .
-
-    - name: Verify Untracked Files
+    - name: Move Build Artifacts to Temporary Directory
+      id: artifacts
       shell: bash
-      run: git status
+      run: |
+        DIR=$(mktemp -d ${{runner.temp}}/XXXXXX)
+        move tmp/* $DIR
+
+        echo "dir=$DIR" >> $GITHUB_ENV
 
     - name: Set Up Helm CLI
       uses: azure/setup-helm@v3
@@ -40,6 +41,11 @@ runs:
       with:
         ref: "${{ inputs.target_branch }}"
 
+    - name: Move Build Artifacts back to Working Directory
+      shell: bash
+      run: |
+        mv ${{ steps.artifacts.outputs.dir }}/* .
+
     - name: Verify Untracked Files
       shell: bash
       run: git status
@@ -49,7 +55,6 @@ runs:
       run: |
         git add ./{assets,charts,extensions,index.yaml}
         git commit -m "CI: Publish Helm charts for ${{ inputs.tagged_release }}"
-        git status
         git push
 
     - name: Release Helm Charts
