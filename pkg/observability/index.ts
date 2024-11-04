@@ -1,4 +1,4 @@
-import { importTypes } from "@rancher/auto-import";
+import { importTypes } from '@rancher/auto-import';
 import {
   CardLocation,
   IPlugin,
@@ -6,7 +6,7 @@ import {
   PanelLocation,
   TableColumnLocation,
   TabLocation,
-} from "@shell/core/types";
+} from '@shell/core/types';
 import {
   NODE,
   POD,
@@ -18,16 +18,19 @@ import {
   PV,
   PVC,
   MANAGEMENT,
-} from "@shell/config/types";
+} from '@shell/config/types';
 
-import { isCrdLoaded, loadConnectionInfo } from "./modules/stackstate";
-import extensionRouting from "./routing/extension-routing";
-import observabilityStore from "./store";
-import { ObservabilityHealth } from "./types/headers";
+import {
+  isCrdLoaded,
+  loadConnectionInfo,
+} from './modules/stackstate';
+import extensionRouting from './routing/extension-routing';
+import observabilityStore from './store';
+import { ObservabilityHealth } from './types/headers';
 
-const onEnter: OnNavToPackage = async (store) => {
+const onEnter: OnNavToPackage = async(store) => {
   if (!isCrdLoaded(store)) {
-    await store.dispatch("observability/setMissingCrd", true);
+    await store.dispatch('observability/setMissingCrd', true);
 
     return;
   }
@@ -35,14 +38,15 @@ const onEnter: OnNavToPackage = async (store) => {
 };
 
 // Init the package
-export default function (plugin: IPlugin): void {
+export default function(plugin: IPlugin): void {
   // Auto-import model, detail, edit from the folders
   importTypes(plugin);
 
   // Provide plugin metadata from package.json
-  plugin.metadata = require("./package.json");
+  plugin.metadata = require('./package.json');
 
-  plugin.addProduct(require("./product"));
+  // Load a product
+  plugin.addProduct(require('./product'));
 
   plugin.addDashboardStore(
     observabilityStore.config.namespace,
@@ -76,8 +80,8 @@ export default function (plugin: IPlugin): void {
     CardLocation.CLUSTER_DASHBOARD_CARD,
     {},
     {
-      labelKey: "sts.observed",
-      component: () => import("./components/ObservabilityClusterCard.vue"),
+      labelKey:  'sts.observed',
+      component: () => import('./components/ObservabilityClusterCard.vue'),
     }
   );
 
@@ -100,7 +104,7 @@ export default function (plugin: IPlugin): void {
         PVC,
       ],
     },
-    { component: () => import("./components/ComponentHealth.vue") }
+    { component: () => import('./components/ComponentHealth.vue') }
   );
 
   plugin.addTab(
@@ -124,11 +128,11 @@ export default function (plugin: IPlugin): void {
       ],
     },
     {
-      name: "observability",
-      labelKey: "observability.name",
+      name:       'observability',
+      labelKey:   'observability.name',
       showHeader: false,
-      tooltip: "Rancher Prime Observability through StackState",
-      component: () => import("./components/MonitorTab.vue"),
+      tooltip:    'Rancher Prime Observability through StackState',
+      component:  () => import('./components/MonitorTab.vue'),
     }
   );
 
