@@ -40,6 +40,10 @@ runs:
       with:
         ref: "${{ inputs.target_branch }}"
 
+    - name: Verify Untracked Files
+      shell: bash
+      run: git status
+
     - name: Commit and Push Changes
       shell: bash
       run: |
