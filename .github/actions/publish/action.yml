@@ -22,12 +22,14 @@ runs:
           -b "${{ inputs.target_branch }}" \
           -t "${{ inputs.tagged_release }}"
 
+    # the checkout action resets the working directory
+    # so we need to move the build artifacts to a temporary directory
     - name: Move Build Artifacts to Temporary Directory
       id: artifacts
       shell: bash
       run: |
         DIR=$(mktemp -d ${{runner.temp}}/XXXXXX)
-        move tmp/* $DIR
+        mv tmp/* $DIR
 
         echo "dir=$DIR" >> $GITHUB_ENV
 
