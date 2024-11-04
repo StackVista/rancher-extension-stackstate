@@ -112,8 +112,9 @@ jobs:
         id: changesets-output
         if: steps.changesets.outputs.published == 'true'
         run: |
-          # Extract the first package name and version
-          TAGGED_RELEASE=$(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r '.[0] | "\(.name)@\(.version)"')
+          # Extract the first package name and version and format as `name-version`
+          # ! The publish-pkgs script expects `name-version` but not `name@version` so `release-tag` creates both
+          TAGGED_RELEASE=$(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r '.[0] | "\(.name)-\(.version)"')
 
           # Output the tagged release
           echo "tagged_release=$TAGGED_RELEASE" >> $GITHUB_OUTPUT
