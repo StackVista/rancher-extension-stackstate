@@ -25,6 +25,7 @@ jobs:
       contents: write
       deployments: write
       pages: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
