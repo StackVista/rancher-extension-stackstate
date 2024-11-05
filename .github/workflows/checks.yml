@@ -1,4 +1,4 @@
-name: Checks
+name: Pipeline
 
 on:
   pull_request:
@@ -7,30 +7,33 @@ on:
 
   push:
     branches:
+      # latest release
       - main
+      # maintenance releases
+      - v[0-9]+.x.x
+      - v[0-9]+.[0-9]+.x
 
 env:
   CI: true
+  HELM_CHART_BRANCH: gh-pages
 
 jobs:
-  pipeline:
+  checks:
     name: Checks
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Install Node
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: .nvmrc
-          cache: "yarn"
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile --prefer-offline
+      - name: Check for Uncommitted Changes
+        run: |
+          git diff --name-only --exit-code --relative || (echo "\nUncommitted changes found 👆" && exit 1)
 
-      - name: Detect file changes
+      - name: Detect File Changes
         id: changed-files
         uses: tj-actions/changed-files@v41
         with:
@@ -40,10 +43,9 @@ jobs:
               - .eslintignore
               - yarn.lock
             eslint_target:
-              - "**/*.{ts,js,vue}"
+              - '**/*.{ts,js,vue}'
 
       - name: Lint all files
-        id: lint-all
         if: ${{ github.event_name == 'push' || steps.changed-files.outputs.eslint_config_any_changed == 'true' }}
         run: yarn lint .
 
@@ -51,5 +53,133 @@ jobs:
         if: ${{ steps.lint-all.outcome == 'skipped' && steps.changed-files.outputs.eslint_target_any_changed == 'true' }}
         run: yarn lint ${{ steps.changed-files.outputs.eslint_target_all_changed_files }} --no-error-on-unmatched-pattern
 
-      - name: Build observability package
+      - name: Build Observability Package
         run: yarn build-pkg observability
+
+  build:
+    name: Build and Version
+    runs-on: ubuntu-latest
+    # runs only on pushes so it does not run on PRs
+    if: github.event_name == 'push'
+    outputs:
+      tagged_release: ${{ steps.changesets-output.outputs.tagged_release }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+
+      - name: Read Changesets Config
+        id: changeset-config
+        run: |
+          BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
+          echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Determine Release Details
+        id: release-details
+        # runs only when the .changeset.baseBranch is the target branch
+        if: steps.changeset-config.outputs.base_branch == '${{ github.ref_name }}'
+        run: |
+          OUTPUT=$(mktemp ${{runner.temp}}/changeset-output.XXXXXX.json)
+
+          if [ ! -f "$OUTPUT" ]; then
+            echo "Failed to create temp file at: $OUTPUT"
+            exit 1
+          fi
+          echo "Temporary file created at: $OUTPUT"
+
+          # the `changeset status` command uses path.join so the path should be relative
+          yarn changeset status --output $(realpath --relative-to . $OUTPUT)
+
+          if [ ! -s "$OUTPUT" ]; then
+            echo "Error: Temporary file is empty after running 'yarn changeset status'"
+            exit 1
+          fi
+
+          MESSAGE=$(jq -r 'if .releases | length > 0 then .releases[0] | "🚀 Release `\(.name)@\(.oldVersion) → \(.newVersion)`" else "Publishing release..." end' "$OUTPUT")
+          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+
+      # creates a PR if there are changesets or assign the new tag if the PR is merged
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        if: steps.release-details.outputs.message
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: changesets/action@v1
+        with:
+          title: ${{ steps.release-details.outputs.message }}
+          commit: ${{ steps.release-details.outputs.message }}
+          # define the publish command, so changeset creates a release in GitHub
+          publish: yarn release-tag
+
+      - name: Extract Published Version
+        id: changesets-output
+        if: steps.changesets.outputs.published == 'true'
+        # extract the first package name and version and format as `name-version`
+        # the publish-pkgs script expects `name-version` but not `name@version`
+        # so `release-tag` creates both but outputs only the default changeset format
+        run: |
+          TAGGED_RELEASE=$(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r '.[0] | "\(.name)-\(.version)"')
+          echo "tagged_release=$TAGGED_RELEASE" >> $GITHUB_OUTPUT
+
+      - name: Preare Build Artifact
+        id: prepare-artifact
+        if: steps.changesets-output.outputs.tagged_release
+        run: |
+          yarn publish-pkgs \
+            -s "${{ github.repository }}" \
+            -b "${{ env.HELM_CHART_BRANCH }}" \
+            -t "${{ steps.changesets-output.outputs.tagged_release }}"
+
+      - name: Upload Charts Artifact
+        if: steps.prepare-artifact.conclusion == 'success'
+        uses: actions/upload-artifact@v3
+        with:
+          name: charts
+          path: tmp
+          if-no-files-found: error
+
+  release:
+    name: Helm Release
+    needs:
+      - build
+      - checks
+    if: needs.build.outputs.tagged_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Target Branch
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ env.HELM_CHART_BRANCH }}"
+
+      - name: Configure Git User
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Set Up Helm CLI
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.8.0
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: charts
+
+      - name: Commit and Push Changes
+        run: |
+          git add ./{assets,charts,extensions,index.yaml}
+          git commit -m "CI: Publish Helm charts for ${{ needs.build.outputs.tagged_release }}"
+          git push
+
+      - name: Run Helm Chart Releaser
+        uses: helm/chart-releaser-action@v1.4.1
+        with:
+          charts_dir: ./charts/*
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_SKIP_EXISTING: true
