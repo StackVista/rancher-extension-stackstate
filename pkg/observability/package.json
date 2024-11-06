@@ -1,13 +1,13 @@
 {
   "name": "observability",
-  "description": "Rancher Prime Observability Extension",
+  "description": "SUSE Rancher Prime Observability Extension",
   "version": "0.2.0",
   "license": "Apache-2.0",
   "author": "SUSE",
   "private": false,
   "rancher": {
     "annotations": {
-      "catalog.cattle.io/rancher-version": ">= v2.8.4"
+      "catalog.cattle.io/rancher-version": ">= 2.8.0 < 2.9.0"
     }
   },
   "icon": "https://raw.githubusercontent.com/stackvista/rancher-extension-stackstate/main/pkg/observability/rancher-observability.svg",
