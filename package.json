@@ -14,8 +14,8 @@
     "@rancher/shell": "^3.0.0-rc.9"
   },
   "devDependencies": {
-    "@nuxtjs/eslint-config-typescript": "6.0.1",
-    "@types/lodash": "4.14.184"
+    "@changesets/cli": "^2.27.9",
+    "@nuxtjs/eslint-config-typescript": "6.0.1"
   },
   "scripts": {
     "lint": "eslint --ext .ts,.js,.vue",
@@ -27,8 +27,5 @@
     "publish-pkgs": "./node_modules/@rancher/shell/scripts/extension/publish",
     "parse-tag-name": "./node_modules/@rancher/shell/scripts/extension/parse-tag-name",
     "release-tag": "changeset tag && ./scripts/duplicate-release-tags.sh"
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.27.9"
   }
 }
