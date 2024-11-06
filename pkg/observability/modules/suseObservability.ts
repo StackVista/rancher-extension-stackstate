@@ -1,4 +1,3 @@
-import isEmpty from 'lodash/isEmpty';
 import { ConnectionInfo } from 'types/component';
 import {
   CONFIG_MAP,
@@ -10,7 +9,8 @@ import {
   WORKLOAD_TYPES,
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
-import { OBSERVABILITY_CONFIGURATION_TYPE } from '../types/types';
+import { OBSERVABILITY_CONFIGURATION_TYPE, OBSERVABILITY_CLUSTERREPO } from '../types/types';
+import { logger } from '../utils/logger';
 
 export const STS_POD = 'pod';
 export const STS_SERVICE = 'service';
@@ -49,22 +49,28 @@ export function mapKind(kind: string): string {
   return KINDS.get(kind) || kind;
 }
 
-export async function loadStackStateSettings(store: any) {
-  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
-
-  if (!settings || isEmpty(settings)) {
-    return;
+export interface ObservabilitySettings {
+  spec: {
+    url: string;
+    apiToken: string;
+    serviceToken: string;
   }
+  metadata: Record<string, string>;
+}
 
-  const stackstateSettings = settings.find(
-    (s: any) => s.metadata.name === 'stackstate'
-  );
+function isSuseObservabilityName(name: string): boolean {
+  // match either the legacy (stackstate) or new (suse-observability) name
+  return name === 'stackstate' || name === 'suse-observability';
+}
 
-  if (!stackstateSettings || isEmpty(stackstateSettings)) {
-    return;
-  }
+function isSuseObservabilitySettings(settings: ObservabilitySettings): boolean {
+  return isSuseObservabilityName(settings.metadata.name);
+}
 
-  return stackstateSettings;
+export async function loadSuseObservabilitySettings(store: any): Promise<undefined | ObservabilitySettings> {
+  const settings: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+
+  return settings?.find(isSuseObservabilitySettings);
 }
 
 /**
@@ -78,26 +84,45 @@ export function isCrdLoaded(store: any): boolean {
   return loaded;
 }
 
+export async function isSuseObservabilityRepoPresent(store: any): Promise<boolean> {
+  logger.log('Checking if Observability Repo is present');
+
+  const repos: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: 'catalog.cattle.io.clusterrepo' });
+
+  logger.log('Checking if Observability Repo is present', repos);
+
+  const isPresent = repos?.some(isSuseObservabilitySettings) ?? false;
+
+  logger.log('Checking if Observability Repo is present', isPresent);
+
+  return isPresent;
+}
+
+export async function createObservabilityRepoIfNotPresent(store: any) {
+  logger.log('Creating Observability Repo if needed');
+  if (!(await isSuseObservabilityRepoPresent(store))) {
+    logger.log('Creating Observability Repo');
+    await store.dispatch('management/request', {
+      url:    '/v1/catalog.cattle.io.clusterrepos',
+      method: 'POST',
+      data:   OBSERVABILITY_CLUSTERREPO,
+    });
+    logger.log('Created Observability Repo');
+  }
+}
+
 export async function loadConnectionInfo(store: any): Promise<void> {
-  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+  const settings: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
 
-  if (!settings || isEmpty(settings)) {
-    return;
+  const suseObservabilitySettings = settings?.find(isSuseObservabilitySettings);
+
+  if (suseObservabilitySettings) {
+    await store.dispatch('observability/setConnectionInfo', {
+      apiURL:       suseObservabilitySettings.spec.url,
+      apiToken:     suseObservabilitySettings.spec.apiToken,
+      serviceToken: suseObservabilitySettings.spec.serviceToken,
+    });
   }
-  const stackstateSettings = settings.find(
-    (s: any) => s.metadata.name === 'stackstate'
-  );
-
-  if (!stackstateSettings || isEmpty(stackstateSettings)) {
-    return;
-  }
-  store.dispatch('observability/setConnectionInfo', {
-    apiURL:       stackstateSettings.spec.url,
-    apiToken:     stackstateSettings.spec.apiToken,
-    serviceToken: stackstateSettings.spec.serviceToken,
-  });
-
-  return stackstateSettings;
 }
 
 /**
@@ -136,20 +161,20 @@ export async function checkConnection(
 export async function getSnapshot(
   store: any,
   stql: string,
-  creds: any | undefined
+  settings: undefined | ObservabilitySettings
 ): Promise<any | void> {
-  const stackStateURL = creds ? creds.spec.url : await store.getters['observability/apiURL'];
-  const apiToken = creds ? creds.spec.apiToken : await store.getters['observability/apiToken'];
-  const serviceToken = creds ? creds.spec.serviceToken : await store.getters['observability/serviceToken'];
+  const suseObservabilityURL = settings ? settings.spec.url : await store.getters['observability/apiURL'];
+  const apiToken = settings ? settings.spec.apiToken : await store.getters['observability/apiToken'];
+  const serviceToken = settings ? settings.spec.serviceToken : await store.getters['observability/serviceToken'];
 
-  if (!stackStateURL || (!apiToken && !serviceToken)) {
+  if (!suseObservabilityURL || (!apiToken && !serviceToken)) {
     return;
   }
 
   const httpToken = token(apiToken, serviceToken);
 
   return store.dispatch('management/request', {
-    url:     `meta/proxy/${ stackStateURL }/api/snapshot`,
+    url:     `meta/proxy/${ suseObservabilityURL }/api/snapshot`,
     method:  'POST',
     headers: {
       'Content-Type':      'application/json',
@@ -176,15 +201,13 @@ export async function getSnapshot(
 
 export function loadComponent(
   store: any,
-  credentials: any,
+  { spec }: ObservabilitySettings,
   identifier: string
 ) {
-  const creds = token(credentials.spec.apiToken, credentials.spec.serviceToken);
+  const creds = token(spec.apiToken, spec.serviceToken);
 
   return store.dispatch('management/request', {
-    url: `meta/proxy/${
-      credentials.spec.url
-    }/api/components?identifier=${ encodeURIComponent(identifier) }`,
+    url:     `meta/proxy/${ spec.url }/api/components?identifier=${ encodeURIComponent(identifier) }`,
     method:  'GET',
     headers: { 'Content-Type': 'application/json', 'X-API-Auth-Header': creds },
   });
@@ -195,8 +218,8 @@ function token(apiToken: string, serviceToken: string): string {
 }
 
 /**
- * Ensure that there is a NodeDriver called 'stackstate' that has the URL whitelisted, so that the
- * Metadata Proxy can call out to the StackState API.
+ * Ensure that there is a NodeDriver called 'suse-observability' (previously 'stackstate') that has the URL whitelisted, so that the
+ * Metadata Proxy can call out to the SUSE Observability API.
  *
  * NOTE: Be aware that this goes through Norman APIs, not the Steve ones.
  *
@@ -210,7 +233,7 @@ export async function ensureObservabilityUrlWhitelisted(
 ): Promise<boolean> {
   async function newNodeDriver(store: any): Promise<any> {
     const emptyDriver = {
-      name: `stackstate`,
+      name: `suse-observability`,
       type: 'nodeDriver',
     };
 
@@ -223,27 +246,27 @@ export async function ensureObservabilityUrlWhitelisted(
     { root: true }
   );
 
-  const stackStateDriver =
-    nodeDrivers.find((driver: any) => driver.name === 'stackstate') ||
+  const suseObservabilityDriver =
+    nodeDrivers.find((driver: any) => isSuseObservabilityName(driver.name) ) ||
     (await newNodeDriver(store));
 
-  if (!stackStateDriver.whitelistDomains) {
-    stackStateDriver.whitelistDomains = [];
+  if (!suseObservabilityDriver.whitelistDomains) {
+    suseObservabilityDriver.whitelistDomains = [];
   }
 
   // Already in the whitelist
   if (
-    stackStateDriver.whitelistDomains.find((domain: string) => domain === url)
+    suseObservabilityDriver.whitelistDomains.find((domain: string) => domain === url)
   ) {
     return true;
   }
 
-  stackStateDriver.state = 'inactive';
-  stackStateDriver.url = 'local://';
-  stackStateDriver.whitelistDomains.push(url);
+  suseObservabilityDriver.state = 'inactive';
+  suseObservabilityDriver.url = 'local://';
+  suseObservabilityDriver.whitelistDomains.push(url);
 
   try {
-    await stackStateDriver.save();
+    await suseObservabilityDriver.save();
 
     return true;
   } catch (e) {

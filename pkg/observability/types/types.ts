@@ -1,11 +1,19 @@
 export const OBSERVABILITY_PRODUCT_NAME = 'observability';
-export const STACKSTATE_NAME = 'StackState';
 export const BLANK_CLUSTER = '_';
 
 export const OBSERVABILITY_DASHBOARD = 'observability.rancher.io.dashboard';
 
 export const OBSERVABILITY_CONFIGURATION_TYPE =
   'observability.rancher.io.configuration';
+
+export const OBSERVABILITY_CLUSTERREPO = {
+  type:     'catalog.cattle.io.clusterrepo',
+  metadata:   { name: 'suse-observability' },
+  spec:     {
+    clientSecret: null,
+    url:          'https://charts.rancher.com/server-charts/prime/suse-observability'
+  }
+};
 
 export const OBSERVABILITY_CRD = {
   apiVersion: 'apiextensions.k8s.io/v1',

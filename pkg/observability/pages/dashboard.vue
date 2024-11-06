@@ -1,34 +1,24 @@
 <script>
-import Loading from '@shell/components/Loading';
 import ConfigurationView from '../components/Dashboard/ConfigurationView';
-import InstallCrdView from '../components/Dashboard/InstallCrdView';
+import InstallView from '../components/Dashboard/InstallView';
 
 export default {
   name:       'ObservabilityDashboard',
   components: {
-    Loading,
     ConfigurationView,
-    InstallCrdView,
+    InstallView,
   },
 
-  data() {
-    return { loading: false };
-  },
   computed: {
-    stackStateURL() {
-      return this.$store.getters['observability/apiURL'];
-    },
-
     isConfigured() {
       return this.$store.getters['observability/hasCredentials'];
     },
     missingCrd() {
       return this.$store.getters['observability/isCrdMissing'];
     },
-  },
-  async fetch() {
-    await this.$store.dispatch('observability/setMissingCrd', this.missingCrd);
-    this.loading = false;
+    observabilityRepoPresent() {
+      return this.$store.getters['observability/isRepoPresent'];
+    },
   },
 };
 </script>
@@ -37,21 +27,13 @@ export default {
   <div class="dashboard">
     <div class="banner mt-40 mb-40">
       <div class="mb-20">
-        <img src="../rancher-observability.svg" alt="StackState logo" />
+        <img src="../rancher-observability.svg" alt="SUSE Observability logo" />
       </div>
       <h1>{{ t("observability.name") }}</h1>
       <p>{{ t("observability.dashboard.description") }}</p>
     </div>
-    <Loading v-if="$fetchState.pending" />
-    <div v-else-if="missingCrd">
-      <InstallCrdView class="mt-40" />
-    </div>
-    <div v-else-if="!isConfigured">
-      <ConfigurationView mode="create" />
-    </div>
-    <div v-else>
-      <ConfigurationView mode="edit" />
-    </div>
+    <InstallView v-if="(missingCrd || !observabilityRepoPresent)" class="mt-40" />
+    <ConfigurationView v-else :mode="isConfigured ? 'edit' : 'create'" />
   </div>
 </template>
 

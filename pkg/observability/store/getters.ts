@@ -7,5 +7,6 @@ export default {
   hasCredentials: (state: ObservabilityState) => {
     return state.apiURL && (state.apiToken || state.serviceToken);
   },
-  isCrdMissing: (state: ObservabilityState) => state.missingCrd,
+  isCrdMissing:  (state: ObservabilityState) => state.missingCrd,
+  isRepoPresent: (state: ObservabilityState) => state.repoPresent,
 };

@@ -1,7 +1,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import HealthState from '../components/Health/HealthState';
-import { loadStackStateSettings, loadComponent, isCrdLoaded } from '../modules/stackstate';
+import { loadSuseObservabilitySettings, loadComponent, isCrdLoaded } from '../modules/suseObservability';
 import { buildUrn } from '../modules/urn';
 import { HEALTH_STATE_TYPES } from '../types/types';
 
@@ -62,7 +62,7 @@ export default {
     }
 
     try {
-      const settings = await loadStackStateSettings(this.$store);
+      const settings = await loadSuseObservabilitySettings(this.$store);
 
       const component = await loadComponent(
         this.$store,

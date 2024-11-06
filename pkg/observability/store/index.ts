@@ -9,6 +9,7 @@ export interface ObservabilityState {
   apiToken?: string;
   serviceToken?: string;
   missingCrd: boolean;
+  repoPresent?: boolean;
 }
 
 const observabilityStoreFactory = (config: ObservabilityState): CoreStoreSpecifics => {
@@ -18,7 +19,8 @@ const observabilityStoreFactory = (config: ObservabilityState): CoreStoreSpecifi
         apiURL:         config.apiURL,
         apiToken:       config.apiToken,
         serviceToken:   config.serviceToken,
-        missingCrd:     false,
+        missingCrd:   config.missingCrd,
+        repoPresent:    config.repoPresent,
       };
     },
     getters:   { ...getters },
@@ -34,7 +36,8 @@ export default {
     apiURL:         '',
     apiToken:       '',
     serviceToken:   '',
-    missingCrd:     false,
+    missingCrd:   false,
+    repoPresent:    true,
   }),
   config,
 };

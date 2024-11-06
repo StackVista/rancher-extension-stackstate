@@ -3,8 +3,8 @@ import { mapGetters } from 'vuex';
 import LiveDate from '@shell/components/formatter/LiveDate.vue';
 import SortableTable from '@shell/components/SortableTable';
 
-import { loadComponent, mapKind, loadStackStateSettings, isCrdLoaded } from '../modules/stackstate';
-import { isStackStateObserved } from '../modules/observed';
+import { loadComponent, mapKind, loadSuseObservabilitySettings, isCrdLoaded } from '../modules/suseObservability';
+import { isObserved } from '../modules/observed';
 import { MONITOR_HEADERS } from '../types/headers';
 
 import HealthState from './Health/HealthState.vue';
@@ -63,18 +63,18 @@ export default {
       return;
     }
 
-    const obs = await isStackStateObserved(this.$store, this.clusterId);
+    const obs = await isObserved(this.$store, this.clusterId);
 
     this.observed = obs?.length > 0;
 
     if (!this.observed) {
       return;
     }
-    const creds = await loadStackStateSettings(this.$store);
+    const settings = await loadSuseObservabilitySettings(this.$store);
 
     this.urn = this.componentIdentifier;
 
-    const component = await loadComponent(this.$store, creds, this.urn);
+    const component = await loadComponent(this.$store, settings, this.urn);
 
     if (!component) {
       return;
@@ -82,7 +82,7 @@ export default {
 
     this.monitors = component.syncedCheckStates;
 
-    this.url = creds.spec.url;
+    this.url = settings.spec.url;
   },
 };
 </script>

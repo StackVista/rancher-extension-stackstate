@@ -7,5 +7,9 @@ export default {
 
   setMissingCrd: ({ commit }: any, missingCrd: boolean) => {
     commit('setMissingCrd', missingCrd);
+  },
+
+  setRepoPresent: ({ commit }: any, repoPresent: boolean) => {
+    commit('setRepoPresent', repoPresent);
   }
 };

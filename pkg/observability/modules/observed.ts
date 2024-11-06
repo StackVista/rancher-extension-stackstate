@@ -1,4 +1,4 @@
-export async function isStackStateObserved(
+export async function isObserved(
   store: any,
   clusterId: string
 ): Promise<any> {

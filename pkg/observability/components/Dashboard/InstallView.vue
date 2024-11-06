@@ -1,14 +1,51 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Banner } from '@components/Banner';
+import { createObservabilityRepoIfNotPresent } from '../../modules/suseObservability';
 import { OBSERVABILITY_CRD } from '../../types/types';
 import { handleGrowl } from '../../utils/growl';
 
 export default {
-  computed:   { ...mapGetters(['currentCluster']) },
+  computed: {
+    ...mapGetters(['currentCluster']),
+    missingCrd() {
+      return this.$store.getters['observability/isCrdMissing'];
+    },
+    repoPresent() {
+      return this.$store.getters['observability/isRepoPresent'];
+    },
+  },
   components: { Banner },
   methods:    {
+    async install() {
+      await this.installRepo();
+      await this.installCrd();
+    },
+
+    async installRepo() {
+      if (this.repoPresent) {
+        return;
+      }
+
+      try {
+        await createObservabilityRepoIfNotPresent(this.$store);
+
+        await this.$store.dispatch('observability/setRepoPresent', true);
+      } catch (err) {
+        handleGrowl(this.$store, {
+          message: `${ this.t('observability.errorMsg.failedRepo') } ${
+            err.message ? `: ${ err.message }` : ''
+          }`,
+          type: 'error',
+        });
+      }
+    },
+
     async installCrd() {
+      if (!this.missingCrd) {
+        return;
+      }
+
       try {
         await this.$store.dispatch('management/request', {
           url:    '/v1/apiextensions.k8s.io.customresourcedefinitions',
@@ -38,7 +75,7 @@ export default {
             <span class="mb-20">{{
               t("observability.dashboard.error.crdmissing")
             }}</span>
-            <button class="btn role-primary" @click="installCrd">
+            <button class="btn role-primary" @click="install">
               {{ t("observability.dashboard.installcrd") }}
             </button>
           </div>

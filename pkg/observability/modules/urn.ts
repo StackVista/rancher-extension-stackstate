@@ -2,7 +2,7 @@ import {
   mapKind, STS_CLUSTER,
   STS_NAMESPACE,
   STS_NODE
-} from './stackstate';
+} from './suseObservability';
 
 export function buildUrn(component: any, clusterName: string | undefined): string | undefined {
   if (!component.type) {

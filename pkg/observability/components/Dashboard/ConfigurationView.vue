@@ -2,7 +2,7 @@
 import { LabeledInput } from '@components/Form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import { Banner } from '@components/Banner';
-import { checkConnection, ensureObservabilityUrlWhitelisted } from '../../modules/stackstate';
+import { loadSuseObservabilitySettings, checkConnection, ensureObservabilityUrlWhitelisted } from '../../modules/suseObservability';
 import { handleGrowl } from '../../utils/growl';
 import { OBSERVABILITY_CONFIGURATION_TYPE } from '../../types/types';
 
@@ -14,28 +14,24 @@ export default {
   },
   props: { mode: { type: String, default: 'edit' } },
   async fetch() {
-    const cfg = await this.observabilityConfig();
-
-    if (cfg) {
-      this.stackStateURL = cfg.spec.url;
-      this.stackStateServiceToken = cfg.spec.serviceToken;
-    }
+    await this.fetchFormValues();
   },
   data: () => ({
-    stackStateURL:          '',
-    stackStateServiceToken: '',
-    showSuccessfulSave:     false,
-    showEditInterface:      false,
-    urlError:               false
+    suseObservabilityURL:          '',
+    suseObservabilityServiceToken: '',
+    showSuccessfulSave:            false,
+    showEditInterface:             false,
+    urlError:                      false
   }),
   watch: {
-    stackStateURL(neu) {
+    suseObservabilityURL(neu) {
       if (neu?.length && (neu.startsWith('http://') || neu.startsWith('https://'))) {
         this.urlError = true;
       } else {
         this.urlError = false;
       }
-    }
+    },
+
   },
   computed: {
     isCreateMode() {
@@ -43,24 +39,24 @@ export default {
     },
   },
   methods: {
-    async observabilityConfig() {
-      const configs = await this.$store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+    async fetchFormValues() {
+      const settings = await loadSuseObservabilitySettings(this.$store);
 
-      if (configs) {
-        for (const config of configs) {
-          if (config.metadata.name !== 'stackstate') {
-            continue;
-          }
-
-          return config;
-        }
+      if (settings) {
+        this.suseObservabilityURL = settings.spec.url;
+        this.suseObservabilityServiceToken = settings.spec.serviceToken;
       }
+    },
 
-      return null;
+    async cancel() {
+      this.showEditInterface = false;
+
+      // reset the form values when the user cancels the edit
+      await this.fetchFormValues();
     },
 
     async save(btnCb) {
-      const whitelisted = await ensureObservabilityUrlWhitelisted(this.$store, this.stackStateURL);
+      const whitelisted = await ensureObservabilityUrlWhitelisted(this.$store, this.suseObservabilityURL);
 
       if (!whitelisted) {
         handleGrowl(this.$store, {
@@ -74,8 +70,8 @@ export default {
       }
 
       const conn = await checkConnection(this.$store, {
-        apiURL:       this.stackStateURL,
-        serviceToken: this.stackStateServiceToken,
+        apiURL:       this.suseObservabilityURL,
+        serviceToken: this.suseObservabilityServiceToken,
       });
 
       if (!conn) {
@@ -93,25 +89,25 @@ export default {
 
       if (this.isCreateMode) {
         const config = {
-          metadata: { name: `stackstate`, namespace: 'default' },
+          metadata: { name: `suse-observability`, namespace: 'default' },
           spec:     {},
           type:     OBSERVABILITY_CONFIGURATION_TYPE,
         };
 
         newConfig = await this.$store.dispatch('management/create', config);
       } else {
-        newConfig = await this.observabilityConfig();
+        newConfig = await loadSuseObservabilitySettings(this.$store);
       }
 
-      newConfig.spec.url = this.stackStateURL;
-      newConfig.spec.serviceToken = this.stackStateServiceToken;
+      newConfig.spec.url = this.suseObservabilityURL;
+      newConfig.spec.serviceToken = this.suseObservabilityServiceToken;
 
       try {
         await newConfig.save();
 
         await this.$store.dispatch('observability/setConnectionInfo', {
-          apiURL:       this.stackStateURL,
-          serviceToken: this.stackStateServiceToken,
+          apiURL:       this.suseObservabilityURL,
+          serviceToken: this.suseObservabilityServiceToken,
         });
 
         this.showEditInterface = false;
@@ -148,8 +144,9 @@ export default {
           color="info"
         >
           <div class="banner-info">
-            <p>{{ t("observability.dashboard.connected") }}&nbsp;</p>
-            <a :href="`https://${stackStateURL}/`"> {{ stackStateURL }}</a>
+            <p>{{ t("observability.dashboard.connected") }}</p>
+            <!-- reserve a line when the url is an empty string so UI won't jump on change -->
+            <a :href="`https://${suseObservabilityURL}/`">{{ suseObservabilityURL || '&nbsp;' }}</a>
           </div>
         </Banner>
 
@@ -173,7 +170,7 @@ export default {
           class="configuration-inputs"
         >
           <LabeledInput
-            v-model="stackStateURL"
+            v-model="suseObservabilityURL"
             :label="t('observability.configuration.url')"
             class="url-input"
             :class="{'error': urlError }"
@@ -188,7 +185,7 @@ export default {
             </p>
           </div>
           <LabeledInput
-            v-model="stackStateServiceToken"
+            v-model="suseObservabilityServiceToken"
             class="mb-20"
             type="password"
             :label="t('observability.configuration.serviceToken')"
@@ -200,7 +197,7 @@ export default {
             <button
               v-if="showEditInterface"
               class="btn role-secondary"
-              @click="showEditInterface = !showEditInterface"
+              @click="cancel"
             >
               {{ t("observability.dashboard.cancelEditConfig") }}
             </button>
@@ -241,9 +238,8 @@ export default {
 
   .banner-info {
     padding: 15px 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    max-width: 480px;
   }
 
   .configuration-actions {

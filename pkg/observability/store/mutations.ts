@@ -10,5 +10,8 @@ export default {
   },
   setMissingCrd(state: ObservabilityState, val: boolean) {
     state.missingCrd = val;
+  },
+  setRepoPresent(state: ObservabilityState, val: boolean) {
+    state.repoPresent = val;
   }
 };
