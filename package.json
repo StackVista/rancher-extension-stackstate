@@ -17,6 +17,9 @@
     "@changesets/cli": "^2.27.9",
     "@nuxtjs/eslint-config-typescript": "6.0.1"
   },
+  "resolutions": {
+    "@types/lodash": "4.14.184"
+  },
   "scripts": {
     "lint": "eslint --ext .ts,.js,.vue",
     "dev": "NODE_ENV=dev vue-cli-service serve",
