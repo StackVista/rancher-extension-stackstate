@@ -15,7 +15,10 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Read changeset status
+    - name: Print remotes
+      run: git remote -v
+
+    - name: Read Changeset Status
       shell: bash
       id: status
       run: |
@@ -27,8 +30,10 @@ runs:
         fi
         echo "Temporary file created at: $OUTPUT"
 
+        BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
+
         # the `changeset status` command uses path.join so the path should be relative
-        yarn changeset status --output $(realpath --relative-to . $OUTPUT)
+        yarn changeset status --since origin/$BASE_BRANCH --output $(realpath --relative-to . $OUTPUT)
 
         if [ ! -s "$OUTPUT" ]; then
           echo "Error: Temporary file is empty after running 'yarn changeset status'"
@@ -38,3 +43,4 @@ runs:
         RELEASE=$(jq -r '.releases[0]' "$OUTPUT")
 
         echo "release=$RELEASE" >> $GITHUB_OUTPUT
+        echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
