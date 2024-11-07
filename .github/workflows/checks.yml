@@ -41,25 +41,28 @@ jobs:
 
       - name: Check Version Changes
         run: |
-          BASE_BRANCH=${{ steps.changeset-status.outputs.base_branch }}
-          RELEASE=${{ steps.changeset-status.outputs.release }}
-          VERSION_TYPE=echo $RELEASE | jq -r '.type'
-          OLD_VERSION=echo $RELEASE | jq -r '.oldVersion'
-          NEW_VERSION=echo $RELEASE | jq -r '.newVersion'
+          BASE_BRANCH="${{ steps.changeset-status.outputs.base_branch }}"
+          RELEASE="${{ steps.changeset-status.outputs.release }}"
 
-          if [[ $BASE_BRANCH =~ ^v[0-9]+\.[0-9]+\.x$ ]] && [[ $VERSION_TYPE != "patch" ]]; then
-            echo "🚨 Detected "$VERSION_TYPE" bump: $OLD_VERSION → $NEW_VERSION."
-            echo "🚨 Only patch versions are allowed for the maintenance branch ${{ steps.changeset-status.outputs.base_branch }}."
+          # Extract version information from RELEASE JSON
+          VERSION_TYPE=$(echo "$RELEASE" | jq -r '.type')
+          OLD_VERSION=$(echo "$RELEASE" | jq -r '.oldVersion')
+          NEW_VERSION=$(echo "$RELEASE" | jq -r '.newVersion')
+
+          # Check for invalid version bumps based on the branch type
+          if [[ "$BASE_BRANCH" =~ ^v[0-9]+\.[0-9]+\.x$ && "$VERSION_TYPE" != "patch" ]]; then
+            echo "🚨 Detected '$VERSION_TYPE' bump: $OLD_VERSION → $NEW_VERSION."
+            echo "🚨 Only patch versions are allowed for the maintenance branch $BASE_BRANCH."
             exit 1
           fi
 
-          if [[ $BASE_BRANCH =~ ^v[0-9]+\.x\.x$ ]] && [[ $VERSION_TYPE == "major" ]]; then
-            echo "🚨 Detected "$VERSION_TYPE" bump: $OLD_VERSION → $NEW_VERSION."
-            echo "🚨 Only patch or minor versions are allowed for the maintenance branch ${{ steps.changeset-status.outputs.base_branch }}."
+          if [[ "$BASE_BRANCH" =~ ^v[0-9]+\.x\.x$ && "$VERSION_TYPE" == "major" ]]; then
+            echo "🚨 Detected '$VERSION_TYPE' bump: $OLD_VERSION → $NEW_VERSION."
+            echo "🚨 Only patch or minor versions are allowed for the maintenance branch $BASE_BRANCH."
             exit 1
           fi
 
-          echo "✅ Detected "$VERSION_TYPE" bump: $OLD_VERSION → $NEW_VERSION."
+          echo "✅ Detected '$VERSION_TYPE' bump: $OLD_VERSION → $NEW_VERSION."
 
       - name: Detect File Changes
         id: changed-files
