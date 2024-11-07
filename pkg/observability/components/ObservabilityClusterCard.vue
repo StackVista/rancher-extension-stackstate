@@ -28,9 +28,6 @@ export default {
     countDeviating() {
       return this.deviating;
     },
-    countHealthy() {
-      return this.healthy;
-    },
     countCritical() {
       return this.critical;
     },
@@ -55,7 +52,6 @@ export default {
       snapshot:                undefined,
       deviating:               0,
       critical:                0,
-      healthy:                 0,
       isConfigured:            true,
       HEALTH_STATE_TYPES,
       extensionDashboardRoute: {
@@ -96,8 +92,6 @@ export default {
         this.deviating++;
       } else if (component.state.healthState === 'CRITICAL') {
         this.critical++;
-      } else if (component.state.healthState === 'HEALTHY') {
-        this.healthy++;
       }
     }
     this.observed = obs;
