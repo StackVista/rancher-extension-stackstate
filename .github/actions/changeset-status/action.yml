@@ -10,8 +10,8 @@ outputs:
       The release version of the changeset:
       {
         name: string,
-        type: "path" | "minor" | "major",
-        oldVersion: string
+        type: "patch" | "minor" | "major",
+        oldVersion: string,
         newVersion: string
       }
     value: ${{ steps.status.outputs.release }}
@@ -23,25 +23,26 @@ runs:
       shell: bash
       id: status
       run: |
-        OUTPUT=$(mktemp ${{runner.temp}}/changeset-output.XXXXXX.json)
+        OUTPUT=$(mktemp "${{runner.temp}}/changeset-output.XXXXXX.json")
 
         if [ ! -f "$OUTPUT" ]; then
-          echo "Failed to create temp file at: $OUTPUT"
+          echo "🚨 Error: Failed to create temp file at: $OUTPUT"
           exit 1
         fi
-        echo "Temporary file created at: $OUTPUT"
+        echo "✅ Temporary file created at: $OUTPUT"
 
+        # Read the base branch from the changeset configuration
         BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
 
-        # the `changeset status` command uses path.join so the path should be relative
-        yarn changeset status --since origin/$BASE_BRANCH --output $(realpath --relative-to . $OUTPUT)
+        # Run the changeset status command with relative path output
+        yarn changeset status --since "origin/$BASE_BRANCH" --output $(realpath --relative-to . "$OUTPUT")
 
         if [ ! -s "$OUTPUT" ]; then
-          echo "Error: Temporary file is empty after running 'yarn changeset status'"
+          echo "🚨 Error: Temporary file is empty after running 'yarn changeset status'"
           exit 1
         fi
 
-        RELEASE=$(jq -r '.releases[0]' "$OUTPUT")
+        RELEASE=$(jq -c '.releases[0] // empty' "$OUTPUT")
 
-        echo "release=$RELEASE" >> $GITHUB_OUTPUT
+        echo "release=" >> $GITHUB_OUTPUT
         echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
