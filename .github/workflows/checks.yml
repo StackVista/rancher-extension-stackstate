@@ -40,7 +40,7 @@ jobs:
         uses: ./.github/actions/changeset-status
 
       - name: Check Version Changes
-        if: steps.changeset-status.outputs.release
+        if: steps.changeset-status.outputs.release != 'null'
         run: |
           BASE_BRANCH="${{ steps.changeset-status.outputs.base_branch }}"
           RELEASE="${{ steps.changeset-status.outputs.release }}"
