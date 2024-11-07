@@ -1,0 +1,40 @@
+name: Read changeset status
+
+outputs:
+  release:
+    description: |
+      The release version of the changeset:
+      {
+        name: string,
+        type: "path" | "minor" | "major",
+        oldVersion: string
+        newVersion: string
+      }
+    release: ${{ steps.status.outputs.release }}
+
+runs:
+  using: composite
+  steps:
+    - name: Read changeset status
+      shell: bash
+      id: status
+      run: |
+        OUTPUT=$(mktemp ${{runner.temp}}/changeset-output.XXXXXX.json)
+
+        if [ ! -f "$OUTPUT" ]; then
+          echo "Failed to create temp file at: $OUTPUT"
+          exit 1
+        fi
+        echo "Temporary file created at: $OUTPUT"
+
+        # the `changeset status` command uses path.join so the path should be relative
+        yarn changeset status --output $(realpath --relative-to . $OUTPUT)
+
+        if [ ! -s "$OUTPUT" ]; then
+          echo "Error: Temporary file is empty after running 'yarn changeset status'"
+          exit 1
+        fi
+
+        RELEASE=$(jq -r '.releases[0]' "$OUTPUT")
+
+        echo "release=$RELEASE" >> $GITHUB_OUTPUT

@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup environment
         uses: ./.github/actions/setup-env
@@ -32,6 +34,15 @@ jobs:
       - name: Check for Uncommitted Changes
         run: |
           git diff --name-only --exit-code --relative || (echo "\nUncommitted changes found 👆" && exit 1)
+
+      - name: Read Changeset Status
+        id: changeset-status
+        uses: ./.github/actions/changeset-status
+
+      - run: echo "${{ steps.changeset-status.outputs.release }}"
+      - run: |
+          MESSAGE=$(echo "${{ steps.changeset-status.outputs.release }}" | jq -r 'if . then "🚀 Release `\(.name)@\(.oldVersion) → \(.newVersion)`" else "Publishing release..." end')
+          echo "$MESSAGE"
 
       - name: Detect File Changes
         id: changed-files
