@@ -39,9 +39,9 @@ jobs:
         id: changeset-status
         uses: ./.github/actions/changeset-status
 
-      - run: echo "${{ steps.changeset-status.outputs.release }}"
+      - run: echo "${{ steps.changeset-status.outputs }}"
       - run: |
-          MESSAGE=$(echo "${{ steps.changeset-status.outputs.release }}" | jq -r 'if . then "🚀 Release `\(.name)@\(.oldVersion) → \(.newVersion)`" else "Publishing release..." end')
+          MESSAGE=$(echo "${{ steps.changeset-status.outputs.base_branch }}" | jq -r 'if . then "🚀 Release `\(.name)@\(.oldVersion) → \(.newVersion)`" else "Publishing release..." end')
           echo "$MESSAGE"
 
       - name: Detect File Changes
