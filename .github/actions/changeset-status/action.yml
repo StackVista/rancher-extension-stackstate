@@ -10,7 +10,7 @@ outputs:
         oldVersion: string
         newVersion: string
       }
-    release: ${{ steps.status.outputs.release }}
+    value: ${{ steps.status.outputs.release }}
 
 runs:
   using: composite
