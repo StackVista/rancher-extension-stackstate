@@ -16,6 +16,7 @@ runs:
   using: composite
   steps:
     - name: Print remotes
+      shell: bash
       run: git remote -v
 
     - name: Read Changeset Status
