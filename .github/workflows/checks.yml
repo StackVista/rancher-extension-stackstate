@@ -42,7 +42,7 @@ jobs:
         uses: ./.github/actions/changeset-status
         with:
           # pass the PR target branch as an argument
-          args: --since ${{ github.base_ref }}
+          args: --since origin/${{ github.base_ref }}
 
       - name: Check Version Changes
         if: steps.changeset-status.outputs
