@@ -4,6 +4,7 @@ on:
   pull_request:
     paths-ignore:
       - "**.md"
+      - "!.changeset/**"
 
   push:
     branches:
@@ -25,6 +26,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup environment
         uses: ./.github/actions/setup-env
@@ -32,6 +35,34 @@ jobs:
       - name: Check for Uncommitted Changes
         run: |
           git diff --name-only --exit-code --relative || (echo "\nUncommitted changes found 👆" && exit 1)
+
+      - name: Read Changeset Status
+        id: changeset-status
+        if: github.event_name == 'pull_request'
+        uses: ./.github/actions/changeset-status
+        with:
+          args: --since origin/${{ github.base_ref }}
+
+      - name: Check Version Changes
+        if: steps.changeset-status.outputs.type
+        run: |
+          BASE_BRANCH="${{ steps.changeset-status.outputs.base_branch }}"
+          VERSION_TYPE="${{ steps.changeset-status.outputs.type }}"
+
+          # Check for invalid version bumps based on the branch type
+          if [[ "$BASE_BRANCH" =~ ^v[0-9]+\.[0-9]+\.x$ && "$VERSION_TYPE" != "patch" ]]; then
+            echo "🚨 Detected '$VERSION_TYPE' bump."
+            echo "🚨 Only 'patch' versions are allowed for the maintenance branch $BASE_BRANCH."
+            exit 1
+          fi
+
+          if [[ "$BASE_BRANCH" =~ ^v[0-9]+\.x\.x$ && "$VERSION_TYPE" == "major" ]]; then
+            echo "🚨 Detected '$VERSION_TYPE' bump."
+            echo "🚨 Only 'patch' or 'minor' versions are allowed for the maintenance branch $BASE_BRANCH."
+            exit 1
+          fi
+
+          echo "✅ Detected '$VERSION_TYPE' bump."
 
       - name: Detect File Changes
         id: changed-files
@@ -62,7 +93,7 @@ jobs:
     # runs only on pushes so it does not run on PRs
     if: github.event_name == 'push'
     outputs:
-      tagged_release: ${{ steps.changesets-output.outputs.tagged_release }}
+      tagged_release: ${{ steps.release-info.outputs.tag }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -72,67 +103,43 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup-env
 
-      - name: Read Changesets Config
-        id: changeset-config
-        run: |
-          BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
-          echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
-
-      - name: Determine Release Details
-        id: release-details
-        # runs only when the .changeset.baseBranch is the target branch
-        if: steps.changeset-config.outputs.base_branch == '${{ github.ref_name }}'
-        run: |
-          OUTPUT=$(mktemp ${{runner.temp}}/changeset-output.XXXXXX.json)
-
-          if [ ! -f "$OUTPUT" ]; then
-            echo "Failed to create temp file at: $OUTPUT"
-            exit 1
-          fi
-          echo "Temporary file created at: $OUTPUT"
-
-          # the `changeset status` command uses path.join so the path should be relative
-          yarn changeset status --output $(realpath --relative-to . $OUTPUT)
-
-          if [ ! -s "$OUTPUT" ]; then
-            echo "Error: Temporary file is empty after running 'yarn changeset status'"
-            exit 1
-          fi
-
-          MESSAGE=$(jq -r 'if .releases | length > 0 then .releases[0] | "🚀 Release `\(.name)@\(.oldVersion) → \(.newVersion)`" else "Publishing release..." end' "$OUTPUT")
-          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+      - name: Read Changeset Status
+        id: changeset-status
+        uses: ./.github/actions/changeset-status
 
       # creates a PR if there are changesets or assign the new tag if the PR is merged
       - name: Create Release Pull Request or Publish
         id: changesets
-        if: steps.release-details.outputs.message
+        # runs only when the changeset's base_branch is the target branch
+        if: steps.changeset-status.outputs.base_branch == '${{ github.ref_name }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MESSAGE: "🚀 Release `${{ steps.changeset-status.outputs.name }}@${{ steps.changeset-status.outputs.old_version }} → ${{ steps.changeset-status.outputs.new_version }}`"
         uses: changesets/action@v1
         with:
-          title: ${{ steps.release-details.outputs.message }}
-          commit: ${{ steps.release-details.outputs.message }}
+          title: ${{ env.MESSAGE }}
+          commit: ${{ env.MESSAGE }}
           # define the publish command, so changeset creates a release in GitHub
           publish: yarn release-tag
 
-      - name: Extract Published Version
-        id: changesets-output
+      - name: Extract Release Info
+        id: release-info
         if: steps.changesets.outputs.published == 'true'
         # extract the first package name and version and format as `name-version`
         # the publish-pkgs script expects `name-version` but not `name@version`
         # so `release-tag` creates both but outputs only the default changeset format
         run: |
-          TAGGED_RELEASE=$(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r '.[0] | "\(.name)-\(.version)"')
-          echo "tagged_release=$TAGGED_RELEASE" >> $GITHUB_OUTPUT
+          TAG="${{ steps.changeset-status.outputs.name }}-${{ steps.changeset-status.outputs.new_version }}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Preare Build Artifact
         id: prepare-artifact
-        if: steps.changesets-output.outputs.tagged_release
+        if: steps.release-info.outputs.tag
         run: |
           yarn publish-pkgs \
             -s "${{ github.repository }}" \
             -b "${{ env.HELM_CHART_BRANCH }}" \
-            -t "${{ steps.changesets-output.outputs.tagged_release }}"
+            -t "${{ steps.release-info.outputs.tag }}"
 
       - name: Upload Charts Artifact
         if: steps.prepare-artifact.conclusion == 'success'
