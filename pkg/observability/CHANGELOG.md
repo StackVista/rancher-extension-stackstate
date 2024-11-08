@@ -1,5 +1,11 @@
 # observability
 
+## 0.2.30
+
+### Patch Changes
+
+- 45d3363: Add patch
+
 ## 0.2.2
 
 ### Patch Changes
