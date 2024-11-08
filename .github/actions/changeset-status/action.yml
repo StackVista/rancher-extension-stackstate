@@ -6,6 +6,9 @@ inputs:
     required: false
 
 outputs:
+  base_branch:
+    description: The base branch of the changeset
+    value: ${{ steps.status.outputs.base_branch }}
   name:
     description: The name of the package
     value: ${{ steps.status.outputs.name }}
@@ -56,3 +59,6 @@ runs:
         else
           echo "⏩ No changeset found"
         fi
+
+        BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
+        echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
