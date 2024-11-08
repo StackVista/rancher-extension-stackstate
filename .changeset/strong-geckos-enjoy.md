@@ -1,5 +1,5 @@
 ---
-"observability": minor
+"observability": major
 ---
 
-Add minor
+Add major
