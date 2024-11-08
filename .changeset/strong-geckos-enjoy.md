@@ -1,5 +1,5 @@
 ---
-"observability": major
+"observability": patch
 ---
 
-Add major
+Add patch
