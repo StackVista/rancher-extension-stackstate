@@ -26,6 +26,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
+          # TODO delete if possible
           fetch-depth: 0
 
       - name: Setup environment
@@ -37,34 +38,32 @@ jobs:
 
       - name: Read Changeset Status
         id: changeset-status
+        if: github.event_name == 'pull_request'
         uses: ./.github/actions/changeset-status
+        with:
+          # pass the PR target branch as an argument
+          args: --since ${{ github.base_ref }}
 
       - name: Check Version Changes
-        if: steps.changeset-status.outputs.release != ''
+        if: steps.changeset-status.outputs
         run: |
-          BASE_BRANCH='${{ steps.changeset-status.outputs.base_branch }}'
-          RELEASE='${{ steps.changeset-status.outputs.release }}'
-
-          # Extract version information from RELEASE JSON
-          VERSION_TYPE=$(echo "$RELEASE" | jq -r '.type')
-          OLD_VERSION=$(echo "$RELEASE" | jq -r '.oldVersion')
-          NEW_VERSION=$(echo "$RELEASE" | jq -r '.newVersion')
-
+          BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
+          VERSION_TYPE="${{ steps.changeset-status.outputs.type }}"
 
           # Check for invalid version bumps based on the branch type
           if [[ "$BASE_BRANCH" =~ ^v[0-9]+\.[0-9]+\.x$ && "$VERSION_TYPE" != "patch" ]]; then
-            echo "🚨 Detected '$VERSION_TYPE' bump: $OLD_VERSION → $NEW_VERSION."
+            echo "🚨 Detected '$VERSION_TYPE' bump."
             echo "🚨 Only 'patch' versions are allowed for the maintenance branch $BASE_BRANCH."
             exit 1
           fi
 
           if [[ "$BASE_BRANCH" =~ ^v[0-9]+\.x\.x$ && "$VERSION_TYPE" == "major" ]]; then
-            echo "🚨 Detected '$VERSION_TYPE' bump: $OLD_VERSION → $NEW_VERSION."
+            echo "🚨 Detected '$VERSION_TYPE' bump."
             echo "🚨 Only 'patch' or 'minor' versions are allowed for the maintenance branch $BASE_BRANCH."
             exit 1
           fi
 
-          echo "✅ Detected '$VERSION_TYPE' bump: $OLD_VERSION → $NEW_VERSION."
+          echo "✅ Detected '$VERSION_TYPE' bump."
 
       - name: Detect File Changes
         id: changed-files

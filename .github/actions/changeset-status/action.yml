@@ -1,20 +1,23 @@
 name: Read changeset status
 
-outputs:
-  base_branch:
-    description: The value of 'baseBranch' field from .changeset/config.json
-    value: ${{ steps.status.outputs.base_branch }}
+inputs:
+  args:
+    description: Additional arguments to pass to 'yarn changeset status'
+    required: false
 
-  release:
-    description: |
-      The release version of the changeset if any:
-      {
-        name: string,
-        type: "patch" | "minor" | "major",
-        oldVersion: string,
-        newVersion: string
-      }
-    value: ${{ steps.status.outputs.release }}
+outputs:
+  name:
+    description: The name of the package
+    value: ${{ steps.status.outputs.name }}
+  type:
+    description: "The type of version bump: 'patch' | 'minor' | 'major'"
+    value: ${{ steps.status.outputs.type }}
+  old_version:
+    description: The old version of the package
+    value: ${{ steps.status.outputs.old_version }}
+  new_version:
+    description: The new version of the package
+    value: ${{ steps.status.outputs.new_version }}
 
 runs:
   using: composite
@@ -31,18 +34,25 @@ runs:
         fi
         echo "✅ Temporary file created at: $OUTPUT"
 
-        # Read the base branch from the changeset configuration
-        BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
-
         # Run the changeset status command with relative path output
-        yarn changeset status --since "origin/$BASE_BRANCH" --output $(realpath --relative-to . "$OUTPUT")
+        yarn changeset status ${{ inputs.args }} --output $(realpath --relative-to . "$OUTPUT")
 
         if [ ! -s "$OUTPUT" ]; then
           echo "🚨 Error: Temporary file is empty after running 'yarn changeset status'"
           exit 1
         fi
 
-        RELEASE=$(jq -c '.releases[0] // empty' "$OUTPUT")
+        # if the .releases length is greater than 0, then the changeset is ready to be released
+        if jq -e '.releases | length > 0' "$OUTPUT" > /dev/null; then
+          NAME=$(jq -r '.releases[0].name' "$OUTPUT")
+          TYPE=$(jq -r '.releases[0].type' "$OUTPUT")
+          OLD_VERSION=$(jq -r '.releases[0].oldVersion' "$OUTPUT")
+          NEW_VERSION=$(jq -r '.releases[0].newVersion' "$OUTPUT")
 
-        echo "release=$RELEASE" >> $GITHUB_OUTPUT
-        echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "type=$TYPE" >> $GITHUB_OUTPUT
+          echo "old_version=$OLD_VERSION" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        else
+          echo "⏩ No changeset found"
+        fi
