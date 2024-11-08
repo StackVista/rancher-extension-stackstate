@@ -1,5 +1,11 @@
 # observability
 
+## 1.0.1
+
+### Patch Changes
+
+- 0cd6f20: Delete not used `ObservabilityClusterCard.data.healthy` field
+
 ## 1.0.0
 
 ### Major Changes
