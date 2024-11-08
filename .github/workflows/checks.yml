@@ -27,6 +27,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
+          # changesets status requires deeper history
           fetch-depth: 0
 
       - name: Setup environment
@@ -98,6 +99,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
+          # changesets status requires deeper history
           fetch-depth: 0
 
       - name: Setup environment
