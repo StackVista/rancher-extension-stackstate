@@ -1,5 +1,0 @@
----
-"observability": major
----
-
-Major
