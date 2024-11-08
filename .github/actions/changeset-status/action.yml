@@ -7,7 +7,7 @@ outputs:
 
   release:
     description: |
-      The release version of the changeset:
+      The release version of the changeset if any:
       {
         name: string,
         type: "patch" | "minor" | "major",
@@ -43,6 +43,9 @@ runs:
         fi
 
         RELEASE=$(jq -c '.releases[0] // empty' "$OUTPUT")
+
+        # PRINT THE RELEASE CONTENT
+        echo "RELEASE: $RELEASE"
 
         echo "release=" >> $GITHUB_OUTPUT
         echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT

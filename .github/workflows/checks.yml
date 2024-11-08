@@ -40,13 +40,10 @@ jobs:
         uses: ./.github/actions/changeset-status
 
       - name: Check Version Changes
-        if: steps.changeset-status.outputs.release != 'null'
+        if: steps.changeset-status.outputs.release != ''
         run: |
           BASE_BRANCH="${{ steps.changeset-status.outputs.base_branch }}"
           RELEASE="${{ steps.changeset-status.outputs.release }}"
-
-          # print RELEASE JSON data
-          echo "RELEASE: $RELEASE"
 
           # Extract version information from RELEASE JSON
           VERSION_TYPE=$(echo "$RELEASE" | jq -r '.type')
