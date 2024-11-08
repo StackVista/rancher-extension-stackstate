@@ -46,6 +46,9 @@ jobs:
       - name: Check Version Changes
         if: steps.changeset-status.outputs != ''
         run: |
+          # TODO delete
+          ${{ steps.changeset-status.outputs }}
+
           BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
           VERSION_TYPE="${{ steps.changeset-status.outputs.type }}"
 
