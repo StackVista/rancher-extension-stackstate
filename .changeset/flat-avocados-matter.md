@@ -1,5 +1,5 @@
 ---
-"observability": patch
+"observability": minor
 ---
 
 Path change
