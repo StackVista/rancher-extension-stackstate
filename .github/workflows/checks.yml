@@ -128,7 +128,7 @@ jobs:
         # the publish-pkgs script expects `name-version` but not `name@version`
         # so `release-tag` creates both but outputs only the default changeset format
         run: |
-          TAG="${{ steps.changeset-status.outputs.name }}-${{ steps.changeset-status.outputs.new_version }}"
+          TAG=$(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r '.[0] | "\(.name)-\(.version)"')
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Preare Build Artifact
