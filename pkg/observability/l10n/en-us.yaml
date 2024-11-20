@@ -1,5 +1,5 @@
 sts:
-  observed: "Rancher Prime Observability"
+  observed: "SUSE Observability"
   observability: "Observability"
   settings:
     label: "Settings"
@@ -12,7 +12,7 @@ components:
   componentHealth:
     title: "Component health:"
   monitorTab:
-    notEnabled: "Rancher Prime Observability is not enabled for this cluster."
+    notEnabled: "SUSE Observability is not enabled for this cluster."
     noMonitors: "No monitors found for this component."
     state: State
     monitor: Monitor
@@ -21,7 +21,7 @@ components:
 
 observability:
   health: "Health"
-  name: "Rancher Prime Observability"
+  name: "SUSE Observability"
   configuration:
     url: SUSE Observability URL
     serviceToken: SUSE Observability Service Token
@@ -34,23 +34,23 @@ observability:
     failedClusterRepo: Failed to create the SUSE Observability cluster repository
   dashboard:
     name: Dashboard
-    description: Using Rancher Prime Observability, you can monitor the health of all clusters managed by Rancher and the workloads running on them.
+    description: Using SUSE Observability, you can monitor the health of all clusters managed by Rancher Prime and the workloads running on them.
     editConfig: Edit Configuration
     cancelEditConfig: Cancel
     error:
-      notconfigured: "The connection details for have not been configured yet. Please enter the Stackstate URL and Service Token to start using Rancher Prime Observability:"
-      crdmissing: "Rancher Prime Observability Extension is not fully installed yet. Please install it in order to proceed to configuration:"
-    connected: "Rancher Prime is now connected to SUSE Observability at:"
+      notconfigured: "The connection details for have not been configured yet. Please enter the URL and Service Token to start using SUSE Observability:"
+      crdmissing: "The SUSE Observability Extension is not fully installed yet. Please install it in order to proceed to configuration:"
+    connected: "SUSE Rancher Prime is now connected to SUSE Observability at:"
     installcrd: Install
     saveSuccess: Configuration saved successfully!
   clusterCard:
     clusterIs: Cluster is
-    notObservedPrepend: 'Cluster is not observed by Rancher Prime Observability. Please '
+    notObservedPrepend: 'Cluster is not observed by SUSE Observability. Please '
     notObservedInstall: 'install'
     notObservedPostpend: 'the agent'
-    connecting: "Connecting to Observability Plane..."
-    notConnectedPrepend: 'Rancher Prime Observability has not been configured, please go to the'
-    notConnectedObservability: 'Rancher Prime Observability Configuration.'
+    connecting: "Connecting to SUSE Observability Plane..."
+    notConnectedPrepend: 'SUSE Observability has not been configured, please go to the'
+    notConnectedObservability: 'SUSE Observability Configuration.'
     clusterHealth: "Cluster health:"
     componentsHealth: "Components health:"
     deviating: "Deviating:"
