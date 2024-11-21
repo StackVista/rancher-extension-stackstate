@@ -34,7 +34,7 @@ observability:
     failedClusterRepo: Failed to create the SUSE Observability cluster repository
   dashboard:
     name: Dashboard
-    description: Using SUSE Observability, you can monitor the health of all clusters managed by Rancher Prime and the workloads running on them.
+    description: Using SUSE Observability, you can monitor the health of all clusters managed by SUSE Rancher Prime and the workloads running on them.
     editConfig: Edit Configuration
     cancelEditConfig: Cancel
     error:
