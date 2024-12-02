@@ -8,8 +8,8 @@
   "rancher": {
     "annotations": {
       "catalog.cattle.io/kube-version": ">= 1.16.0-0",
-      "catalog.cattle.io/rancher-version": ">= 2.9.0 < 2.10.0",
-      "catalog.cattle.io/ui-extensions-version": ">= 2.0.1"
+      "catalog.cattle.io/rancher-version": ">= 2.10.0",
+      "catalog.cattle.io/ui-extensions-version": ">= 3.0.0 < 4.0.0"
     }
   },
   "icon": "https://raw.githubusercontent.com/stackvista/rancher-extension-stackstate/main/pkg/observability/rancher-observability.svg",
@@ -18,12 +18,12 @@
     "nuxt": "./node_modules/.bin/nuxt"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=20.0.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "4.5.18",
-    "@vue/cli-plugin-typescript": "4.5.18",
-    "@vue/cli-service": "4.5.18"
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-typescript": "~5.0.0",
+    "@vue/cli-service": "~5.0.0"
   },
   "browserslist": [
     "> 1%",

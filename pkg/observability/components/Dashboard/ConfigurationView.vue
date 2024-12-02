@@ -31,7 +31,6 @@ export default {
         this.urlError = false;
       }
     },
-
   },
   computed: {
     isCreateMode() {
@@ -146,7 +145,7 @@ export default {
           <div class="banner-info">
             <p>{{ t("observability.dashboard.connected") }}</p>
             <!-- reserve a line when the url is an empty string so UI won't jump on change -->
-            <a :href="`https://${suseObservabilityURL}/`">{{ suseObservabilityURL || '&nbsp;' }}</a>
+            <a :href="`https://${suseObservabilityURL}/`">{{ suseObservabilityURL || "&nbsp;" }}</a>
           </div>
         </Banner>
 
@@ -170,10 +169,10 @@ export default {
           class="configuration-inputs"
         >
           <LabeledInput
-            v-model="suseObservabilityURL"
+            v-model:value="suseObservabilityURL"
             :label="t('observability.configuration.url')"
             class="url-input"
-            :class="{'error': urlError }"
+            :class="{ error: urlError }"
             required
           />
           <div class="pt-10 pb-10">
@@ -181,11 +180,11 @@ export default {
               v-show="urlError"
               class="url-error mb-10"
             >
-              {{ t('observability.configuration.urlError') }}
+              {{ t("observability.configuration.urlError") }}
             </p>
           </div>
           <LabeledInput
-            v-model="suseObservabilityServiceToken"
+            v-model:value="suseObservabilityServiceToken"
             class="mb-20"
             type="password"
             :label="t('observability.configuration.serviceToken')"

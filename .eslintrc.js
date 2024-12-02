@@ -9,7 +9,6 @@ module.exports = {
     'standard',
     'eslint:recommended',
     '@nuxtjs/eslint-config-typescript',
-    'plugin:cypress/recommended'
   ],
   // add your custom rules here
   rules: {
@@ -31,6 +30,7 @@ module.exports = {
     'vue/html-self-closing':    'off',
     'vue/no-unused-components': 'warn',
     'vue/no-v-html':            'error',
+    'vue/no-v-model-argument':  'off',
     'wrap-iife':                'off',
 
     'array-bracket-spacing':             'warn',
