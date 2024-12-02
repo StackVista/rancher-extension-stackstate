@@ -1,5 +1,13 @@
 # observability
 
+## 2.0.0
+
+### Major Changes
+
+- f1941b8: Migrate SUSE Observability UI extension to be vue3 compliant.
+
+  The new version of the extension is available at rancher@2.10.0.
+
 ## 1.0.1
 
 ### Patch Changes
