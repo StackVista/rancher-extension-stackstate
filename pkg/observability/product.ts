@@ -36,8 +36,6 @@ export function init($plugin: IPlugin, store: any) {
     // @ts-ignore -- though `svg` is not part of the interface, it does work.
     svg:  stsIcon,
     name: OBSERVABILITY_PRODUCT_NAME,
-
-    label:               store.getters['i18n/t']('observability.name'),
     inStore:             'management',
     showClusterSwitcher: true,
     to:                  {
