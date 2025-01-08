@@ -26,7 +26,7 @@ runs:
   using: composite
   steps:
     - name: Read Changeset Status
-      shell: bash -e {0}
+      shell: bash
       id: status
       run: |
         OUTPUT=$(mktemp "${{runner.temp}}/changeset-output.XXXXXX.json")
@@ -42,15 +42,11 @@ runs:
         # Run the changeset status command with relative path output
         # and catch an error if the command fails
         { # try
-          yarn changeset status ${{ inputs.args }} --output $RELATED_OUTPUT 2>&1
+          CAUGHT_OUTPUT=$(yarn changeset status ${{ inputs.args }} --output $RELATED_OUTPUT 2>&1)
         } || { # catch
-          CAUGHT_ERROR=$(cat /dev/stderr)
-
-          echo "$CAUGHT_ERROR"
-
           # If the error is NOT caused by empty changesets, print the error and exit
-          if ! echo "$CAUGHT_ERROR" | grep -q "Some packages have been changed but no changesets were found"; then
-            echo "$CAUGHT_ERROR"
+          if ! echo "$CAUGHT_OUTPUT" | grep -q "Some packages have been changed but no changesets were found"; then
+            echo "$CAUGHT_OUTPUT" >&2
             exit 1
           fi
         }
