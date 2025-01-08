@@ -29,6 +29,8 @@ runs:
       shell: bash
       id: status
       run: |
+        set -e
+
         OUTPUT=$(mktemp "${{runner.temp}}/changeset-output.XXXXXX.json")
 
         if [ ! -f "$OUTPUT" ]; then
@@ -55,7 +57,7 @@ runs:
           fi
         }
 
-        # if the .releases length is greater than 0, then the changeset is ready to be released
+        # if the output is not empty and the .releases length is greater than 0, then the changeset is ready to be released
         if [ -s "$OUTPUT" ] && jq -e '.releases | length > 0' "$OUTPUT" > /dev/null; then
           NAME=$(jq -r '.releases[0].name' "$OUTPUT")
           TYPE=$(jq -r '.releases[0].type' "$OUTPUT")
