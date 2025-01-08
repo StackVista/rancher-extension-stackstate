@@ -41,6 +41,9 @@ runs:
         # and suppress the error for cases when no changeset is found
         yarn changeset status ${{ inputs.args }} --output $(realpath --relative-to . "$OUTPUT") 2>/dev/null || true
 
+        # print the output
+        jq '.' "$OUTPUT"
+
         # The OUTPUT file might be empty, so the .releases value should default to an empty array.
         # If the .releases value is empty, then the changeset is not ready to be released
         if jq -e '(.releases // [] | length) == 0' "$OUTPUT" > /dev/null; then
