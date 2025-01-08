@@ -65,7 +65,10 @@ jobs:
 
           echo "✅ Detected '$VERSION_TYPE' bump."
 
-      - name: Lint all files
+      - name: Run typecheck
+        run: yarn typecheck
+
+      - name: Run lint
         run: yarn lint .
 
       - name: Build Observability Package
