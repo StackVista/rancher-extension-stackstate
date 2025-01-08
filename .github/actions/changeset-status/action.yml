@@ -26,11 +26,9 @@ runs:
   using: composite
   steps:
     - name: Read Changeset Status
-      shell: bash
+      shell: bash -e {0}
       id: status
       run: |
-        set -e
-
         OUTPUT=$(mktemp "${{runner.temp}}/changeset-output.XXXXXX.json")
 
         if [ ! -f "$OUTPUT" ]; then
