@@ -38,8 +38,7 @@ runs:
         echo "✅ Temporary file created at: $OUTPUT"
 
         # Run the changeset status command with relative path output
-        # and suppress the error for cases when no changeset is found
-        yarn changeset status ${{ inputs.args }} --output $(realpath --relative-to . "$OUTPUT") 2>/dev/null || true
+        yarn changeset status ${{ inputs.args }} --output $(realpath --relative-to . "$OUTPUT")
 
 
         # The OUTPUT file might be empty, so the .releases value should default to an empty array.
