@@ -41,12 +41,14 @@ runs:
 
         # Run the changeset status command with relative path output
         # and catch an error if the command fails
-        {
+        { # try
           yarn changeset status ${{ inputs.args }} --output $RELATED_OUTPUT 2>&1
-        } || {
-          if ! grep -q "Some packages have been changed but no changesets were found" /dev/stderr; then
+        } || { # catch
+          CAUGHT_ERROR=$(cat /dev/stderr)
+
+          if ! echo "$CAUGHT_ERROR" | grep -q "Some packages have been changed but no changesets were found"; then
             # if the error is not caused by empty changesets, print the error and exit
-            cat /dev/stderr
+            cat "$CAUGHT_ERROR"
             exit 1
           fi
         }
