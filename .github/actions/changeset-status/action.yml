@@ -41,8 +41,6 @@ runs:
         # and suppress the error for cases when no changeset is found
         yarn changeset status ${{ inputs.args }} --output $(realpath --relative-to . "$OUTPUT") 2>/dev/null || true
 
-        # print the output
-        jq '.' "$OUTPUT"
 
         # The OUTPUT file might be empty, so the .releases value should default to an empty array.
         # If the .releases value is empty, then the changeset is not ready to be released
@@ -58,6 +56,10 @@ runs:
           echo "type=$TYPE" >> $GITHUB_OUTPUT
           echo "old_version=$OLD_VERSION" >> $GITHUB_OUTPUT
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+          # print the github output
+          echo "📦 Changeset found:"
+          cat $GITHUB_OUTPUT
         fi
 
         BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
