@@ -41,20 +41,12 @@ jobs:
         id: changeset-status
         if: github.event_name == 'pull_request'
         uses: ./.github/actions/changeset-status
+        with:
+          args: --since origin/${{ github.base_ref }}
 
       - name: Check Version Changes
         if: steps.changeset-status.outputs.type
         run: |
-          NAME="${{ steps.changeset-status.outputs.name }}"
-          NEW_VERSION="${{ steps.changeset-status.outputs.new_version }}"
-
-          # Check that a tag for the new version does not already exist
-          if [[ git tag -l "$NAME@$NEW_VERSION" ]]; then
-            echo "🚨 The version '$NAME@$NEW_VERSION' already exists."
-            echo "🚨 Please ensure that the version bump and the base branch is correct."
-            exit 1
-          fi
-
           BASE_BRANCH="${{ steps.changeset-status.outputs.base_branch }}"
           VERSION_TYPE="${{ steps.changeset-status.outputs.type }}"
 
@@ -102,6 +94,19 @@ jobs:
       - name: Read Changeset Status
         id: changeset-status
         uses: ./.github/actions/changeset-status
+
+      - name: Check if Version Already Exists
+        if: steps.changeset-status.outputs.new_version
+        run: |
+          NAME="${{ steps.changeset-status.outputs.name }}"
+          NEW_VERSION="${{ steps.changeset-status.outputs.new_version }}"
+
+          # Check that a tag for the new version does not already exist
+          if [[ ! -z $(git tag -l "$NAME@$NEW_VERSION") ]]; then
+            echo "🚨 The version '$NAME@$NEW_VERSION' already exists."
+            echo "🚨 Please ensure that the version bump and the base branch is correct."
+            exit 1
+          fi
 
       # creates a PR if there are changesets or assign the new tag if the PR is merged
       - name: Create Release Pull Request or Publish
