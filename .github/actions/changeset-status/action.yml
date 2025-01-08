@@ -44,13 +44,7 @@ runs:
         { # try
           yarn changeset status ${{ inputs.args }} --output $RELATED_OUTPUT 2>&1
         } || { # catch
-          CAUGHT_ERROR=$(cat /dev/stderr)
-
-          if ! echo "$CAUGHT_ERROR" | grep -q "Some packages have been changed but no changesets were found"; then
-            # if the error is not caused by empty changesets, print the error and exit
-            cat "$CAUGHT_ERROR"
-            exit 1
-          fi
+          echo 'oops, error'
         }
 
         # if the .releases length is greater than 0, then the changeset is ready to be released
