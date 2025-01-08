@@ -41,8 +41,6 @@ jobs:
         id: changeset-status
         if: github.event_name == 'pull_request'
         uses: ./.github/actions/changeset-status
-        with:
-          args: --since origin/${{ github.base_ref }}
 
       - name: Check Version Changes
         if: steps.changeset-status.outputs.type
