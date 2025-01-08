@@ -1,10 +1,5 @@
 name: Read changeset status
 
-inputs:
-  args:
-    description: Additional arguments to pass to 'yarn changeset status'
-    required: false
-
 outputs:
   base_branch:
     description: The base branch of the changeset
@@ -29,6 +24,9 @@ runs:
       shell: bash
       id: status
       run: |
+        BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
+        echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
+
         OUTPUT=$(mktemp "${{runner.temp}}/changeset-output.XXXXXX.json")
 
         if [ ! -f "$OUTPUT" ]; then
@@ -38,8 +36,7 @@ runs:
         echo "✅ Temporary file created at: $OUTPUT"
 
         # Run the changeset status command with relative path output
-        yarn changeset status ${{ inputs.args }} --output $(realpath --relative-to . "$OUTPUT")
-
+        yarn changeset status --since "origin/$BASE_BRANCH" --output $(realpath --relative-to . "$OUTPUT")
 
         # The OUTPUT file might be empty, so the .releases value should default to an empty array.
         # If the .releases value is empty, then the changeset is not ready to be released
@@ -60,6 +57,3 @@ runs:
           echo "📦 Changeset found:"
           cat $GITHUB_OUTPUT
         fi
-
-        BASE_BRANCH=$(jq -r '.baseBranch' .changeset/config.json)
-        echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
