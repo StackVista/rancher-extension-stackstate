@@ -37,16 +37,22 @@ runs:
         fi
         echo "✅ Temporary file created at: $OUTPUT"
 
+        RELATED_OUTPUT=$(realpath --relative-to . "$OUTPUT")
+
         # Run the changeset status command with relative path output
-        yarn changeset status ${{ inputs.args }} --output $(realpath --relative-to . "$OUTPUT")
+        # and catch an error if the command fails
+        { # try
+          CAUGHT_OUTPUT=$(yarn changeset status ${{ inputs.args }} --output $RELATED_OUTPUT 2>&1)
+        } || { # catch
+          # If the error is NOT caused by empty changesets, print the error and exit
+          if ! echo "$CAUGHT_OUTPUT" | grep -q "Some packages have been changed but no changesets were found"; then
+            echo "$CAUGHT_OUTPUT" >&2
+            exit 1
+          fi
+        }
 
-        if [ ! -s "$OUTPUT" ]; then
-          echo "🚨 Error: Temporary file is empty after running 'yarn changeset status'"
-          exit 1
-        fi
-
-        # if the .releases length is greater than 0, then the changeset is ready to be released
-        if jq -e '.releases | length > 0' "$OUTPUT" > /dev/null; then
+        # if the output is not empty and the .releases length is greater than 0, then the changeset is ready to be released
+        if [ -s "$OUTPUT" ] && jq -e '.releases | length > 0' "$OUTPUT" > /dev/null; then
           NAME=$(jq -r '.releases[0].name' "$OUTPUT")
           TYPE=$(jq -r '.releases[0].type' "$OUTPUT")
           OLD_VERSION=$(jq -r '.releases[0].oldVersion' "$OUTPUT")
@@ -56,6 +62,10 @@ runs:
           echo "type=$TYPE" >> $GITHUB_OUTPUT
           echo "old_version=$OLD_VERSION" >> $GITHUB_OUTPUT
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+          # print the github output
+          echo "📦 Changeset found:"
+          cat $GITHUB_OUTPUT
         else
           echo "⏩ No changeset found"
         fi

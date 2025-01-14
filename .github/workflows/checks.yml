@@ -65,24 +65,11 @@ jobs:
 
           echo "✅ Detected '$VERSION_TYPE' bump."
 
-      - name: Detect File Changes
-        id: changed-files
-        uses: tj-actions/changed-files@v41
-        with:
-          files_yaml: |
-            eslint_config:
-              - .eslintrc.js
-              - yarn.lock
-            eslint_target:
-              - '**/*.{ts,js,vue}'
+      - name: Run typecheck
+        run: yarn typecheck
 
-      - name: Lint all files
-        if: ${{ github.event_name == 'push' || steps.changed-files.outputs.eslint_config_any_changed == 'true' }}
+      - name: Run lint
         run: yarn lint .
-
-      - name: Lint changed files
-        if: ${{ steps.lint-all.outcome == 'skipped' && steps.changed-files.outputs.eslint_target_any_changed == 'true' }}
-        run: yarn lint ${{ steps.changed-files.outputs.eslint_target_all_changed_files }} --no-error-on-unmatched-pattern
 
       - name: Build Observability Package
         run: yarn build-pkg observability
@@ -107,6 +94,19 @@ jobs:
       - name: Read Changeset Status
         id: changeset-status
         uses: ./.github/actions/changeset-status
+
+      - name: Check if Version Already Exists
+        if: steps.changeset-status.outputs.new_version
+        run: |
+          NAME="${{ steps.changeset-status.outputs.name }}"
+          NEW_VERSION="${{ steps.changeset-status.outputs.new_version }}"
+
+          # Check that a tag for the new version does not already exist
+          if [[ ! -z $(git tag -l "$NAME@$NEW_VERSION") ]]; then
+            echo "🚨 The version '$NAME@$NEW_VERSION' already exists."
+            echo "🚨 Please ensure that the version bump and the base branch is correct."
+            exit 1
+          fi
 
       # creates a PR if there are changesets or assign the new tag if the PR is merged
       - name: Create Release Pull Request or Publish
@@ -144,7 +144,7 @@ jobs:
 
       - name: Upload Charts Artifact
         if: steps.prepare-artifact.conclusion == 'success'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: charts
           path: tmp
@@ -174,7 +174,7 @@ jobs:
           version: v3.8.0
 
       - name: Download Build Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: charts
 

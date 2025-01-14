@@ -14,6 +14,7 @@
   },
   "icon": "https://raw.githubusercontent.com/stackvista/rancher-extension-stackstate/main/pkg/observability/rancher-observability.svg",
   "scripts": {
+    "typecheck": "tsc --noEmit --skipLibCheck",
     "dev": "./node_modules/.bin/nuxt dev",
     "nuxt": "./node_modules/.bin/nuxt"
   },

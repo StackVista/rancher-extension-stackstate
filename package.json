@@ -14,7 +14,7 @@
     "@rancher/shell": "^3.0.0"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.9",
+    "@changesets/cli": "^2.27.11",
     "@nuxtjs/eslint-config-typescript": "6.0.1"
   },
   "resolutions": {
@@ -24,6 +24,7 @@
     "lint": "eslint --ext .ts,.js,.vue",
     "dev": "NODE_ENV=dev vue-cli-service serve",
     "build": "vue-cli-service build",
+    "typecheck": "yarn workspaces run typecheck",
     "clean": "./node_modules/@rancher/shell/scripts/clean",
     "build-pkg": "./node_modules/@rancher/shell/scripts/build-pkg.sh",
     "serve-pkgs": "./node_modules/@rancher/shell/scripts/serve-pkgs",
