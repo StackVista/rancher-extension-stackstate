@@ -1,5 +1,11 @@
 # observability
 
+## 1.0.2
+
+### Patch Changes
+
+- 3c77a02: Drop the unsupported definition of `ProductOptions.label` field from `product.ts`.
+
 ## 1.0.1
 
 ### Patch Changes
