@@ -18,8 +18,7 @@
     "@nuxtjs/eslint-config-typescript": "6.0.1"
   },
   "resolutions": {
-    "@types/lodash": "4.14.184",
-    "entities": "4.5.0"
+    "@types/lodash": "4.14.184"
   },
   "scripts": {
     "lint": "eslint --ext .ts,.js,.vue",
