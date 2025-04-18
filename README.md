@@ -27,6 +27,14 @@ Then, follow the prompts:
 
 This will create a new changeset file in the `.changeset` directory. Each changeset filename is a unique, randomly generated string, so do not try to make sense of it.
 
+### Maintenance Branches
+
+The `pkg/observability` package has a maintenance branch for each minor and major version:
+
+- `v[\d+].x.x` supports the minor and patch versions for specified major versions, ex: `v1.x.x` supports `1.0.0`, `1.1.0`, `1.2.3`, etc.
+- `v[\d+].[\d+].x` supports the patch version for specified minor versions, ex: `v1.2.x` supports `1.2.0`, `1.2.1`, `1.2.2`, etc.
+- `main` is the latest version and can include breaking changes.
+
 ## End-to-End Process for Making and Releasing Changes
 
 This section explains the complete workflow for making changes to the `pkg/observability` package and releasing them.
