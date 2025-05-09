@@ -2,7 +2,7 @@
 import { mapGetters } from 'vuex';
 import { Banner } from '@components/Banner';
 import { createObservabilityRepoIfNotPresent } from '../../modules/suseObservability';
-import { OBSERVABILITY_CRD } from '../../types/types';
+import { OBSERVABILITY_CRD, OBSERVABILITY_SCOPE_OBSERVER } from '../../types/types';
 import { handleGrowl } from '../../utils/growl';
 
 export default {
@@ -20,6 +20,7 @@ export default {
     async install() {
       await this.installRepo();
       await this.installCrd();
+      await this.installRoleTemplates();
     },
 
     async installRepo() {
@@ -58,6 +59,28 @@ export default {
         handleGrowl(this.$store, {
           message: `${ this.t('observability.errorMsg.failedCrd') } ${
             err.message ? `: ${ err.message }` : ''
+          }`,
+          type: 'error',
+        });
+      }
+    },
+
+    async installRoleTemplates() {
+      try {
+        //const roleTemplate = await findRoleTemplate(this.$store, OBSERVABILITY_SCOPE_OBSERVER.metadata.name);
+
+        //if (roleTemplate) {
+        //roleTemplate.rules = OBSERVABILITY_SCOPE_OBSERVER.rules;
+        //roleTemplate.save();
+        //} else {
+        const rT = await this.$store.dispatch('management/create', OBSERVABILITY_SCOPE_OBSERVER);
+        //await rT.save();
+        await rT.save({ url: 'apis/management.cattle.io/v3/roletemplates' });
+        //}
+      } catch (err) {
+        handleGrowl(this.$store, {
+          message: `${ this.t('observability.errorMsg.failedRoleTemplate') } ${
+              err.message ? `: ${ err.message }` : ''
           }`,
           type: 'error',
         });

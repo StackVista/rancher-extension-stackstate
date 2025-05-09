@@ -1,3 +1,6 @@
+import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
+import { MANAGEMENT } from '@shell/config/types';
+
 export const OBSERVABILITY_PRODUCT_NAME = 'observability';
 export const BLANK_CLUSTER = '_';
 
@@ -52,6 +55,74 @@ export const OBSERVABILITY_CRD = {
     },
   },
 };
+
+export const OBSERVABILITY_SCOPE_OBSERVER: RoleTemplate = {
+  apiVersion: 'management.cattle.io/v3',
+  builtin: false, // Ideally we set this as true to avoid getting updated
+  context: 'project',
+  description: 'Template for SUSE Observability Project Observer role',
+  displayName: 'SUSE Observability Project Observer',
+  external: false,
+  hidden: false,
+  kind: 'RoleTemplate',
+  //type: MANAGEMENT.ROLE_TEMPLATE,
+  metadata: { name: 'suse-observability-project-observer' },
+  rules: [
+    {
+      apiGroups: [
+        'scope.observability.cattle.io'
+      ],
+      resources: [
+        'views',
+        'apitokens',
+        'metrics',
+        'systemnotifications',
+        'topology',
+        'traces',
+        'settings',
+        'stackpacks',
+        'metricbindings'
+      ],
+      verbs: [
+        'get'
+      ]
+    },
+    {
+      apiGroups: [
+        'scope.observability.cattle.io'
+      ],
+      resources: [
+        'visualizationsettings'
+      ],
+      verbs: [
+        'update'
+      ]
+    },
+    {
+      apiGroups: [
+        'scope.observability.cattle.io'
+      ],
+      resources: [
+        'componentactions'
+      ],
+      verbs: [
+        'execute'
+      ]
+    },
+    {
+      apiGroups: [
+        'scope.observability.cattle.io'
+      ],
+      resources: [
+        'favoriteviews'
+      ],
+      verbs: [
+        'delete',
+        'create'
+      ]
+    }
+  ]
+}
 
 export const HEALTH_STATE_TYPES = {
   UNKNOWN:       'UNKNOWN',

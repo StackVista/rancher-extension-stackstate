@@ -1,6 +1,6 @@
 import { ConnectionInfo } from 'types/component';
 import {
-  CONFIG_MAP,
+  CONFIG_MAP, MANAGEMENT,
   NAMESPACE,
   NODE,
   POD,
@@ -9,6 +9,7 @@ import {
   WORKLOAD_TYPES,
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
+import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
 import { OBSERVABILITY_CONFIGURATION_TYPE, OBSERVABILITY_CLUSTERREPO } from '../types/types';
 import { logger } from '../utils/logger';
 
@@ -65,6 +66,19 @@ function isSuseObservabilityName(name: string): boolean {
 
 function isSuseObservabilitySettings(settings: ObservabilitySettings): boolean {
   return isSuseObservabilityName(settings.metadata.name);
+}
+
+export async function loadRoleTemplates(store: any): Promise<undefined | RoleTemplate> {
+  return store.dispatch(
+    'management/findAll',
+    { type: MANAGEMENT.ROLE_TEMPLATE }
+  );
+}
+
+export async function findRoleTemplate(store: any, name: String): Promise<undefined | RoleTemplate> {
+  const roleTemplates: undefined | ReadonlyArray<RoleTemplate> = await loadRoleTemplates(store);
+
+  return roleTemplates?.find(roleTemplate => roleTemplate.id === name);
 }
 
 export async function loadSuseObservabilitySettings(store: any): Promise<undefined | ObservabilitySettings> {
