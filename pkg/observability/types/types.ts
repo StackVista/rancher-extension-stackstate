@@ -56,7 +56,62 @@ export const OBSERVABILITY_CRD = {
   },
 };
 
-export const OBSERVABILITY_SCOPE_OBSERVER: RoleTemplate = {
+export const OBSERVABILITY_OBSERVER_RULES = [
+  {
+    apiGroups: [
+      'scope.observability.cattle.io'
+    ],
+    resources: [
+      'views',
+      'apitokens',
+      'metrics',
+      'systemnotifications',
+      'topology',
+      'traces',
+      'settings',
+      'stackpacks',
+      'metricbindings'
+    ],
+    verbs: [
+      'get'
+    ]
+  },
+  {
+    apiGroups: [
+      'scope.observability.cattle.io'
+    ],
+    resources: [
+      'visualizationsettings'
+    ],
+    verbs: [
+      'update'
+    ]
+  },
+  {
+    apiGroups: [
+      'scope.observability.cattle.io'
+    ],
+    resources: [
+      'componentactions'
+    ],
+    verbs: [
+      'execute'
+    ]
+  },
+  {
+    apiGroups: [
+      'scope.observability.cattle.io'
+    ],
+    resources: [
+      'favoriteviews'
+    ],
+    verbs: [
+      'delete',
+      'create'
+    ]
+  }
+]
+export const OBSERVABILITY_PROJECT_SCOPE_OBSERVER: RoleTemplate = {
   apiVersion: 'management.cattle.io/v3',
   builtin: false, // Ideally we set this as true to avoid getting updated
   context: 'project',
@@ -65,64 +120,26 @@ export const OBSERVABILITY_SCOPE_OBSERVER: RoleTemplate = {
   external: false,
   hidden: false,
   kind: 'RoleTemplate',
-  //type: MANAGEMENT.ROLE_TEMPLATE,
   metadata: { name: 'suse-observability-project-observer' },
-  rules: [
-    {
-      apiGroups: [
-        'scope.observability.cattle.io'
-      ],
-      resources: [
-        'views',
-        'apitokens',
-        'metrics',
-        'systemnotifications',
-        'topology',
-        'traces',
-        'settings',
-        'stackpacks',
-        'metricbindings'
-      ],
-      verbs: [
-        'get'
-      ]
-    },
-    {
-      apiGroups: [
-        'scope.observability.cattle.io'
-      ],
-      resources: [
-        'visualizationsettings'
-      ],
-      verbs: [
-        'update'
-      ]
-    },
-    {
-      apiGroups: [
-        'scope.observability.cattle.io'
-      ],
-      resources: [
-        'componentactions'
-      ],
-      verbs: [
-        'execute'
-      ]
-    },
-    {
-      apiGroups: [
-        'scope.observability.cattle.io'
-      ],
-      resources: [
-        'favoriteviews'
-      ],
-      verbs: [
-        'delete',
-        'create'
-      ]
-    }
-  ]
-}
+  rules: OBSERVABILITY_OBSERVER_RULES
+};
+
+export const OBSERVABILITY_CLUSTER_SCOPE_OBSERVER: RoleTemplate = {
+  apiVersion: 'management.cattle.io/v3',
+  builtin: false, // Ideally we set this as true to avoid getting updated
+  context: 'cluster',
+  description: 'Template for SUSE Observability Cluster Observer role',
+  displayName: 'SUSE Observability Cluster Observer',
+  external: false,
+  hidden: false,
+  kind: 'RoleTemplate',
+  metadata: { name: 'suse-observability-cluster-observer' },
+  rules: OBSERVABILITY_OBSERVER_RULES
+};
+
+export const ROLE_TEMPLATES = new Map<string, RoleTemplate>();
+ROLE_TEMPLATES.set('suse-observability-project-observer', OBSERVABILITY_PROJECT_SCOPE_OBSERVER);
+ROLE_TEMPLATES.set('suse-observability-cluster-observer', OBSERVABILITY_CLUSTER_SCOPE_OBSERVER);
 
 export const HEALTH_STATE_TYPES = {
   UNKNOWN:       'UNKNOWN',

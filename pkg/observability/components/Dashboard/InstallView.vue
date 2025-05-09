@@ -1,8 +1,9 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Banner } from '@components/Banner';
+import { diff } from '@shell/utils/object';
 import { createObservabilityRepoIfNotPresent } from '../../modules/suseObservability';
-import { OBSERVABILITY_CRD, OBSERVABILITY_SCOPE_OBSERVER } from '../../types/types';
+import { OBSERVABILITY_CRD, OBSERVABILITY_PROJECT_SCOPE_OBSERVER, ROLE_TEMPLATES } from '../../types/types';
 import { handleGrowl } from '../../utils/growl';
 
 export default {
@@ -14,6 +15,9 @@ export default {
     repoPresent() {
       return this.$store.getters['observability/isRepoPresent'];
     },
+    roleTemplates() {
+      return this.$store.getters['observability/roleTemplates'];
+    }
   },
   components: { Banner },
   methods:    {
@@ -67,20 +71,18 @@ export default {
 
     async installRoleTemplates() {
       try {
-        //const roleTemplate = await findRoleTemplate(this.$store, OBSERVABILITY_SCOPE_OBSERVER.metadata.name);
+        const missingTemplates = new Set(ROLE_TEMPLATES.keys().filter(roleTemplateName => !this.roleTemplates.has(roleTemplateName)));
 
-        //if (roleTemplate) {
-        //roleTemplate.rules = OBSERVABILITY_SCOPE_OBSERVER.rules;
-        //roleTemplate.save();
-        //} else {
-        const rT = await this.$store.dispatch('management/create', OBSERVABILITY_SCOPE_OBSERVER);
-        //await rT.save();
-        await rT.save({ url: 'apis/management.cattle.io/v3/roletemplates' });
-        //}
+        for (const roleTemplateName of missingTemplates) {
+          const rT = await this.$store.dispatch('management/create', ROLE_TEMPLATES.get(roleTemplateName));
+
+          await rT.save({ url: 'apis/management.cattle.io/v3/roletemplates' });
+          await this.$store.dispatch('observability/setRoleTemplate', roleTemplateName);
+        }
       } catch (err) {
         handleGrowl(this.$store, {
           message: `${ this.t('observability.errorMsg.failedRoleTemplate') } ${
-              err.message ? `: ${ err.message }` : ''
+            err.message ? `: ${ err.message }` : ''
           }`,
           type: 'error',
         });

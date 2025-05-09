@@ -68,17 +68,11 @@ function isSuseObservabilitySettings(settings: ObservabilitySettings): boolean {
   return isSuseObservabilityName(settings.metadata.name);
 }
 
-export async function loadRoleTemplates(store: any): Promise<undefined | RoleTemplate> {
-  return store.dispatch(
+export async function loadRoleTemplates(store: any): Promise<undefined | ReadonlyArray<RoleTemplate>> {
+  return await store.dispatch(
     'management/findAll',
     { type: MANAGEMENT.ROLE_TEMPLATE }
   );
-}
-
-export async function findRoleTemplate(store: any, name: String): Promise<undefined | RoleTemplate> {
-  const roleTemplates: undefined | ReadonlyArray<RoleTemplate> = await loadRoleTemplates(store);
-
-  return roleTemplates?.find(roleTemplate => roleTemplate.id === name);
 }
 
 export async function loadSuseObservabilitySettings(store: any): Promise<undefined | ObservabilitySettings> {

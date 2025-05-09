@@ -23,16 +23,30 @@ import {
 import {
   isCrdLoaded,
   isSuseObservabilityRepoPresent,
-  loadConnectionInfo,
+  loadConnectionInfo, loadRoleTemplates,
 } from './modules/suseObservability';
 import extensionRouting from './routing/extension-routing';
 import observabilityStore from './store';
 import { ObservabilityHealth } from './types/headers';
+import { ROLE_TEMPLATES } from './types/types';
 
 const onEnter: OnNavToPackage = async(store) => {
   if (!await isSuseObservabilityRepoPresent(store)) {
     await store.dispatch('observability/setRepoPresent', false);
   }
+
+  // Load RoleTemplates
+  const roleTemplates = await loadRoleTemplates(store);
+
+  await Promise.all(Array.from(ROLE_TEMPLATES.keys().map(async(roleTemplateName) => {
+    const roleTemplate = roleTemplates?.find(rT => rT.id === roleTemplateName);
+
+    if (roleTemplate) {
+      return await store.dispatch('observability/setRoleTemplate', roleTemplateName);
+    }
+
+    return Promise.resolve();
+  })));
 
   if (!isCrdLoaded(store)) {
     await store.dispatch('observability/setMissingCrd', true);
