@@ -10,7 +10,7 @@ import {
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
 import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
-import { OBSERVABILITY_CONFIGURATION_TYPE, OBSERVABILITY_CLUSTERREPO } from '../types/types';
+import { OBSERVABILITY_CLUSTERREPO, OBSERVABILITY_CONFIGURATION_TYPE } from '../types/types';
 import { logger } from '../utils/logger';
 
 export const STS_POD = 'pod';

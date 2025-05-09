@@ -1,9 +1,9 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Banner } from '@components/Banner';
-import { diff } from '@shell/utils/object';
 import { createObservabilityRepoIfNotPresent } from '../../modules/suseObservability';
-import { OBSERVABILITY_CRD, OBSERVABILITY_PROJECT_SCOPE_OBSERVER, ROLE_TEMPLATES } from '../../types/types';
+import { OBSERVABILITY_CRD } from '../../types/types';
+import { ROLE_TEMPLATES } from '../../types/rbac_types';
 import { handleGrowl } from '../../utils/growl';
 
 export default {

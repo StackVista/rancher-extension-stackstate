@@ -28,7 +28,7 @@ import {
 import extensionRouting from './routing/extension-routing';
 import observabilityStore from './store';
 import { ObservabilityHealth } from './types/headers';
-import { ROLE_TEMPLATES } from './types/types';
+import { ROLE_TEMPLATES } from './types/rbac_types';
 
 const onEnter: OnNavToPackage = async(store) => {
   if (!await isSuseObservabilityRepoPresent(store)) {

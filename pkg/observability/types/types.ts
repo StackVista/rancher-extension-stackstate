@@ -1,6 +1,3 @@
-import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
-import { MANAGEMENT } from '@shell/config/types';
-
 export const OBSERVABILITY_PRODUCT_NAME = 'observability';
 export const BLANK_CLUSTER = '_';
 
@@ -55,91 +52,6 @@ export const OBSERVABILITY_CRD = {
     },
   },
 };
-
-export const OBSERVABILITY_OBSERVER_RULES = [
-  {
-    apiGroups: [
-      'scope.observability.cattle.io'
-    ],
-    resources: [
-      'views',
-      'apitokens',
-      'metrics',
-      'systemnotifications',
-      'topology',
-      'traces',
-      'settings',
-      'stackpacks',
-      'metricbindings'
-    ],
-    verbs: [
-      'get'
-    ]
-  },
-  {
-    apiGroups: [
-      'scope.observability.cattle.io'
-    ],
-    resources: [
-      'visualizationsettings'
-    ],
-    verbs: [
-      'update'
-    ]
-  },
-  {
-    apiGroups: [
-      'scope.observability.cattle.io'
-    ],
-    resources: [
-      'componentactions'
-    ],
-    verbs: [
-      'execute'
-    ]
-  },
-  {
-    apiGroups: [
-      'scope.observability.cattle.io'
-    ],
-    resources: [
-      'favoriteviews'
-    ],
-    verbs: [
-      'delete',
-      'create'
-    ]
-  }
-]
-export const OBSERVABILITY_PROJECT_SCOPE_OBSERVER: RoleTemplate = {
-  apiVersion: 'management.cattle.io/v3',
-  builtin: false, // Ideally we set this as true to avoid getting updated
-  context: 'project',
-  description: 'Template for SUSE Observability Project Observer role',
-  displayName: 'SUSE Observability Project Observer',
-  external: false,
-  hidden: false,
-  kind: 'RoleTemplate',
-  metadata: { name: 'suse-observability-project-observer' },
-  rules: OBSERVABILITY_OBSERVER_RULES
-};
-
-export const OBSERVABILITY_CLUSTER_SCOPE_OBSERVER: RoleTemplate = {
-  apiVersion: 'management.cattle.io/v3',
-  builtin: false, // Ideally we set this as true to avoid getting updated
-  context: 'cluster',
-  description: 'Template for SUSE Observability Cluster Observer role',
-  displayName: 'SUSE Observability Cluster Observer',
-  external: false,
-  hidden: false,
-  kind: 'RoleTemplate',
-  metadata: { name: 'suse-observability-cluster-observer' },
-  rules: OBSERVABILITY_OBSERVER_RULES
-};
-
-export const ROLE_TEMPLATES = new Map<string, RoleTemplate>();
-ROLE_TEMPLATES.set('suse-observability-project-observer', OBSERVABILITY_PROJECT_SCOPE_OBSERVER);
-ROLE_TEMPLATES.set('suse-observability-cluster-observer', OBSERVABILITY_CLUSTER_SCOPE_OBSERVER);
 
 export const HEALTH_STATE_TYPES = {
   UNKNOWN:       'UNKNOWN',
