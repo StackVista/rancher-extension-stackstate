@@ -9,7 +9,7 @@ import {
   WORKLOAD_TYPES,
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
-import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
+//import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
 import { OBSERVABILITY_CLUSTERREPO, OBSERVABILITY_CONFIGURATION_TYPE } from '../types/types';
 import { logger } from '../utils/logger';
 
@@ -57,6 +57,10 @@ export interface ObservabilitySettings {
     serviceToken: string;
   }
   metadata: Record<string, string>;
+}
+
+export interface RoleTemplate {
+  id: string;
 }
 
 function isSuseObservabilityName(name: string): boolean {

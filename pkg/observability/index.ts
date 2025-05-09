@@ -38,7 +38,7 @@ const onEnter: OnNavToPackage = async(store) => {
   // Load RoleTemplates
   const roleTemplates = await loadRoleTemplates(store);
 
-  await Promise.all(Array.from(ROLE_TEMPLATES.keys().map(async(roleTemplateName) => {
+  await Promise.all(Array.from(ROLE_TEMPLATES.keys()).map(async(roleTemplateName: string) => {
     const roleTemplate = roleTemplates?.find(rT => rT.id === roleTemplateName);
 
     if (roleTemplate) {
@@ -46,7 +46,7 @@ const onEnter: OnNavToPackage = async(store) => {
     }
 
     return Promise.resolve();
-  })));
+  }));
 
   if (!isCrdLoaded(store)) {
     await store.dispatch('observability/setMissingCrd', true);

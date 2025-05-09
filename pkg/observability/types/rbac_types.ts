@@ -1,4 +1,4 @@
-import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
+//import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
 
 const SCOPE_API_GROUP = 'scope.observability.cattle.io';
 const INSTANCE_API_GROUP = 'instance.observability.cattle.io';
@@ -224,7 +224,7 @@ function createTroubleshooterRules(apiGroup: string) {
   ];
 }
 
-function createRoleTemplate(name: string, displayName: string, context: string, rules: Array<Object>): RoleTemplate {
+function createRoleTemplate(name: string, displayName: string, context: string, rules: Array<Object>) {
   return {
     apiVersion:  'management.cattle.io/v3',
     builtin:     false, // Ideally we set this as true to avoid getting updated
@@ -240,26 +240,26 @@ function createRoleTemplate(name: string, displayName: string, context: string, 
 }
 
 const OBSERVABILITY_PROJECT_SCOPE_OBSERVER_NAME = 'suse-observability-project-observer';
-const OBSERVABILITY_PROJECT_SCOPE_OBSERVER: RoleTemplate = createRoleTemplate(
+const OBSERVABILITY_PROJECT_SCOPE_OBSERVER = createRoleTemplate(
   OBSERVABILITY_PROJECT_SCOPE_OBSERVER_NAME, 'SUSE Observability Project Observer', 'project', createObserverRules(SCOPE_API_GROUP));
 
 const OBSERVABILITY_CLUSTER_SCOPE_OBSERVER_NAME = 'suse-observability-cluster-observer';
-const OBSERVABILITY_CLUSTER_SCOPE_OBSERVER: RoleTemplate = createRoleTemplate(
+const OBSERVABILITY_CLUSTER_SCOPE_OBSERVER = createRoleTemplate(
   OBSERVABILITY_CLUSTER_SCOPE_OBSERVER_NAME, 'SUSE Observability Cluster Observer', 'cluster', createObserverRules(SCOPE_API_GROUP));
 
 const OBSERVABILITY_INSTANCE_OBSERVER_NAME = 'suse-observability-instance-observer';
-const OBSERVABILITY_INSTANCE_OBSERVER: RoleTemplate = createRoleTemplate(
+const OBSERVABILITY_INSTANCE_OBSERVER = createRoleTemplate(
   OBSERVABILITY_INSTANCE_OBSERVER_NAME, 'SUSE Observability Instance Observer', 'project', createObserverRules(INSTANCE_API_GROUP));
 
 const OBSERVABILITY_INSTANCE_ADMIN_NAME = 'suse-observability-instance-admin';
-const OBSERVABILITY_INSTANCE_ADMIN: RoleTemplate = createRoleTemplate(
+const OBSERVABILITY_INSTANCE_ADMIN = createRoleTemplate(
   OBSERVABILITY_INSTANCE_ADMIN_NAME, 'SUSE Observability Instance Admin', 'project', createAdminRules(INSTANCE_API_GROUP));
 
 const OBSERVABILITY_INSTANCE_TROUBLESHOOTER_NAME = 'suse-observability-instance-troubleshooter';
-const OBSERVABILITY_INSTANCE_TROUBLESHOOTER: RoleTemplate = createRoleTemplate(
+const OBSERVABILITY_INSTANCE_TROUBLESHOOTER = createRoleTemplate(
   OBSERVABILITY_INSTANCE_TROUBLESHOOTER_NAME, 'SUSE Observability Instance Troubleshooter', 'project', createTroubleshooterRules(INSTANCE_API_GROUP));
 
-export const ROLE_TEMPLATES = new Map<string, RoleTemplate>();
+export const ROLE_TEMPLATES = new Map<string, Object>();
 ROLE_TEMPLATES.set(OBSERVABILITY_PROJECT_SCOPE_OBSERVER_NAME, OBSERVABILITY_PROJECT_SCOPE_OBSERVER);
 ROLE_TEMPLATES.set(OBSERVABILITY_CLUSTER_SCOPE_OBSERVER_NAME, OBSERVABILITY_CLUSTER_SCOPE_OBSERVER);
 ROLE_TEMPLATES.set(OBSERVABILITY_INSTANCE_OBSERVER_NAME, OBSERVABILITY_INSTANCE_OBSERVER);
