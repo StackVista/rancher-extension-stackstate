@@ -11,5 +11,8 @@ export default {
 
   setRepoPresent: ({ commit }: any, repoPresent: boolean) => {
     commit('setRepoPresent', repoPresent);
+  },
+  setRoleTemplate: ({ commit }: any, roleTemplate: string) => {
+    commit('setRoleTemplate', roleTemplate);
   }
 };

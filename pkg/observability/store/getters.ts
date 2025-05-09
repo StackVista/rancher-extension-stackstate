@@ -9,4 +9,5 @@ export default {
   },
   isCrdMissing:  (state: ObservabilityState) => state.missingCrd,
   isRepoPresent: (state: ObservabilityState) => state.repoPresent,
+  roleTemplates: (state: ObservabilityState) => state.roleTemplates
 };

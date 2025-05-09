@@ -32,6 +32,7 @@ observability:
     failedSave: Failed to save configuration
     failedCrd: Failed to install CRD
     failedClusterRepo: Failed to create the SUSE Observability cluster repository
+    failedRoleTemplate: Failed to save role template
   dashboard:
     name: Dashboard
     description: Using SUSE Observability, you can monitor the health of all clusters managed by SUSE Rancher Prime and the workloads running on them.
