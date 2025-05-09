@@ -1,5 +1,3 @@
-//import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
-
 const SCOPE_API_GROUP = 'scope.observability.cattle.io';
 const INSTANCE_API_GROUP = 'instance.observability.cattle.io';
 
@@ -234,9 +232,9 @@ function createRoleTemplate(name: string, displayName: string, context: string, 
     external:    false,
     hidden:      false,
     kind:        'RoleTemplate',
-    metadata:    { name: name },
+    metadata:    { name: name, labels: { 'observability.cattle.io': 'rbac', 'rbac.observability.cattle.io/version': '1' } },
     rules:       rules
-  }
+  };
 }
 
 const OBSERVABILITY_PROJECT_SCOPE_OBSERVER_NAME = 'suse-observability-project-observer';

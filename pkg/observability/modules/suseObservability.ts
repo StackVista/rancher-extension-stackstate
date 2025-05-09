@@ -9,7 +9,6 @@ import {
   WORKLOAD_TYPES,
 } from '@shell/config/types';
 import { CLUSTER } from '@shell/store/prefs';
-//import RoleTemplate from '@shell/models/management.cattle.io.roletemplate';
 import { OBSERVABILITY_CLUSTERREPO, OBSERVABILITY_CONFIGURATION_TYPE } from '../types/types';
 import { logger } from '../utils/logger';
 
@@ -74,8 +73,11 @@ function isSuseObservabilitySettings(settings: ObservabilitySettings): boolean {
 
 export async function loadRoleTemplates(store: any): Promise<undefined | ReadonlyArray<RoleTemplate>> {
   return await store.dispatch(
-    'management/findAll',
-    { type: MANAGEMENT.ROLE_TEMPLATE }
+    'management/findMatching',
+    {
+      type: MANAGEMENT.ROLE_TEMPLATE,
+      selector: `observability.cattle.io=rbac`
+    }
   );
 }
 
