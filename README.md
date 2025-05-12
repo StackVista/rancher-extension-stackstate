@@ -2,11 +2,11 @@
 
 ## Version matrix
 
-| Rancher Version   | Observability UI Extension Version |
-| ----------------- | ---------------------------------- |
-| >= 2.8.0 < 2.9.0  | 0.2.x                              |
-| >= 2.9.0 < 2.10.0 | 1.x.x                              |
-| >= 2.10           | 2.x.x                              |
+| Rancher Version   | Observability UI Extension Version                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------- |
+| >= 2.8.0 < 2.9.0  | maintenance [0.2.x](https://github.com/StackVista/rancher-extension-stackstate/tree/v0.2.x) |
+| >= 2.9.0 < 2.10.0 | maintenance [1.x.x](https://github.com/StackVista/rancher-extension-stackstate/tree/v1.x.x) |
+| >= 2.10           | latest [2.x.x](https://github.com/StackVista/rancher-extension-stackstate/tree/main)        |
 
 ## Versioning
 
