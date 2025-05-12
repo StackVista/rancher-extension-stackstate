@@ -1,5 +1,11 @@
 # observability
 
+## 2.1.0
+
+### Minor Changes
+
+- 2ad9357: Provision RoleTemplates for RBAC
+
 ## 2.0.1
 
 ### Patch Changes
