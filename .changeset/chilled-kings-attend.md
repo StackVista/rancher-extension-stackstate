@@ -1,5 +1,5 @@
 ---
-"observability": patch
+"observability": minor
 ---
 
 Provision RoleTemplates for RBAC
