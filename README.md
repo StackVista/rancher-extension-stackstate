@@ -1,5 +1,13 @@
 # SUSE Rancher Observability UI Extension
 
+## Version matrix
+
+| Rancher Version   | Observability UI Extension Version |
+| ----------------- | ---------------------------------- |
+| >= 2.8.0 < 2.9.0  | 0.2.x                              |
+| >= 2.9.0 < 2.10.0 | 1.x.x                              |
+| >= 2.10           | 2.x.x                              |
+
 ## Versioning
 
 This project uses [Changesets](https://github.com/changesets/changesets) to manage versioning and generate changelogs.
