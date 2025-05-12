@@ -1,5 +1,17 @@
 # SUSE Rancher Observability UI Extension
 
+## Version matrix
+
+| Rancher Version   | Observability UI Extension Version                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------- |
+| >= 2.8.0 < 2.9.0  | maintenance [0.2.x](https://github.com/StackVista/rancher-extension-stackstate/tree/v0.2.x) |
+| >= 2.9.0 < 2.10.0 | maintenance [1.x.x](https://github.com/StackVista/rancher-extension-stackstate/tree/v1.x.x) |
+| >= 2.10           | latest [2.x.x](https://github.com/StackVista/rancher-extension-stackstate/tree/main)        |
+
+## Provisioning a rancher environment for testing against suse observability
+
+Here is the [comprehensive guide](https://gitlab.com/stackvista/platform/ci-deployment/-/tree/main/rancher-k3s) to provision a Rancher environment for testing against SUSE Observability.
+
 ## Versioning
 
 This project uses [Changesets](https://github.com/changesets/changesets) to manage versioning and generate changelogs.
