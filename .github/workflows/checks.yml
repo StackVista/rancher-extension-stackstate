@@ -133,7 +133,7 @@ jobs:
           TAG=$(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r '.[0] | "\(.name)-\(.version)"')
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Preare Build Artifact
+      - name: Prepare Build Artifact
         id: prepare-artifact
         if: steps.release-info.outputs.tag
         run: |
@@ -141,6 +141,11 @@ jobs:
             -s "${{ github.repository }}" \
             -b "${{ env.HELM_CHART_BRANCH }}" \
             -t "${{ steps.release-info.outputs.tag }}"
+
+      - name: Inject Manifests in Helm Charts
+        id: inject-manifests
+        if: steps.release-info.outputs.tag
+        run: scripts/inject-manifests-in-chart.sh
 
       - name: Upload Charts Artifact
         if: steps.prepare-artifact.conclusion == 'success'
