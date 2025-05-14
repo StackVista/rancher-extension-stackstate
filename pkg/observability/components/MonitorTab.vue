@@ -27,6 +27,7 @@ export default {
       urn:      '',
       url:      '',
       monitors: [],
+      currResourceData: undefined
     };
   },
   computed:   {
@@ -49,11 +50,17 @@ export default {
 
       let identifier = `urn:kubernetes:/${ cluster }`;
 
-      if (this.resource?.metadata?.namespace) {
-        identifier += `:${ this.resource.metadata.namespace }`;
+      const resourceData = this.resource?.metadata
+        ? this.resource
+        : this.currResourceData;
+
+      if (resourceData?.metadata?.namespace) {
+        identifier += `:${resourceData.metadata.namespace}`;
       }
 
-      identifier += `:${ mapKind(this.resource?.type?.toLowerCase()) }/${ this.resource?.metadata?.name }`;
+      identifier += `:${mapKind(resourceData?.type?.toLowerCase())}/${
+        resourceData?.metadata?.name
+      }`;
 
       return identifier;
     },
@@ -61,6 +68,21 @@ export default {
   async fetch() {
     if (!isCrdLoaded(this.$store)) {
       return;
+    }
+
+    if (!this.resource?.metadata) {
+      const routeResource = this.$route?.params?.resource;
+      const routeNamespace = this.$route?.params?.namespace;
+      const routeResourceId = this.$route?.params?.id;
+
+      const resourceId = routeNamespace
+        ? `${routeNamespace}/${routeResourceId}`
+        : routeResourceId;
+
+      this.currResourceData = await this.$store.dispatch('cluster/find', {
+        type: routeResource,
+        id: resourceId,
+      });
     }
 
     const obs = await isObserved(this.$store, this.clusterId);
