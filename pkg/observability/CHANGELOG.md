@@ -1,5 +1,11 @@
 # observability
 
+## 2.1.1
+
+### Patch Changes
+
+- ee1a46b: Provision Role Templates from Helm chart
+
 ## 2.1.0
 
 ### Minor Changes
