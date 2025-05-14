@@ -3,7 +3,6 @@ import { mapGetters } from 'vuex';
 import { Banner } from '@components/Banner';
 import { createObservabilityRepoIfNotPresent } from '../../modules/suseObservability';
 import { OBSERVABILITY_CRD } from '../../types/types';
-import { ROLE_TEMPLATES } from '../../types/rbac_types';
 import { handleGrowl } from '../../utils/growl';
 
 export default {

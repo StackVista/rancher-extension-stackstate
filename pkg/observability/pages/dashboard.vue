@@ -1,7 +1,6 @@
 <script>
 import ConfigurationView from '../components/Dashboard/ConfigurationView';
 import InstallView from '../components/Dashboard/InstallView';
-import { ROLE_TEMPLATES } from '../types/rbac_types';
 
 export default {
   name:       'ObservabilityDashboard',
