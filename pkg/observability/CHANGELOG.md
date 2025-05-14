@@ -1,5 +1,11 @@
 # observability
 
+## 2.1.2
+
+### Patch Changes
+
+- fb3c813: Update the MonitorTab to fetch the `resource` data if the prop data is missing (mitigates https://github.com/rancher/dashboard/issues/14321)
+
 ## 2.1.1
 
 ### Patch Changes
