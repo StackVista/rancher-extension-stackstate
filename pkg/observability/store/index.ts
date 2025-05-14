@@ -10,7 +10,6 @@ export interface ObservabilityState {
   serviceToken?: string;
   missingCrd: boolean;
   repoPresent?: boolean;
-  roleTemplates?: Set<string>
 }
 
 const observabilityStoreFactory = (config: ObservabilityState): CoreStoreSpecifics => {
@@ -22,7 +21,6 @@ const observabilityStoreFactory = (config: ObservabilityState): CoreStoreSpecifi
         serviceToken:   config.serviceToken,
         missingCrd:   config.missingCrd,
         repoPresent:    config.repoPresent,
-        roleTemplates:  config.roleTemplates,
       };
     },
     getters:   { ...getters },
@@ -40,7 +38,6 @@ export default {
     serviceToken:   '',
     missingCrd:   false,
     repoPresent:    true,
-    roleTemplates: new Set()
   }),
   config,
 };

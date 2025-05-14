@@ -1,6 +1,6 @@
 import { ConnectionInfo } from 'types/component';
 import {
-  CONFIG_MAP, MANAGEMENT,
+  CONFIG_MAP,
   NAMESPACE,
   NODE,
   POD,
@@ -58,10 +58,6 @@ export interface ObservabilitySettings {
   metadata: Record<string, string>;
 }
 
-export interface RoleTemplate {
-  id: string;
-}
-
 function isSuseObservabilityName(name: string): boolean {
   // match either the legacy (stackstate) or new (suse-observability) name
   return name === 'stackstate' || name === 'suse-observability';
@@ -69,16 +65,6 @@ function isSuseObservabilityName(name: string): boolean {
 
 function isSuseObservabilitySettings(settings: ObservabilitySettings): boolean {
   return isSuseObservabilityName(settings.metadata.name);
-}
-
-export async function loadRoleTemplates(store: any): Promise<undefined | ReadonlyArray<RoleTemplate>> {
-  return await store.dispatch(
-    'management/findMatching',
-    {
-      type: MANAGEMENT.ROLE_TEMPLATE,
-      selector: `observability.cattle.io=rbac`
-    }
-  );
 }
 
 export async function loadSuseObservabilitySettings(store: any): Promise<undefined | ObservabilitySettings> {

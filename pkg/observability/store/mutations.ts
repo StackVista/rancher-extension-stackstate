@@ -14,7 +14,4 @@ export default {
   setRepoPresent(state: ObservabilityState, val: boolean) {
     state.repoPresent = val;
   },
-  setRoleTemplate(state: ObservabilityState, val: string) {
-    state.roleTemplates = state.roleTemplates?.add(val);
-  }
 };

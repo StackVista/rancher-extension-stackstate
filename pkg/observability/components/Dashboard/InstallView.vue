@@ -3,7 +3,6 @@ import { mapGetters } from 'vuex';
 import { Banner } from '@components/Banner';
 import { createObservabilityRepoIfNotPresent } from '../../modules/suseObservability';
 import { OBSERVABILITY_CRD } from '../../types/types';
-import { ROLE_TEMPLATES } from '../../types/rbac_types';
 import { handleGrowl } from '../../utils/growl';
 
 export default {
@@ -15,16 +14,12 @@ export default {
     repoPresent() {
       return this.$store.getters['observability/isRepoPresent'];
     },
-    roleTemplates() {
-      return this.$store.getters['observability/roleTemplates'];
-    }
   },
   components: { Banner },
   methods:    {
     async install() {
       await this.installRepo();
       await this.installCrd();
-      await this.installRoleTemplates();
     },
 
     async installRepo() {
@@ -62,26 +57,6 @@ export default {
       } catch (err) {
         handleGrowl(this.$store, {
           message: `${ this.t('observability.errorMsg.failedCrd') } ${
-            err.message ? `: ${ err.message }` : ''
-          }`,
-          type: 'error',
-        });
-      }
-    },
-
-    async installRoleTemplates() {
-      try {
-        const missingTemplates = new Set(ROLE_TEMPLATES.keys().filter(roleTemplateName => !this.roleTemplates.has(roleTemplateName)));
-
-        for (const roleTemplateName of missingTemplates) {
-          const rT = await this.$store.dispatch('management/create', ROLE_TEMPLATES.get(roleTemplateName));
-
-          await rT.save({ url: 'apis/management.cattle.io/v3/roletemplates' });
-          await this.$store.dispatch('observability/setRoleTemplate', roleTemplateName);
-        }
-      } catch (err) {
-        handleGrowl(this.$store, {
-          message: `${ this.t('observability.errorMsg.failedRoleTemplate') } ${
             err.message ? `: ${ err.message }` : ''
           }`,
           type: 'error',

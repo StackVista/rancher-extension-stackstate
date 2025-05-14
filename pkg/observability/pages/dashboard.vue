@@ -1,7 +1,6 @@
 <script>
 import ConfigurationView from '../components/Dashboard/ConfigurationView';
 import InstallView from '../components/Dashboard/InstallView';
-import { ROLE_TEMPLATES } from '../types/rbac_types';
 
 export default {
   name:       'ObservabilityDashboard',
@@ -20,9 +19,6 @@ export default {
     observabilityRepoPresent() {
       return this.$store.getters['observability/isRepoPresent'];
     },
-    missingRoleTemplates() {
-      return this.$store.getters['observability/roleTemplates'].size !== ROLE_TEMPLATES.size;
-    }
   },
 };
 </script>
@@ -36,7 +32,7 @@ export default {
       <h1>{{ t("observability.name") }}</h1>
       <p>{{ t("observability.dashboard.description") }}</p>
     </div>
-    <InstallView v-if="(missingCrd || !observabilityRepoPresent || missingRoleTemplates)" class="mt-40" />
+    <InstallView v-if="(missingCrd || !observabilityRepoPresent)" class="mt-40" />
     <ConfigurationView v-else :mode="isConfigured ? 'edit' : 'create'" />
   </div>
 </template>
