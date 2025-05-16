@@ -1,5 +1,12 @@
 # observability
 
+## 2.1.4
+
+### Patch Changes
+
+- e8fa25f: Drop builtin flag from RoleTemplates
+  Include project and cluster Observer RoleTemplates
+
 ## 2.1.3
 
 ### Patch Changes
