@@ -2,7 +2,7 @@ apiVersion: management.cattle.io/v3
 kind: RoleTemplate
 displayName: SUSE Observability Instance Guest
 description: Read-only access to all data the SUSE Observability instance
-builtin: true
+builtin: false
 hidden: false
 external: false
 context: project
