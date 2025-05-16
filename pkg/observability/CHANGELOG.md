@@ -1,5 +1,11 @@
 # observability
 
+## 2.1.3
+
+### Patch Changes
+
+- cb2a4c0: Drop builtin flag from RoleTemplates
+
 ## 2.1.2
 
 ### Patch Changes
