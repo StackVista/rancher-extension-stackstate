@@ -1,5 +1,11 @@
 # observability
 
+## 2.1.5
+
+### Patch Changes
+
+- 1d34e7f: Add recommended access RoleTemplate
+
 ## 2.1.4
 
 ### Patch Changes
