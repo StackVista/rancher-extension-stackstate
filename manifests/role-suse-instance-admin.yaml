@@ -1,6 +1,6 @@
 apiVersion: management.cattle.io/v3
 kind: RoleTemplate
-displayName: SUSE Observability Instance Admin
+displayName: SUSE Observability Instance Admin (Coming soon)
 description: Administrate the SUSE Observability instance
 builtin: false
 hidden: false

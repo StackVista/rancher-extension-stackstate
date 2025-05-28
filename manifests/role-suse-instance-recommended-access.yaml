@@ -1,6 +1,6 @@
 apiVersion: management.cattle.io/v3
 kind: RoleTemplate
-displayName: SUSE Observability Instance Recommended Access
+displayName: SUSE Observability Instance Recommended Access (Coming soon)
 description: Recommended permissions for accessing SUSE Observability
 builtin: false
 hidden: false
