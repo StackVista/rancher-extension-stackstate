@@ -1,6 +1,6 @@
 apiVersion: management.cattle.io/v3
 kind: RoleTemplate
-displayName: SUSE Observability Cluster Observer
+displayName: SUSE Observability Cluster Observer (Coming soon)
 description: Read-only access to cluster data in SUSE Observability
 builtin: false
 hidden: false

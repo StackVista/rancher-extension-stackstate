@@ -1,6 +1,6 @@
 apiVersion: management.cattle.io/v3
 kind: RoleTemplate
-displayName: SUSE Observability Instance Troubleshooter
+displayName: SUSE Observability Instance Troubleshooter (Coming soon)
 description: Troubleshoot with SUSE Observability
 builtin: false
 hidden: false

@@ -1,6 +1,6 @@
 apiVersion: management.cattle.io/v3
 kind: RoleTemplate
-displayName: SUSE Observability Instance Observer
+displayName: SUSE Observability Instance Observer (Coming soon)
 description: Read-only access to all data the SUSE Observability instance
 builtin: false
 hidden: false
