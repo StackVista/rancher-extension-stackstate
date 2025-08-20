@@ -25,7 +25,7 @@ export default {
   }),
   watch: {
     suseObservabilityURL(neu) {
-      if (neu?.length && (neu.startsWith('http://') || neu.startsWith('https://'))) {
+      if (neu?.length && !neu.startsWith('http://') && !neu.startsWith('https://')) {
         this.urlError = true;
       } else {
         this.urlError = false;
@@ -145,7 +145,7 @@ export default {
           <div class="banner-info">
             <p>{{ t("observability.dashboard.connected") }}</p>
             <!-- reserve a line when the url is an empty string so UI won't jump on change -->
-            <a :href="`https://${suseObservabilityURL}/`">{{ suseObservabilityURL || "&nbsp;" }}</a>
+            <a :href="`${suseObservabilityURL}/`">{{ suseObservabilityURL || "&nbsp;" }}</a>
           </div>
         </Banner>
 

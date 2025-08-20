@@ -72,7 +72,7 @@ export default {
 
       this.data = {
         health: component.state.healthState,
-        href:   `https://${ settings.spec.url }/#/components/${ encodeURIComponent(
+        href:   `${ settings.spec.url }/#/components/${ encodeURIComponent(
           componentIdentifier
         ) }`
       };
