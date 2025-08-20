@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.0
+
+### Minor Changes
+
+- 66f3f3b: Fetch observability data directly using CORS
+
 ## 2.1.5
 
 ### Patch Changes
