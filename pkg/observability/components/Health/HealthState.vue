@@ -57,7 +57,7 @@ export default {
 .healthstate-skeleton {
   cursor: wait;
   color: rgb(217, 217, 217);
-  background-color: rgb(217, 217, 217);
+  background-color: transparent;
 }
 
 .healthstate {

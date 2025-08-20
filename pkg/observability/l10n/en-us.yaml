@@ -26,7 +26,7 @@ observability:
     url: SUSE Observability URL
     serviceToken: SUSE Observability Service Token
     save: Save
-    urlError: "* URL cannot start with http:// or https://"
+    urlError: "* URL must start with http:// or https://"
   errorMsg:
     connectionFailed: Connection to SUSE Observability failed
     failedSave: Failed to save configuration

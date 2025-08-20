@@ -139,11 +139,11 @@ export async function checkConnection(
 
   try {
     const resp = await store.dispatch('management/request', {
-      url:     `meta/proxy/${ credentials.apiURL }/api/server/info`,
+      url:     `${ credentials.apiURL }/api/server/info`,
       method:  'GET',
       headers: {
-        'Content-Type':      'application/json',
-        'X-API-Auth-Header': creds,
+        'Content-Type': 'application/json',
+        'Authorization': creds,
       },
       redirectUnauthorized: false,
     });
@@ -174,12 +174,13 @@ export async function getSnapshot(
   const httpToken = token(apiToken, serviceToken);
 
   return store.dispatch('management/request', {
-    url:     `meta/proxy/${ suseObservabilityURL }/api/snapshot`,
+    url:     `${ suseObservabilityURL }/api/snapshot`,
     method:  'POST',
     headers: {
-      'Content-Type':      'application/json',
-      'X-API-Auth-Header': httpToken,
+      'Content-Type':  'application/json',
+      'Authorization': httpToken,
     },
+    withCredentials: true,
     data: {
       query:        stql,
       queryVersion: '1.0',
@@ -207,9 +208,9 @@ export function loadComponent(
   const creds = token(spec.apiToken, spec.serviceToken);
 
   return store.dispatch('management/request', {
-    url:     `meta/proxy/${ spec.url }/api/components?identifier=${ encodeURIComponent(identifier) }`,
+    url:     `${ spec.url }/api/components?identifier=${ encodeURIComponent(identifier) }`,
     method:  'GET',
-    headers: { 'Content-Type': 'application/json', 'X-API-Auth-Header': creds },
+    headers: { 'Content-Type': 'application/json', 'Authorization': creds },
   });
 }
 

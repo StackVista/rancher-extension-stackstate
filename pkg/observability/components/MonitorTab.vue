@@ -139,7 +139,7 @@ export default {
     <template #col:monitor="{row}">
       <td>
         <a
-          :href="`https://${url}/#/components/${encodeURIComponent(urn)}`"
+          :href="`${url}/#/components/${encodeURIComponent(urn)}`"
           target="_blank"
           rel="nofollow noopener noreferrer"
         >{{ row.name }}</a>
