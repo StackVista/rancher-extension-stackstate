@@ -4,6 +4,7 @@ import { Banner } from '@components/Banner';
 import { createObservabilityRepoIfNotPresent } from '../../modules/suseObservability';
 import { OBSERVABILITY_CRD } from '../../types/types';
 import { handleGrowl } from '../../utils/growl';
+import { logger } from '../../utils/logger';
 
 export default {
   computed: {
@@ -47,11 +48,27 @@ export default {
       }
 
       try {
-        await this.$store.dispatch('management/request', {
-          url:    '/v1/apiextensions.k8s.io.customresourcedefinitions',
-          method: 'POST',
-          data:   OBSERVABILITY_CRD,
-        });
+        try {
+          await this.$store.dispatch('management/request', {
+            url:    '/v1/apiextensions.k8s.io.customresourcedefinitions',
+            method: 'POST',
+            data:   OBSERVABILITY_CRD,
+          });
+        } catch (err) {
+          logger.log("Error creating CRD, attempting update");
+          const currentCrd = await this.$store.dispatch('management/request', {
+            url:    '/v1/apiextensions.k8s.io.customresourcedefinitions/configurations.observability.rancher.io',
+            method: 'GET'
+          });
+          if (currentCrd) {
+            OBSERVABILITY_CRD.metadata.resourceVersion = currentCrd.metadata.resourceVersion;
+            await this.$store.dispatch('management/request', {
+              url:    '/v1/apiextensions.k8s.io.customresourcedefinitions/configurations.observability.rancher.io',
+              method: 'PUT',
+              data:   OBSERVABILITY_CRD,
+            });
+          }
+        }
 
         await this.$store.dispatch('observability/setMissingCrd', false);
       } catch (err) {
@@ -67,16 +84,16 @@ export default {
 };
 </script>
 <template>
-  <div class="install-crd-main-container">
+  <div class="install-repo-main-container">
     <div class="row">
       <div class="col span-12">
         <Banner class="mt-20 mb-40" color="warning">
-          <div class="install-crd">
+          <div class="install-repo">
             <span class="mb-20">{{
-              t("observability.dashboard.error.crdmissing")
+              t("observability.dashboard.error.repomissing")
             }}</span>
             <button class="btn role-primary" @click="install">
-              {{ t("observability.dashboard.installcrd") }}
+              {{ t("observability.dashboard.install") }}
             </button>
           </div>
         </Banner>
@@ -85,12 +102,12 @@ export default {
   </div>
 </template>
 <style lang="scss" scoped>
-.install-crd-main-container {
+.install-repo-main-container {
   display: flex;
   justify-content: center;
   align-items: center;
 
-  .install-crd {
+  .install-repo {
     padding: 15px 30px;
     width: 100%;
     display: flex;
