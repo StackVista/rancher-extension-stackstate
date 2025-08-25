@@ -1,5 +1,6 @@
 import { ConnectionInfo } from 'types/component';
 import {
+  API_SERVICE,
   CONFIG_MAP,
   NAMESPACE,
   NODE,
@@ -50,12 +51,8 @@ export function mapKind(kind: string): string {
 }
 
 export interface ObservabilitySettings {
-  spec: {
     url: string;
-    apiToken: string;
     serviceToken: string;
-  }
-  metadata: Record<string, string>;
 }
 
 function isSuseObservabilityName(name: string): boolean {
@@ -63,14 +60,27 @@ function isSuseObservabilityName(name: string): boolean {
   return name === 'stackstate' || name === 'suse-observability';
 }
 
-function isSuseObservabilitySettings(settings: ObservabilitySettings): boolean {
+function isSuseObservabilitySettings(settings: any): boolean {
   return isSuseObservabilityName(settings.metadata.name);
 }
 
 export async function loadSuseObservabilitySettings(store: any): Promise<undefined | ObservabilitySettings> {
-  const settings: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+  const record = settings?.find(isSuseObservabilitySettings);
 
-  return settings?.find(isSuseObservabilitySettings);
+  if (record?.apiVersion == 'observability.rancher.io/v1beta1') {
+    return {
+      url:          `https://${ record.spec.url }`,
+      serviceToken: record.spec.serviceToken,
+    };
+  } else if (record) {
+    return {
+      url:          record.spec.url,
+      serviceToken: record.spec.serviceToken,
+    };
+  } else {
+    return undefined;
+  }
 }
 
 /**
@@ -81,13 +91,13 @@ export function isCrdLoaded(store: any): boolean {
     OBSERVABILITY_CONFIGURATION_TYPE
   );
 
-  return loaded;
+  return loaded?.attributes.version == 'v1';
 }
 
 export async function isSuseObservabilityRepoPresent(store: any): Promise<boolean> {
   logger.log('Checking if Observability Repo is present');
 
-  const repos: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: 'catalog.cattle.io.clusterrepo' });
+  const repos: undefined | ReadonlyArray<any> = await store.dispatch('management/findAll', { type: 'catalog.cattle.io.clusterrepo' });
 
   logger.log('Checking if Observability Repo is present', repos);
 
@@ -112,15 +122,12 @@ export async function createObservabilityRepoIfNotPresent(store: any) {
 }
 
 export async function loadConnectionInfo(store: any): Promise<void> {
-  const settings: undefined | ReadonlyArray<ObservabilitySettings> = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
-
-  const suseObservabilitySettings = settings?.find(isSuseObservabilitySettings);
+  const suseObservabilitySettings = await loadSuseObservabilitySettings(store);
 
   if (suseObservabilitySettings) {
     await store.dispatch('observability/setConnectionInfo', {
-      apiURL:       suseObservabilitySettings.spec.url,
-      apiToken:     suseObservabilitySettings.spec.apiToken,
-      serviceToken: suseObservabilitySettings.spec.serviceToken,
+      apiURL:       suseObservabilitySettings.url,
+      serviceToken: suseObservabilitySettings.serviceToken,
     });
   }
 }
@@ -135,15 +142,15 @@ export async function checkConnection(
   store: any,
   credentials: ConnectionInfo
 ): Promise<boolean> {
-  const creds = token(credentials.apiToken, credentials.serviceToken);
+  const creds = token(credentials.serviceToken);
 
   try {
     const resp = await store.dispatch('management/request', {
       url:     `${ credentials.apiURL }/api/server/info`,
       method:  'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': creds,
+        'Content-Type':  'application/json',
+        Authorization:  creds,
       },
       redirectUnauthorized: false,
     });
@@ -163,25 +170,24 @@ export async function getSnapshot(
   stql: string,
   settings: undefined | ObservabilitySettings
 ): Promise<any | void> {
-  const suseObservabilityURL = settings ? settings.spec.url : await store.getters['observability/apiURL'];
-  const apiToken = settings ? settings.spec.apiToken : await store.getters['observability/apiToken'];
-  const serviceToken = settings ? settings.spec.serviceToken : await store.getters['observability/serviceToken'];
+  const suseObservabilityURL = settings ? settings.url : await store.getters['observability/apiURL'];
+  const serviceToken = settings ? settings.serviceToken : await store.getters['observability/serviceToken'];
 
-  if (!suseObservabilityURL || (!apiToken && !serviceToken)) {
+  if (!suseObservabilityURL || !serviceToken) {
     return;
   }
 
-  const httpToken = token(apiToken, serviceToken);
+  const httpToken = token(serviceToken);
 
   return store.dispatch('management/request', {
     url:     `${ suseObservabilityURL }/api/snapshot`,
     method:  'POST',
     headers: {
       'Content-Type':  'application/json',
-      'Authorization': httpToken,
+      Authorization:  httpToken,
     },
     withCredentials: true,
-    data: {
+    data:            {
       query:        stql,
       queryVersion: '1.0',
       metadata:     {
@@ -202,75 +208,18 @@ export async function getSnapshot(
 
 export function loadComponent(
   store: any,
-  { spec }: ObservabilitySettings,
+  spec: ObservabilitySettings,
   identifier: string
 ) {
-  const creds = token(spec.apiToken, spec.serviceToken);
+  const creds = token(spec.serviceToken);
 
   return store.dispatch('management/request', {
     url:     `${ spec.url }/api/components?identifier=${ encodeURIComponent(identifier) }`,
     method:  'GET',
-    headers: { 'Content-Type': 'application/json', 'Authorization': creds },
+    headers: { 'Content-Type': 'application/json', Authorization: creds },
   });
 }
 
-function token(apiToken: string, serviceToken: string): string {
-  return apiToken ? `ApiToken ${ apiToken }` : `ApiKey ${ serviceToken }`;
-}
-
-/**
- * Ensure that there is a NodeDriver called 'suse-observability' (previously 'stackstate') that has the URL whitelisted, so that the
- * Metadata Proxy can call out to the SUSE Observability API.
- *
- * NOTE: Be aware that this goes through Norman APIs, not the Steve ones.
- *
- * @param store
- * @param url
- * @returns
- */
-export async function ensureObservabilityUrlWhitelisted(
-  store: any,
-  url: string
-): Promise<boolean> {
-  async function newNodeDriver(store: any): Promise<any> {
-    const emptyDriver = {
-      name: `suse-observability`,
-      type: 'nodeDriver',
-    };
-
-    return await store.dispatch('rancher/create', emptyDriver);
-  }
-
-  const nodeDrivers = await store.dispatch(
-    'rancher/findAll',
-    { type: 'nodeDriver' },
-    { root: true }
-  );
-
-  const suseObservabilityDriver =
-    nodeDrivers.find((driver: any) => isSuseObservabilityName(driver.name) ) ||
-    (await newNodeDriver(store));
-
-  if (!suseObservabilityDriver.whitelistDomains) {
-    suseObservabilityDriver.whitelistDomains = [];
-  }
-
-  // Already in the whitelist
-  if (
-    suseObservabilityDriver.whitelistDomains.find((domain: string) => domain === url)
-  ) {
-    return true;
-  }
-
-  suseObservabilityDriver.state = 'inactive';
-  suseObservabilityDriver.url = 'local://';
-  suseObservabilityDriver.whitelistDomains.push(url);
-
-  try {
-    await suseObservabilityDriver.save();
-
-    return true;
-  } catch (e) {
-    return false;
-  }
+function token(serviceToken: string): string {
+  return `ApiKey ${ serviceToken }`;
 }

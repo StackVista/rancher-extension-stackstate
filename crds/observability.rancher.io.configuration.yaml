@@ -7,7 +7,8 @@ spec:
   versions:
     - name: v1beta1
       served: true
-      storage: true
+      storage: false
+      deprecated: true
       schema:
         openAPIV3Schema:
           type: object
@@ -20,6 +21,20 @@ spec:
                 serviceToken:
                   type: string
                 apiToken:
+                  type: string
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                url:
+                  type: string
+                serviceToken:
                   type: string
   scope: Namespaced
   names:

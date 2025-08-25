@@ -40,9 +40,9 @@ observability:
     cancelEditConfig: Cancel
     error:
       notconfigured: "The connection details for have not been configured yet. Please enter the URL and Service Token to start using SUSE Observability:"
-      crdmissing: "The SUSE Observability Extension is not fully installed yet. Please install it in order to proceed to configuration:"
+      repomissing: "The SUSE Observability Extension is not fully installed yet. Please install it in order to proceed to configuration:"
     connected: "SUSE Rancher Prime is now connected to SUSE Observability at:"
-    installcrd: Install
+    install: Install
     saveSuccess: Configuration saved successfully!
   clusterCard:
     clusterIs: Cluster is

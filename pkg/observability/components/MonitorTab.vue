@@ -104,7 +104,7 @@ export default {
 
     this.monitors = component.syncedCheckStates;
 
-    this.url = settings.spec.url;
+    this.url = settings.url;
   },
 };
 </script>
