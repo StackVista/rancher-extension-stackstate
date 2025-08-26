@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.1
+
+### Patch Changes
+
+- c2ded40: Use new CRD for full SUSE Observability URL
+
 ## 2.2.0
 
 ### Minor Changes
