@@ -25,7 +25,8 @@ export const OBSERVABILITY_CRD = {
       {
         name:    'v1beta1',
         served:  true,
-        storage: true,
+        storage: false,
+        deprecated: true,
         schema:  {
           openAPIV3Schema: {
             type:       'object',
@@ -36,6 +37,25 @@ export const OBSERVABILITY_CRD = {
                   url:          { type: 'string' },
                   serviceToken: { type: 'string' },
                   apiToken:     { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        name:    'v1',
+        served:  true,
+        storage: true,
+        schema:  {
+          openAPIV3Schema: {
+            type:       'object',
+            properties: {
+              spec: {
+                type:       'object',
+                properties: {
+                  url:          { type: 'string' },
+                  serviceToken: { type: 'string' },
                 },
               },
             },

@@ -2,7 +2,7 @@
 import { LabeledInput } from '@components/Form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import { Banner } from '@components/Banner';
-import { loadSuseObservabilitySettings, checkConnection, ensureObservabilityUrlWhitelisted } from '../../modules/suseObservability';
+import { loadSuseObservabilitySettings, checkConnection } from '../../modules/suseObservability';
 import { handleGrowl } from '../../utils/growl';
 import { OBSERVABILITY_CONFIGURATION_TYPE } from '../../types/types';
 
@@ -42,8 +42,8 @@ export default {
       const settings = await loadSuseObservabilitySettings(this.$store);
 
       if (settings) {
-        this.suseObservabilityURL = settings.spec.url;
-        this.suseObservabilityServiceToken = settings.spec.serviceToken;
+        this.suseObservabilityURL = settings.url;
+        this.suseObservabilityServiceToken = settings.serviceToken;
       }
     },
 
@@ -55,19 +55,6 @@ export default {
     },
 
     async save(btnCb) {
-      const whitelisted = await ensureObservabilityUrlWhitelisted(this.$store, this.suseObservabilityURL);
-
-      if (!whitelisted) {
-        handleGrowl(this.$store, {
-          message: this.t('observability.errorMsg.urlNotWhitelisted'),
-          type:    'error',
-        });
-
-        btnCb(false);
-
-        return;
-      }
-
       const conn = await checkConnection(this.$store, {
         apiURL:       this.suseObservabilityURL,
         serviceToken: this.suseObservabilityServiceToken,
@@ -95,9 +82,11 @@ export default {
 
         newConfig = await this.$store.dispatch('management/create', config);
       } else {
-        newConfig = await loadSuseObservabilitySettings(this.$store);
+        const configs = await this.$store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+        newConfig = configs[0];
       }
 
+      newConfig.apiVersion = 'observability.rancher.io/v1';
       newConfig.spec.url = this.suseObservabilityURL;
       newConfig.spec.serviceToken = this.suseObservabilityServiceToken;
 

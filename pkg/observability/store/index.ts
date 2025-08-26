@@ -6,7 +6,6 @@ import actions from './actions';
 
 export interface ObservabilityState {
   apiURL?: string;
-  apiToken?: string;
   serviceToken?: string;
   missingCrd: boolean;
   repoPresent?: boolean;
@@ -17,7 +16,6 @@ const observabilityStoreFactory = (config: ObservabilityState): CoreStoreSpecifi
     state: (): ObservabilityState => {
       return {
         apiURL:         config.apiURL,
-        apiToken:       config.apiToken,
         serviceToken:   config.serviceToken,
         missingCrd:   config.missingCrd,
         repoPresent:    config.repoPresent,
@@ -34,7 +32,6 @@ const config: CoreStoreConfig = { namespace: OBSERVABILITY_PRODUCT_NAME };
 export default {
   specifics: observabilityStoreFactory({
     apiURL:         '',
-    apiToken:       '',
     serviceToken:   '',
     missingCrd:   false,
     repoPresent:    true,
