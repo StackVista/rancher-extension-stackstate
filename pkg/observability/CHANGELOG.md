@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.2
+
+### Patch Changes
+
+- 4ece604: Release RBAC
+
 ## 2.2.1
 
 ### Patch Changes
