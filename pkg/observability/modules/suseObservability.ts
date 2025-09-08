@@ -1,6 +1,5 @@
 import { ConnectionInfo } from 'types/component';
 import {
-  API_SERVICE,
   CONFIG_MAP,
   NAMESPACE,
   NODE,
