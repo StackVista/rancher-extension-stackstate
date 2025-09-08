@@ -36,6 +36,8 @@ const onEnter: OnNavToPackage = async(store) => {
 
   if (!isCrdLoaded(store)) {
     await store.dispatch('observability/setMissingCrd', true);
+
+    return;
   }
   await loadConnectionInfo(store);
 };
