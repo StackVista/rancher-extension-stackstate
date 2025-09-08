@@ -15,7 +15,6 @@ rules:
   - instance.observability.cattle.io
   resources:
   - views
-  - ingestionapikeys
   - permissions
   - servicetokens
   - settings
