@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.3
+
+### Patch Changes
+
+- f38fe3a: fix clean install
+
 ## 2.2.2
 
 ### Patch Changes
