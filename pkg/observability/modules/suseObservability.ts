@@ -137,10 +137,16 @@ export async function loadConnectionInfo(store: any): Promise<void> {
  * @param credentials The Credentials to validate.
  * @returns
  */
+export enum ConnectionStatus {
+  Connected = 0,
+  InvalidToken,
+  CrossOriginError
+}
+
 export async function checkConnection(
   store: any,
   credentials: ConnectionInfo
-): Promise<boolean> {
+): Promise<ConnectionStatus> {
   const creds = token(credentials.serviceToken);
 
   try {
@@ -155,19 +161,43 @@ export async function checkConnection(
     });
 
     if (resp._status !== 200) {
-      return false;
+      return ConnectionStatus.InvalidToken;
     }
 
-    return true;
+    return ConnectionStatus.Connected;
   } catch (e) {
-    return false;
+    if (e instanceof Error) {
+      return ConnectionStatus.CrossOriginError;
+    } else {
+      return ConnectionStatus.InvalidToken;
+    }
+  }
+}
+
+export enum ObservationStatus {
+  Observed = 0,
+  NotDeployed,
+  ConnectionError
+}
+
+export async function loadObservationStatus(
+  store: any,
+  clusterName: string,
+  settings: ObservabilitySettings,
+): Promise<ObservationStatus> {
+  try {
+    const clusterUrn = `urn:cluster:/kubernetes:${ clusterName }`;
+    const clusterStatus = await loadComponent(store, settings, clusterUrn);
+    return clusterStatus ? ObservationStatus.Observed : ObservationStatus.NotDeployed;
+  } catch (e) {
+    return ObservationStatus.ConnectionError;
   }
 }
 
 export async function getSnapshot(
   store: any,
   stql: string,
-  settings: undefined | ObservabilitySettings
+  settings: undefined | ObservabilitySettings,
 ): Promise<any | void> {
   const suseObservabilityURL = settings ? settings.url : await store.getters['observability/apiURL'];
   const serviceToken = settings ? settings.serviceToken : await store.getters['observability/serviceToken'];

@@ -2,7 +2,6 @@
 import { mapGetters } from 'vuex';
 import { isCrdLoaded, loadComponent, loadSuseObservabilitySettings } from '../modules/suseObservability';
 import { buildUrn } from '../modules/urn';
-import { isObserved } from '../modules/observed';
 import { HEALTH_STATE_TYPES } from '../types/types';
 import HealthState from './Health/HealthState.vue';
 
@@ -17,7 +16,6 @@ export default {
   },
   data() {
     return {
-      observed: false,
       health:   HEALTH_STATE_TYPES.UNKNOWN,
       urn:      '',
     };
@@ -39,13 +37,6 @@ export default {
     if (!isCrdLoaded(this.$store)) {
       return;
     }
-    const obs = await isObserved(this.$store, this.clusterId);
-
-    this.observed = obs.length > 0;
-
-    if (!this.observed) {
-      return;
-    }
 
     const settings = await loadSuseObservabilitySettings(this.$store);
 
@@ -55,7 +46,6 @@ export default {
     }
 
     const component = await loadComponent(this.$store, settings, this.urn);
-
     this.health = component.state.healthState;
   },
 };

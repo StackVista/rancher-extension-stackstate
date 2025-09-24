@@ -9,8 +9,9 @@ import {
   getSnapshot,
   loadSuseObservabilitySettings,
   isCrdLoaded,
+  loadObservationStatus,
+  ObservationStatus,
 } from '../modules/suseObservability';
-import { isObserved } from '../modules/observed';
 import { HEALTH_STATE_TYPES, OBSERVABILITY_PRODUCT_NAME, BLANK_CLUSTER } from '../types/types';
 import HealthState from './Health/HealthState.vue';
 import HealthDisc from './Health/HealthDisc.vue';
@@ -31,9 +32,6 @@ export default {
     countCritical() {
       return this.critical;
     },
-    isObserved() {
-      return this.observed.length > 0;
-    },
     chartRoute() {
       return {
         name:   'c-cluster-apps-charts-chart',
@@ -48,12 +46,13 @@ export default {
   },
   data() {
     return {
-      observed:                [],
+      observationStatus:       ObservationStatus.Observed,
       snapshot:                undefined,
       deviating:               0,
       critical:                0,
       isConfigured:            true,
       HEALTH_STATE_TYPES,
+      ObservationStatus,
       extensionDashboardRoute: {
         name:   `${ OBSERVABILITY_PRODUCT_NAME }-c-cluster-dashboard`,
         params: { [FROM_CLUSTER]: BLANK_CLUSTER },
@@ -64,23 +63,16 @@ export default {
     this.isMissingCrd = !isCrdLoaded(this.$store);
     if (this.isMissingCrd) {
       this.isConfigured = false;
-
       return;
     }
 
     const settings = await loadSuseObservabilitySettings(this.$store);
-
     if (!settings) {
       this.isConfigured = false;
-
       return;
     }
 
-    const obs = await isObserved(this.$store, this.resource.id);
-
-    if (!obs) {
-      return;
-    }
+    this.observationStatus = await loadObservationStatus(this.$store, this.resource.spec.displayName, settings);
 
     this.snapshot = await getSnapshot(
       this.$store,
@@ -94,7 +86,6 @@ export default {
         this.critical++;
       }
     }
-    this.observed = obs;
   },
 };
 </script>
@@ -105,16 +96,13 @@ export default {
       <p v-if="$fetchState.pending">
         {{ t("observability.clusterCard.connecting") }}
       </p>
-      <div
-        v-else-if="!isConfigured"
-        class="flex-text"
-      >
+      <div v-else-if="!isConfigured || observationStatus === ObservationStatus.ConnectionError" class="flex-text">
         <p>{{ t('observability.clusterCard.notConnectedPrepend') }}</p>
         <router-link :to="extensionDashboardRoute">
           {{ t('observability.clusterCard.notConnectedObservability') }}
         </router-link>
       </div>
-      <div v-else-if="isConfigured && !isObserved">
+      <div v-else-if="isConfigured && observationStatus === ObservationStatus.NotDeployed">
         <p class="mb-20">
           {{ t("observability.clusterCard.clusterIs") }}
           <HealthState class="state-badge" health="unobserved" color="grey" />

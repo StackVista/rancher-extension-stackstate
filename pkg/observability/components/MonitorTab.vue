@@ -3,8 +3,7 @@ import { mapGetters } from 'vuex';
 import LiveDate from '@shell/components/formatter/LiveDate.vue';
 import SortableTable from '@shell/components/SortableTable';
 
-import { loadComponent, mapKind, loadSuseObservabilitySettings, isCrdLoaded } from '../modules/suseObservability';
-import { isObserved } from '../modules/observed';
+import { loadComponent, mapKind, loadSuseObservabilitySettings, isCrdLoaded, loadObservationStatus, ObservationStatus } from '../modules/suseObservability';
 import { MONITOR_HEADERS } from '../types/headers';
 
 import HealthState from './Health/HealthState.vue';
@@ -23,7 +22,8 @@ export default {
   data() {
     return {
       MONITOR_HEADERS,
-      observed: false,
+      observationStatus: ObservationStatus.Observed,
+      ObservationStatus,
       urn:      '',
       url:      '',
       monitors: [],
@@ -85,20 +85,13 @@ export default {
       });
     }
 
-    const obs = await isObserved(this.$store, this.clusterId);
-
-    this.observed = obs?.length > 0;
-
-    if (!this.observed) {
-      return;
-    }
     const settings = await loadSuseObservabilitySettings(this.$store);
 
     this.urn = this.componentIdentifier;
 
     const component = await loadComponent(this.$store, settings, this.urn);
-
     if (!component) {
+      this.observationStatus = await loadObservationStatus(this.$store, this.clusterId, settings);
       return;
     }
 
@@ -109,9 +102,14 @@ export default {
 };
 </script>
 <template>
-  <div v-if="!observed">
+  <div v-if="observationStatus === ObservationStatus.NotDeployed">
     <div class="card">
       <span>{{ t('components.monitorTab.notEnabled') }}</span>
+    </div>
+  </div>
+  <div v-else-if="observationStatus === ObservationStatus.ConnectionError">
+    <div class="card">
+      <span>{{ t('components.monitorTab.connectionError') }}</span>
     </div>
   </div>
   <div v-else-if="!hasMonitors">
