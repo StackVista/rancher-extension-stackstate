@@ -2,7 +2,7 @@
 import { LabeledInput } from '@components/Form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import { Banner } from '@components/Banner';
-import { loadSuseObservabilitySettings, checkConnection } from '../../modules/suseObservability';
+import { loadSuseObservabilitySettings, checkConnection, ConnectionStatus } from '../../modules/suseObservability';
 import { handleGrowl } from '../../utils/growl';
 import { OBSERVABILITY_CONFIGURATION_TYPE } from '../../types/types';
 
@@ -60,15 +60,23 @@ export default {
         serviceToken: this.suseObservabilityServiceToken,
       });
 
-      if (!conn) {
-        handleGrowl(this.$store, {
-          message: this.t('observability.errorMsg.connectionFailed'),
-          type:    'error',
-        });
-
-        btnCb(false);
-
-        return;
+      switch (conn) {
+        case ConnectionStatus.InvalidToken:
+          handleGrowl(this.$store, {
+            message: this.t('observability.errorMsg.connectionFailed'),
+            type:    'error',
+          });
+          btnCb(false);
+          return;
+        case ConnectionStatus.CrossOriginError:
+          handleGrowl(this.$store, {
+            message: this.t('observability.errorMsg.connectionError'),
+            type:    'error',
+          });
+          btnCb(false);
+          return;
+        default:
+          // pass
       }
 
       let newConfig;
