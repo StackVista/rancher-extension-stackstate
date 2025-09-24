@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.4
+
+### Patch Changes
+
+- 48b68ef: Allow non-admin access to health status
+
 ## 2.2.3
 
 ### Patch Changes
