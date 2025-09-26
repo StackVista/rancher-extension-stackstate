@@ -1,23 +1,23 @@
 <script>
-import { mapGetters } from 'vuex';
-import { Banner } from '@components/Banner';
-import { createObservabilityRepoIfNotPresent } from '../../modules/suseObservability';
-import { OBSERVABILITY_CRD } from '../../types/types';
-import { handleGrowl } from '../../utils/growl';
-import { logger } from '../../utils/logger';
+import { mapGetters } from "vuex";
+import { Banner } from "@components/Banner";
+import { createObservabilityRepoIfNotPresent } from "../../modules/suseObservability";
+import { OBSERVABILITY_CRD } from "../../types/types";
+import { handleGrowl } from "../../utils/growl";
+import { logger } from "../../utils/logger";
 
 export default {
   computed: {
-    ...mapGetters(['currentCluster']),
+    ...mapGetters(["currentCluster"]),
     missingCrd() {
-      return this.$store.getters['observability/isCrdMissing'];
+      return this.$store.getters["observability/isCrdMissing"];
     },
     repoPresent() {
-      return this.$store.getters['observability/isRepoPresent'];
+      return this.$store.getters["observability/isRepoPresent"];
     },
   },
   components: { Banner },
-  methods:    {
+  methods: {
     async install() {
       await this.installRepo();
       await this.installCrd();
@@ -31,13 +31,13 @@ export default {
       try {
         await createObservabilityRepoIfNotPresent(this.$store);
 
-        await this.$store.dispatch('observability/setRepoPresent', true);
+        await this.$store.dispatch("observability/setRepoPresent", true);
       } catch (err) {
         handleGrowl(this.$store, {
-          message: `${ this.t('observability.errorMsg.failedRepo') } ${
-            err.message ? `: ${ err.message }` : ''
+          message: `${this.t("observability.errorMsg.failedRepo")} ${
+            err.message ? `: ${err.message}` : ""
           }`,
-          type: 'error',
+          type: "error",
         });
       }
     },
@@ -49,34 +49,35 @@ export default {
 
       try {
         try {
-          await this.$store.dispatch('management/request', {
-            url:    '/v1/apiextensions.k8s.io.customresourcedefinitions',
-            method: 'POST',
-            data:   OBSERVABILITY_CRD,
+          await this.$store.dispatch("management/request", {
+            url: "/v1/apiextensions.k8s.io.customresourcedefinitions",
+            method: "POST",
+            data: OBSERVABILITY_CRD,
           });
         } catch (err) {
           logger.log("Error creating CRD, attempting update");
-          const currentCrd = await this.$store.dispatch('management/request', {
-            url:    '/v1/apiextensions.k8s.io.customresourcedefinitions/configurations.observability.rancher.io',
-            method: 'GET'
+          const currentCrd = await this.$store.dispatch("management/request", {
+            url: "/v1/apiextensions.k8s.io.customresourcedefinitions/configurations.observability.rancher.io",
+            method: "GET",
           });
           if (currentCrd) {
-            OBSERVABILITY_CRD.metadata.resourceVersion = currentCrd.metadata.resourceVersion;
-            await this.$store.dispatch('management/request', {
-              url:    '/v1/apiextensions.k8s.io.customresourcedefinitions/configurations.observability.rancher.io',
-              method: 'PUT',
-              data:   OBSERVABILITY_CRD,
+            OBSERVABILITY_CRD.metadata.resourceVersion =
+              currentCrd.metadata.resourceVersion;
+            await this.$store.dispatch("management/request", {
+              url: "/v1/apiextensions.k8s.io.customresourcedefinitions/configurations.observability.rancher.io",
+              method: "PUT",
+              data: OBSERVABILITY_CRD,
             });
           }
         }
 
-        await this.$store.dispatch('observability/setMissingCrd', false);
+        await this.$store.dispatch("observability/setMissingCrd", false);
       } catch (err) {
         handleGrowl(this.$store, {
-          message: `${ this.t('observability.errorMsg.failedCrd') } ${
-            err.message ? `: ${ err.message }` : ''
+          message: `${this.t("observability.errorMsg.failedCrd")} ${
+            err.message ? `: ${err.message}` : ""
           }`,
-          type: 'error',
+          type: "error",
         });
       }
     },

@@ -1,10 +1,14 @@
 <script>
-import { LabeledInput } from '@components/Form/LabeledInput';
-import AsyncButton from '@shell/components/AsyncButton';
-import { Banner } from '@components/Banner';
-import { loadSuseObservabilitySettings, checkConnection, ConnectionStatus } from '../../modules/suseObservability';
-import { handleGrowl } from '../../utils/growl';
-import { OBSERVABILITY_CONFIGURATION_TYPE } from '../../types/types';
+import { LabeledInput } from "@components/Form/LabeledInput";
+import AsyncButton from "@shell/components/AsyncButton";
+import { Banner } from "@components/Banner";
+import {
+  loadSuseObservabilitySettings,
+  checkConnection,
+  ConnectionStatus,
+} from "../../modules/suseObservability";
+import { handleGrowl } from "../../utils/growl";
+import { OBSERVABILITY_CONFIGURATION_TYPE } from "../../types/types";
 
 export default {
   components: {
@@ -12,20 +16,24 @@ export default {
     AsyncButton,
     Banner,
   },
-  props: { mode: { type: String, default: 'edit' } },
+  props: { mode: { type: String, default: "edit" } },
   async fetch() {
     await this.fetchFormValues();
   },
   data: () => ({
-    suseObservabilityURL:          '',
-    suseObservabilityServiceToken: '',
-    showSuccessfulSave:            false,
-    showEditInterface:             false,
-    urlError:                      false
+    suseObservabilityURL: "",
+    suseObservabilityServiceToken: "",
+    showSuccessfulSave: false,
+    showEditInterface: false,
+    urlError: false,
   }),
   watch: {
     suseObservabilityURL(neu) {
-      if (neu?.length && !neu.startsWith('http://') && !neu.startsWith('https://')) {
+      if (
+        neu?.length &&
+        !neu.startsWith("http://") &&
+        !neu.startsWith("https://")
+      ) {
         this.urlError = true;
       } else {
         this.urlError = false;
@@ -34,7 +42,7 @@ export default {
   },
   computed: {
     isCreateMode() {
-      return this.mode === 'create';
+      return this.mode === "create";
     },
   },
   methods: {
@@ -56,53 +64,55 @@ export default {
 
     async save(btnCb) {
       const conn = await checkConnection(this.$store, {
-        apiURL:       this.suseObservabilityURL,
+        apiURL: this.suseObservabilityURL,
         serviceToken: this.suseObservabilityServiceToken,
       });
 
       switch (conn) {
         case ConnectionStatus.InvalidToken:
           handleGrowl(this.$store, {
-            message: this.t('observability.errorMsg.connectionFailed'),
-            type:    'error',
+            message: this.t("observability.errorMsg.connectionFailed"),
+            type: "error",
           });
           btnCb(false);
           return;
         case ConnectionStatus.CrossOriginError:
           handleGrowl(this.$store, {
-            message: this.t('observability.errorMsg.connectionError'),
-            type:    'error',
+            message: this.t("observability.errorMsg.connectionError"),
+            type: "error",
           });
           btnCb(false);
           return;
         default:
-          // pass
+        // pass
       }
 
       let newConfig;
 
       if (this.isCreateMode) {
         const config = {
-          metadata: { name: `suse-observability`, namespace: 'default' },
-          spec:     {},
-          type:     OBSERVABILITY_CONFIGURATION_TYPE,
+          metadata: { name: `suse-observability`, namespace: "default" },
+          spec: {},
+          type: OBSERVABILITY_CONFIGURATION_TYPE,
         };
 
-        newConfig = await this.$store.dispatch('management/create', config);
+        newConfig = await this.$store.dispatch("management/create", config);
       } else {
-        const configs = await this.$store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+        const configs = await this.$store.dispatch("management/findAll", {
+          type: OBSERVABILITY_CONFIGURATION_TYPE,
+        });
         newConfig = configs[0];
       }
 
-      newConfig.apiVersion = 'observability.rancher.io/v1';
+      newConfig.apiVersion = "observability.rancher.io/v1";
       newConfig.spec.url = this.suseObservabilityURL;
       newConfig.spec.serviceToken = this.suseObservabilityServiceToken;
 
       try {
         await newConfig.save();
 
-        await this.$store.dispatch('observability/setConnectionInfo', {
-          apiURL:       this.suseObservabilityURL,
+        await this.$store.dispatch("observability/setConnectionInfo", {
+          apiURL: this.suseObservabilityURL,
           serviceToken: this.suseObservabilityServiceToken,
         });
 
@@ -115,8 +125,8 @@ export default {
         btnCb(true);
       } catch (err) {
         handleGrowl(this.$store, {
-          message: this.t('observability.errorMsg.failedSave'),
-          type:    'error',
+          message: this.t("observability.errorMsg.failedSave"),
+          type: "error",
         });
         btnCb(false);
       }
@@ -142,7 +152,9 @@ export default {
           <div class="banner-info">
             <p>{{ t("observability.dashboard.connected") }}</p>
             <!-- reserve a line when the url is an empty string so UI won't jump on change -->
-            <a :href="`${suseObservabilityURL}/`">{{ suseObservabilityURL || "&nbsp;" }}</a>
+            <a :href="`${suseObservabilityURL}/`">{{
+              suseObservabilityURL || "&nbsp;"
+            }}</a>
           </div>
         </Banner>
 
@@ -173,10 +185,7 @@ export default {
             required
           />
           <div class="pt-10 pb-10">
-            <p
-              v-show="urlError"
-              class="url-error mb-10"
-            >
+            <p v-show="urlError" class="url-error mb-10">
               {{ t("observability.configuration.urlError") }}
             </p>
           </div>

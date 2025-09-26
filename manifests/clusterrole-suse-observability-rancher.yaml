@@ -3,10 +3,10 @@ kind: ClusterRole
 metadata:
   name: suse-observability-rancher
 rules:
-- apiGroups:
-  - observability.rancher.io
-  resources:
-  - configurations
-  verbs:
-  - get
-  - list
+  - apiGroups:
+      - observability.rancher.io
+    resources:
+      - configurations
+    verbs:
+      - get
+      - list

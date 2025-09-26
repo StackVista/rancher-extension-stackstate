@@ -15,36 +15,15 @@
     "preserveSymlinks": true,
     "typeRoots": [
       "../../node_modules",
-      "../../node_modules/@rancher/shell/types",
+      "../../node_modules/@rancher/shell/types"
     ],
-    "types": [
-      "@types/node",
-      "@types/lodash",
-      "rancher",
-      "shell"
-    ],
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ],
+    "types": ["@types/node", "@types/lodash", "rancher", "shell"],
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
     "paths": {
-      "@shell/*": [
-        "../../node_modules/@rancher/shell/*"
-      ],
-      "@components/*": [
-        "@rancher/components/*"
-      ]
+      "@shell/*": ["../../node_modules/@rancher/shell/*"],
+      "@components/*": ["@rancher/components/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.d.ts",
-    "**/*.tsx",
-    "**/*.vue"
-  ],
-  "exclude": [
-    "../../node_modules"
-  ]
+  "include": ["**/*.ts", "**/*.d.ts", "**/*.tsx", "**/*.vue"],
+  "exclude": ["../../node_modules"]
 }

@@ -1,7 +1,5 @@
 <script>
-import {
-  FROM_CLUSTER,
-} from '@shell/config/query-params';
+import { FROM_CLUSTER } from "@shell/config/query-params";
 import {
   getSnapshot,
   loadSuseObservabilitySettings,
@@ -10,21 +8,25 @@ import {
   ObservationStatus,
   AgentStatus,
   loadAgentStatus,
-} from '../modules/suseObservability';
-import { HEALTH_STATE_TYPES, OBSERVABILITY_PRODUCT_NAME, BLANK_CLUSTER } from '../types/types';
-import HealthState from './Health/HealthState.vue';
-import HealthDisc from './Health/HealthDisc.vue';
+} from "../modules/suseObservability";
+import {
+  HEALTH_STATE_TYPES,
+  OBSERVABILITY_PRODUCT_NAME,
+  BLANK_CLUSTER,
+} from "../types/types";
+import HealthState from "./Health/HealthState.vue";
+import HealthDisc from "./Health/HealthDisc.vue";
 
 export default {
-  name:       'ObservabilityClusterCard',
+  name: "ObservabilityClusterCard",
   components: { HealthState, HealthDisc },
-  props:      {
+  props: {
     resource: {
-      type:     Object,
+      type: Object,
       required: true,
-    }
+    },
   },
-  computed:   {
+  computed: {
     countDeviating() {
       return this.deviating;
     },
@@ -34,20 +36,20 @@ export default {
   },
   data() {
     return {
-      observationStatus:       ObservationStatus.Observed,
+      observationStatus: ObservationStatus.Observed,
       agentStatus: AgentStatus.Installed,
-      snapshot:                undefined,
-      deviating:               0,
-      critical:                0,
-      isConfigured:            true,
+      snapshot: undefined,
+      deviating: 0,
+      critical: 0,
+      isConfigured: true,
       installUrl: undefined,
       HEALTH_STATE_TYPES,
       ObservationStatus,
       AgentStatus,
       extensionDashboardRoute: {
-        name:   `${ OBSERVABILITY_PRODUCT_NAME }-c-cluster-dashboard`,
+        name: `${OBSERVABILITY_PRODUCT_NAME}-c-cluster-dashboard`,
         params: { [FROM_CLUSTER]: BLANK_CLUSTER },
-      }
+      },
     };
   },
   async fetch() {
@@ -64,20 +66,24 @@ export default {
     }
     this.installUrl = `${settings.url}/#/stackpacks/kubernetes-v2`;
 
-    this.observationStatus = await loadObservationStatus(this.$store, this.resource.spec.displayName, settings);
+    this.observationStatus = await loadObservationStatus(
+      this.$store,
+      this.resource.spec.displayName,
+      settings,
+    );
     if (this.observationStatus === ObservationStatus.NotDeployed) {
       this.agentStatus = await loadAgentStatus(this.$store, this.resource.id);
     }
 
     this.snapshot = await getSnapshot(
       this.$store,
-      `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${ this.resource.spec.displayName }"`,
-      settings
+      `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${this.resource.spec.displayName}"`,
+      settings,
     );
     for (const component of this.snapshot.viewSnapshotResponse.components) {
-      if (component.state.healthState === 'DEVIATING') {
+      if (component.state.healthState === "DEVIATING") {
         this.deviating++;
-      } else if (component.state.healthState === 'CRITICAL') {
+      } else if (component.state.healthState === "CRITICAL") {
         this.critical++;
       }
     }
@@ -91,29 +97,43 @@ export default {
       <p v-if="$fetchState.pending">
         {{ t("observability.clusterCard.connecting") }}
       </p>
-      <div v-else-if="!isConfigured || observationStatus === ObservationStatus.ConnectionError" class="flex-text">
-        <p>{{ t('observability.clusterCard.notConnectedPrepend') }}</p>
+      <div
+        v-else-if="
+          !isConfigured ||
+          observationStatus === ObservationStatus.ConnectionError
+        "
+        class="flex-text"
+      >
+        <p>{{ t("observability.clusterCard.notConnectedPrepend") }}</p>
         <router-link :to="extensionDashboardRoute">
-          {{ t('observability.clusterCard.notConnectedObservability') }}
+          {{ t("observability.clusterCard.notConnectedObservability") }}
         </router-link>
       </div>
-      <div v-else-if="isConfigured && observationStatus === ObservationStatus.NotDeployed">
+      <div
+        v-else-if="
+          isConfigured && observationStatus === ObservationStatus.NotDeployed
+        "
+      >
         <p class="mb-20">
           {{ t("observability.clusterCard.clusterIs") }}
           <HealthState class="state-badge" health="unobserved" color="grey" />
         </p>
         <div v-if="agentStatus !== AgentStatus.Installed" class="flex-text">
           <p>
-            {{ t('observability.clusterCard.notObservedPrepend') }}
-            <a :href="installUrl">{{ t('observability.clusterCard.notObservedInstall') }}</a>
-            {{ t('observability.clusterCard.notObservedPostpend') }}
+            {{ t("observability.clusterCard.notObservedPrepend") }}
+            <a :href="installUrl">{{
+              t("observability.clusterCard.notObservedInstall")
+            }}</a>
+            {{ t("observability.clusterCard.notObservedPostpend") }}
           </p>
         </div>
         <div v-else>
           <p>
-            {{ t('observability.clusterCard.noDataPrepend') }}
-            <a :href="installUrl">{{ t('observability.clusterCard.noDataInstall') }}</a>
-            {{ t('observability.clusterCard.noDataPostpend') }}
+            {{ t("observability.clusterCard.noDataPrepend") }}
+            <a :href="installUrl">{{
+              t("observability.clusterCard.noDataInstall")
+            }}</a>
+            {{ t("observability.clusterCard.noDataPostpend") }}
           </p>
         </div>
       </div>

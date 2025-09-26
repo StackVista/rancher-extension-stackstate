@@ -1,4 +1,4 @@
-import { ConnectionInfo } from 'types/component';
+import { ConnectionInfo } from "types/component";
 import {
   CONFIG_MAP,
   NAMESPACE,
@@ -7,25 +7,28 @@ import {
   SECRET,
   SERVICE,
   WORKLOAD_TYPES,
-} from '@shell/config/types';
-import { CLUSTER } from '@shell/store/prefs';
-import { OBSERVABILITY_CLUSTERREPO, OBSERVABILITY_CONFIGURATION_TYPE } from '../types/types';
-import { logger } from '../utils/logger';
+} from "@shell/config/types";
+import { CLUSTER } from "@shell/store/prefs";
+import {
+  OBSERVABILITY_CLUSTERREPO,
+  OBSERVABILITY_CONFIGURATION_TYPE,
+} from "../types/types";
+import { logger } from "../utils/logger";
 
-export const STS_POD = 'pod';
-export const STS_SERVICE = 'service';
-export const STS_NODE = 'node';
-export const STS_DAEMON_SET = 'daemonset';
-export const STS_DEPLOYMENT = 'deployment';
-export const STS_STATEFUL_SET = 'statefulset';
-export const STS_CRON_JOB = 'cronjob';
-export const STS_JOB = 'job';
-export const STS_REPLICA_SET = 'replicaset';
-export const STS_REPLICATION_CONTROLLER = 'replication-controller';
-export const STS_CLUSTER = 'cluster';
-export const STS_CONFIG_MAP = 'configmap';
-export const STS_SECRET = 'secret';
-export const STS_NAMESPACE = 'namespace';
+export const STS_POD = "pod";
+export const STS_SERVICE = "service";
+export const STS_NODE = "node";
+export const STS_DAEMON_SET = "daemonset";
+export const STS_DEPLOYMENT = "deployment";
+export const STS_STATEFUL_SET = "statefulset";
+export const STS_CRON_JOB = "cronjob";
+export const STS_JOB = "job";
+export const STS_REPLICA_SET = "replicaset";
+export const STS_REPLICATION_CONTROLLER = "replication-controller";
+export const STS_CLUSTER = "cluster";
+export const STS_CONFIG_MAP = "configmap";
+export const STS_SECRET = "secret";
+export const STS_NAMESPACE = "namespace";
 
 // Map of kinds to their display names
 const KINDS = new Map<string, string>([
@@ -50,31 +53,35 @@ export function mapKind(kind: string): string {
 }
 
 export interface ObservabilitySettings {
-    url: string;
-    serviceToken: string;
+  url: string;
+  serviceToken: string;
 }
 
 function isSuseObservabilityName(name: string): boolean {
   // match either the legacy (stackstate) or new (suse-observability) name
-  return name === 'stackstate' || name === 'suse-observability';
+  return name === "stackstate" || name === "suse-observability";
 }
 
 function isSuseObservabilitySettings(settings: any): boolean {
   return isSuseObservabilityName(settings.metadata.name);
 }
 
-export async function loadSuseObservabilitySettings(store: any): Promise<undefined | ObservabilitySettings> {
-  const settings = await store.dispatch('management/findAll', { type: OBSERVABILITY_CONFIGURATION_TYPE });
+export async function loadSuseObservabilitySettings(
+  store: any,
+): Promise<undefined | ObservabilitySettings> {
+  const settings = await store.dispatch("management/findAll", {
+    type: OBSERVABILITY_CONFIGURATION_TYPE,
+  });
   const record = settings?.find(isSuseObservabilitySettings);
 
-  if (record?.apiVersion == 'observability.rancher.io/v1beta1') {
+  if (record?.apiVersion == "observability.rancher.io/v1beta1") {
     return {
-      url:          `https://${ record.spec.url }`,
+      url: `https://${record.spec.url}`,
       serviceToken: record.spec.serviceToken,
     };
   } else if (record) {
     return {
-      url:          record.spec.url,
+      url: record.spec.url,
       serviceToken: record.spec.serviceToken,
     };
   } else {
@@ -86,37 +93,42 @@ export async function loadSuseObservabilitySettings(store: any): Promise<undefin
  * Check if the CRD is loaded
  */
 export function isCrdLoaded(store: any): boolean {
-  const loaded = store.getters['management/schemaFor'](
-    OBSERVABILITY_CONFIGURATION_TYPE
+  const loaded = store.getters["management/schemaFor"](
+    OBSERVABILITY_CONFIGURATION_TYPE,
   );
 
-  return loaded?.attributes.version == 'v1';
+  return loaded?.attributes.version == "v1";
 }
 
-export async function isSuseObservabilityRepoPresent(store: any): Promise<boolean> {
-  logger.log('Checking if Observability Repo is present');
+export async function isSuseObservabilityRepoPresent(
+  store: any,
+): Promise<boolean> {
+  logger.log("Checking if Observability Repo is present");
 
-  const repos: undefined | ReadonlyArray<any> = await store.dispatch('management/findAll', { type: 'catalog.cattle.io.clusterrepo' });
+  const repos: undefined | ReadonlyArray<any> = await store.dispatch(
+    "management/findAll",
+    { type: "catalog.cattle.io.clusterrepo" },
+  );
 
-  logger.log('Checking if Observability Repo is present', repos);
+  logger.log("Checking if Observability Repo is present", repos);
 
   const isPresent = repos?.some(isSuseObservabilitySettings) ?? false;
 
-  logger.log('Checking if Observability Repo is present', isPresent);
+  logger.log("Checking if Observability Repo is present", isPresent);
 
   return isPresent;
 }
 
 export async function createObservabilityRepoIfNotPresent(store: any) {
-  logger.log('Creating Observability Repo if needed');
+  logger.log("Creating Observability Repo if needed");
   if (!(await isSuseObservabilityRepoPresent(store))) {
-    logger.log('Creating Observability Repo');
-    await store.dispatch('management/request', {
-      url:    '/v1/catalog.cattle.io.clusterrepos',
-      method: 'POST',
-      data:   OBSERVABILITY_CLUSTERREPO,
+    logger.log("Creating Observability Repo");
+    await store.dispatch("management/request", {
+      url: "/v1/catalog.cattle.io.clusterrepos",
+      method: "POST",
+      data: OBSERVABILITY_CLUSTERREPO,
     });
-    logger.log('Created Observability Repo');
+    logger.log("Created Observability Repo");
   }
 }
 
@@ -124,8 +136,8 @@ export async function loadConnectionInfo(store: any): Promise<void> {
   const suseObservabilitySettings = await loadSuseObservabilitySettings(store);
 
   if (suseObservabilitySettings) {
-    await store.dispatch('observability/setConnectionInfo', {
-      apiURL:       suseObservabilitySettings.url,
+    await store.dispatch("observability/setConnectionInfo", {
+      apiURL: suseObservabilitySettings.url,
       serviceToken: suseObservabilitySettings.serviceToken,
     });
   }
@@ -140,22 +152,22 @@ export async function loadConnectionInfo(store: any): Promise<void> {
 export enum ConnectionStatus {
   Connected = 0,
   InvalidToken,
-  CrossOriginError
+  CrossOriginError,
 }
 
 export async function checkConnection(
   store: any,
-  credentials: ConnectionInfo
+  credentials: ConnectionInfo,
 ): Promise<ConnectionStatus> {
   const creds = token(credentials.serviceToken);
 
   try {
-    const resp = await store.dispatch('management/request', {
-      url:     `${ credentials.apiURL }/api/server/info`,
-      method:  'GET',
+    const resp = await store.dispatch("management/request", {
+      url: `${credentials.apiURL}/api/server/info`,
+      method: "GET",
       headers: {
-        'Content-Type':  'application/json',
-        Authorization:  creds,
+        "Content-Type": "application/json",
+        Authorization: creds,
       },
       redirectUnauthorized: false,
     });
@@ -177,7 +189,7 @@ export async function checkConnection(
 export enum ObservationStatus {
   Observed = 0,
   NotDeployed,
-  ConnectionError
+  ConnectionError,
 }
 
 export async function loadObservationStatus(
@@ -186,7 +198,7 @@ export async function loadObservationStatus(
   settings: ObservabilitySettings,
 ): Promise<ObservationStatus> {
   try {
-    const clusterUrn = `urn:cluster:/kubernetes:${ clusterName }`;
+    const clusterUrn = `urn:cluster:/kubernetes:${clusterName}`;
     await loadComponent(store, settings, clusterUrn);
     return ObservationStatus.Observed;
   } catch (e) {
@@ -201,23 +213,30 @@ export async function loadObservationStatus(
 export enum AgentStatus {
   Installed = 0,
   NotInstalled,
-  ConnectionError
+  ConnectionError,
 }
 
 export async function loadAgentStatus(
   store: any,
-  clusterId: string
+  clusterId: string,
 ): Promise<AgentStatus> {
   try {
-    const response = await store.dispatch(`cluster/request`, { url: `/k8s/clusters/${ clusterId }/v1/apps.deployments` });
-    const deployments = response?.data?.filter((depl: any) => depl.metadata?.labels && (
-        depl.metadata.labels['app.kubernetes.io/name'] === 'suse-observability-agent' ||
-        // backwards compatibility
-        depl.metadata.labels['app.kubernetes.io/name'] === 'stackstate-k8s-agent'
-      )
+    const response = await store.dispatch(`cluster/request`, {
+      url: `/k8s/clusters/${clusterId}/v1/apps.deployments`,
+    });
+    const deployments = response?.data?.filter(
+      (depl: any) =>
+        depl.metadata?.labels &&
+        (depl.metadata.labels["app.kubernetes.io/name"] ===
+          "suse-observability-agent" ||
+          // backwards compatibility
+          depl.metadata.labels["app.kubernetes.io/name"] ===
+            "stackstate-k8s-agent"),
     );
 
-    return deployments.length > 0 ? AgentStatus.Installed : AgentStatus.NotInstalled;
+    return deployments.length > 0
+      ? AgentStatus.Installed
+      : AgentStatus.NotInstalled;
   } catch (e) {
     return AgentStatus.ConnectionError;
   }
@@ -237,28 +256,28 @@ export async function getSnapshot(
 
   const httpToken = token(serviceToken);
 
-  return await store.dispatch('management/request', {
-    url:     `${ suseObservabilityURL }/api/snapshot`,
-    method:  'POST',
+  return await store.dispatch("management/request", {
+    url: `${suseObservabilityURL}/api/snapshot`,
+    method: "POST",
     headers: {
-      'Content-Type':  'application/json',
-      Authorization:  httpToken,
+      "Content-Type": "application/json",
+      Authorization: httpToken,
     },
     withCredentials: true,
-    data:            {
-      query:        stql,
-      queryVersion: '1.0',
-      metadata:     {
-        groupingEnabled:       false,
+    data: {
+      query: stql,
+      queryVersion: "1.0",
+      metadata: {
+        groupingEnabled: false,
         showIndirectRelations: false,
-        minGroupSize:          10,
-        groupedByLayer:        false,
-        groupedByDomain:       false,
-        groupedByRelation:     false,
-        autoGrouping:          false,
-        connectedComponents:   false,
+        minGroupSize: 10,
+        groupedByLayer: false,
+        groupedByDomain: false,
+        groupedByRelation: false,
+        autoGrouping: false,
+        connectedComponents: false,
         neighboringComponents: false,
-        showFullComponent:     false,
+        showFullComponent: false,
       },
     },
   });
@@ -267,17 +286,17 @@ export async function getSnapshot(
 export function loadComponent(
   store: any,
   spec: ObservabilitySettings,
-  identifier: string
+  identifier: string,
 ) {
   const creds = token(spec.serviceToken);
 
-  return store.dispatch('management/request', {
-    url:     `${ spec.url }/api/components?identifier=${ encodeURIComponent(identifier) }`,
-    method:  'GET',
-    headers: { 'Content-Type': 'application/json', Authorization: creds },
+  return store.dispatch("management/request", {
+    url: `${spec.url}/api/components?identifier=${encodeURIComponent(identifier)}`,
+    method: "GET",
+    headers: { "Content-Type": "application/json", Authorization: creds },
   });
 }
 
 function token(serviceToken: string): string {
-  return `ApiKey ${ serviceToken }`;
+  return `ApiKey ${serviceToken}`;
 }

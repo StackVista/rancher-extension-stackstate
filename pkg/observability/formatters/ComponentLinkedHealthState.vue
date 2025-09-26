@@ -1,26 +1,30 @@
 <script>
-import { mapGetters } from 'vuex';
-import HealthState from '../components/Health/HealthState';
-import { loadSuseObservabilitySettings, loadComponent, isCrdLoaded } from '../modules/suseObservability';
-import { buildUrn } from '../modules/urn';
-import { HEALTH_STATE_TYPES } from '../types/types';
+import { mapGetters } from "vuex";
+import HealthState from "../components/Health/HealthState";
+import {
+  loadSuseObservabilitySettings,
+  loadComponent,
+  isCrdLoaded,
+} from "../modules/suseObservability";
+import { buildUrn } from "../modules/urn";
+import { HEALTH_STATE_TYPES } from "../types/types";
 
 export default {
-  name:       'ComponentLinkedHealthState',
+  name: "ComponentLinkedHealthState",
   components: { HealthState },
-  props:      {
+  props: {
     value: {
-      type:    String,
-      default: '',
+      type: String,
+      default: "",
     },
     row: {
-      type:     Object,
+      type: Object,
       required: true,
     },
   },
 
   computed: {
-    ...mapGetters(['currentCluster']),
+    ...mapGetters(["currentCluster"]),
 
     componentIdentifier() {
       const cluster = this.currentCluster?.spec.displayName;
@@ -30,12 +34,12 @@ export default {
 
     color() {
       switch (this.value) {
-      case 'active':
-        return 'green';
-      case 'inactive':
-        return 'grey';
-      default:
-        return '';
+        case "active":
+          return "green";
+        case "inactive":
+          return "grey";
+        default:
+          return "";
       }
     },
   },
@@ -43,8 +47,8 @@ export default {
     return {
       HEALTH_STATE_TYPES,
       isLoading: true,
-      error:     null,
-      data:      null
+      error: null,
+      data: null,
     };
   },
 
@@ -67,14 +71,14 @@ export default {
       const component = await loadComponent(
         this.$store,
         settings,
-        componentIdentifier
+        componentIdentifier,
       );
 
       this.data = {
         health: component.state.healthState,
-        href:   `${ settings.url }/#/components/${ encodeURIComponent(
-          componentIdentifier
-        ) }`
+        href: `${settings.url}/#/components/${encodeURIComponent(
+          componentIdentifier,
+        )}`,
       };
     } catch (error) {
       this.error = error;
