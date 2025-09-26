@@ -1,6 +1,6 @@
-import { ConnectionInfo } from '../types/component';
+import { ConnectionInfo } from "../types/component";
 
-import { ObservabilityState } from './index';
+import { ObservabilityState } from "./index";
 
 export default {
   setConnectionInfo(state: ObservabilityState, val: ConnectionInfo) {

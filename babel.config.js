@@ -1,1 +1,1 @@
-module.exports = require('@rancher/shell/babel.config.js');
+module.exports = require("@rancher/shell/babel.config.js");

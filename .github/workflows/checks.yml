@@ -71,6 +71,9 @@ jobs:
       - name: Run lint
         run: yarn lint .
 
+      - name: Run prettier
+        run: yarn format:check .
+
       - name: Build Observability Package
         run: yarn build-pkg observability
 

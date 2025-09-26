@@ -10,14 +10,15 @@
 
 ## Preview / release process
 
-In order to preview your changes on a Rancher test server, you need to get comfortable with the idea that this requires "making a release".  The extension uses an ideosyncratic release/preview process.  While the code (UI and manifests) can be found in the different branches, they are packaged into helm charts by GitHub actions.  And then made available in a Helm repository that is defined by the `gh-pages` branch.  All this is (only) triggerred automagically when merging a PR into a release branch.
+In order to preview your changes on a Rancher test server, you need to get comfortable with the idea that this requires "making a release". The extension uses an ideosyncratic release/preview process. While the code (UI and manifests) can be found in the different branches, they are packaged into helm charts by GitHub actions. And then made available in a Helm repository that is defined by the `gh-pages` branch. All this is (only) triggerred automagically when merging a PR into a release branch.
 
 To preview changes in a deployed Rancher:
-* Add [https://stackvista.github.io/rancher-extension-stackstate](https://stackvista.github.io/rancher-extension-stackstate) as a repository to the `local` cluster
-* Merge a PR with your changes and a suitable `changeset` into a release branch (see below for details)
-* Install the release that's been created on the extension helm repository
 
-If you find out that some changes need to be made, by far the easiest thing to do is just create a new release.  This will push the patch number up quickly, but at least will preserve your sanity.
+- Add [https://stackvista.github.io/rancher-extension-stackstate](https://stackvista.github.io/rancher-extension-stackstate) as a repository to the `local` cluster
+- Merge a PR with your changes and a suitable `changeset` into a release branch (see below for details)
+- Install the release that's been created on the extension helm repository
+
+If you find out that some changes need to be made, by far the easiest thing to do is just create a new release. This will push the patch number up quickly, but at least will preserve your sanity.
 
 When you are satisfied with the changes, it can be published to the "ui plugin charts" repository - the public helm repository maintained by the Rancher team.
 

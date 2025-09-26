@@ -1,11 +1,11 @@
 <script>
-import { HEALTH_STATE_TYPES } from '../../types/types';
+import { HEALTH_STATE_TYPES } from "../../types/types";
 
 export default {
-  name:  'HealthState',
+  name: "HealthState",
   props: {
     health: { type: String, default: null },
-    color:  { type: String, default: null },
+    color: { type: String, default: null },
   },
 
   computed: {
@@ -15,17 +15,17 @@ export default {
       }
 
       switch (this.health) {
-      case HEALTH_STATE_TYPES.CLEAR:
-        return 'green';
-      case HEALTH_STATE_TYPES.DEVIATING:
-        return 'orange';
-      case HEALTH_STATE_TYPES.CRITICAL:
-        return 'red';
-      case HEALTH_STATE_TYPES.UNKNOWN:
-      case HEALTH_STATE_TYPES.NOT_MONITORED:
-        return 'grey';
-      default:
-        return 'skeleton';
+        case HEALTH_STATE_TYPES.CLEAR:
+          return "green";
+        case HEALTH_STATE_TYPES.DEVIATING:
+          return "orange";
+        case HEALTH_STATE_TYPES.CRITICAL:
+          return "red";
+        case HEALTH_STATE_TYPES.UNKNOWN:
+        case HEALTH_STATE_TYPES.NOT_MONITORED:
+          return "grey";
+        default:
+          return "skeleton";
       }
     },
   },

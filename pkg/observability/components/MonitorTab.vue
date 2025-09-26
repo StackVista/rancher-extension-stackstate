@@ -1,37 +1,46 @@
 <script>
-import { mapGetters } from 'vuex';
-import LiveDate from '@shell/components/formatter/LiveDate.vue';
-import SortableTable from '@shell/components/SortableTable';
+import { mapGetters } from "vuex";
+import LiveDate from "@shell/components/formatter/LiveDate.vue";
+import SortableTable from "@shell/components/SortableTable";
 
-import { loadComponent, mapKind, loadSuseObservabilitySettings, isCrdLoaded, loadObservationStatus, ObservationStatus } from '../modules/suseObservability';
-import { MONITOR_HEADERS } from '../types/headers';
+import {
+  loadComponent,
+  mapKind,
+  loadSuseObservabilitySettings,
+  isCrdLoaded,
+  loadObservationStatus,
+  ObservationStatus,
+} from "../modules/suseObservability";
+import { MONITOR_HEADERS } from "../types/headers";
 
-import HealthState from './Health/HealthState.vue';
+import HealthState from "./Health/HealthState.vue";
 
 export default {
-  name:       'MonitorTab',
+  name: "MonitorTab",
   components: {
-    SortableTable, HealthState, LiveDate
+    SortableTable,
+    HealthState,
+    LiveDate,
   },
-  props:      {
+  props: {
     resource: {
-      type:     Object,
+      type: Object,
       required: true,
-    }
+    },
   },
   data() {
     return {
       MONITOR_HEADERS,
       observationStatus: ObservationStatus.Observed,
       ObservationStatus,
-      urn:      '',
-      url:      '',
+      urn: "",
+      url: "",
       monitors: [],
-      currResourceData: undefined
+      currResourceData: undefined,
     };
   },
-  computed:   {
-    ...mapGetters(['currentCluster']),
+  computed: {
+    ...mapGetters(["currentCluster"]),
 
     clusterId() {
       return this.currentCluster?.id;
@@ -45,10 +54,10 @@ export default {
       const cluster = this.currentCluster?.spec.displayName;
 
       if (!cluster) {
-        return '';
+        return "";
       }
 
-      let identifier = `urn:kubernetes:/${ cluster }`;
+      let identifier = `urn:kubernetes:/${cluster}`;
 
       const resourceData = this.resource?.metadata
         ? this.resource
@@ -79,7 +88,7 @@ export default {
         ? `${routeNamespace}/${routeResourceId}`
         : routeResourceId;
 
-      this.currResourceData = await this.$store.dispatch('cluster/find', {
+      this.currResourceData = await this.$store.dispatch("cluster/find", {
         type: routeResource,
         id: resourceId,
       });
@@ -91,7 +100,11 @@ export default {
 
     const component = await loadComponent(this.$store, settings, this.urn);
     if (!component) {
-      this.observationStatus = await loadObservationStatus(this.$store, this.clusterId, settings);
+      this.observationStatus = await loadObservationStatus(
+        this.$store,
+        this.clusterId,
+        settings,
+      );
       return;
     }
 
@@ -104,17 +117,17 @@ export default {
 <template>
   <div v-if="observationStatus === ObservationStatus.NotDeployed">
     <div class="card">
-      <span>{{ t('components.monitorTab.notEnabled') }}</span>
+      <span>{{ t("components.monitorTab.notEnabled") }}</span>
     </div>
   </div>
   <div v-else-if="observationStatus === ObservationStatus.ConnectionError">
     <div class="card">
-      <span>{{ t('components.monitorTab.connectionError') }}</span>
+      <span>{{ t("components.monitorTab.connectionError") }}</span>
     </div>
   </div>
   <div v-else-if="!hasMonitors">
     <div class="card">
-      <span>{{ t('components.monitorTab.noMonitors') }}</span>
+      <span>{{ t("components.monitorTab.noMonitors") }}</span>
     </div>
   </div>
   <SortableTable
@@ -128,23 +141,24 @@ export default {
     :paging="true"
     :rows-per-page="40"
   >
-    <template #col:state="{row}">
+    <template #col:state="{ row }">
       <td>
         <HealthState :health="row.health" />
       </td>
     </template>
 
-    <template #col:monitor="{row}">
+    <template #col:monitor="{ row }">
       <td>
         <a
           :href="`${url}/#/components/${encodeURIComponent(urn)}`"
           target="_blank"
           rel="nofollow noopener noreferrer"
-        >{{ row.name }}</a>
+          >{{ row.name }}</a
+        >
       </td>
     </template>
 
-    <template #col:lastUpdate="{row}">
+    <template #col:lastUpdate="{ row }">
       <td>
         <LiveDate :value="row.lastUpdateTimestamp" />
       </td>
