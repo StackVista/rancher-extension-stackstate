@@ -50,7 +50,10 @@ observability:
     clusterIs: Cluster is
     notObservedPrepend: 'Cluster is not observed by SUSE Observability. Please '
     notObservedInstall: 'install'
-    notObservedPostpend: 'the agent'
+    notObservedPostpend: 'the agent.'
+    noDataPrepend: 'The SUSE Observability Agent is installed, but no data is received. Please '
+    noDataInstall: 'configure'
+    noDataPostpend: 'the Stackpack or align the agent configuration.'
     accessDenied: Unable to test if SUSE Observability is installed
     connecting: "Connecting to SUSE Observability Plane..."
     notConnectedPrepend: 'SUSE Observability has not been configured, please go to the'

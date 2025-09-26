@@ -1,8 +1,5 @@
 <script>
 import {
-  REPO_TYPE,
-  REPO,
-  CHART,
   FROM_CLUSTER,
 } from '@shell/config/query-params';
 import {
@@ -11,6 +8,8 @@ import {
   isCrdLoaded,
   loadObservationStatus,
   ObservationStatus,
+  AgentStatus,
+  loadAgentStatus,
 } from '../modules/suseObservability';
 import { HEALTH_STATE_TYPES, OBSERVABILITY_PRODUCT_NAME, BLANK_CLUSTER } from '../types/types';
 import HealthState from './Health/HealthState.vue';
@@ -32,27 +31,19 @@ export default {
     countCritical() {
       return this.critical;
     },
-    chartRoute() {
-      return {
-        name:   'c-cluster-apps-charts-chart',
-        params: { [FROM_CLUSTER]: this.resource?.id },
-        query:  {
-          [REPO_TYPE]: 'cluster',
-          [REPO]:      'rancher-partner-charts',
-          [CHART]:     'stackstate-k8s-agent',
-        }
-      };
-    }
   },
   data() {
     return {
       observationStatus:       ObservationStatus.Observed,
+      agentStatus: AgentStatus.Installed,
       snapshot:                undefined,
       deviating:               0,
       critical:                0,
       isConfigured:            true,
+      installUrl: undefined,
       HEALTH_STATE_TYPES,
       ObservationStatus,
+      AgentStatus,
       extensionDashboardRoute: {
         name:   `${ OBSERVABILITY_PRODUCT_NAME }-c-cluster-dashboard`,
         params: { [FROM_CLUSTER]: BLANK_CLUSTER },
@@ -71,8 +62,12 @@ export default {
       this.isConfigured = false;
       return;
     }
+    this.installUrl = `${settings.url}/#/stackpacks/kubernetes-v2`;
 
     this.observationStatus = await loadObservationStatus(this.$store, this.resource.spec.displayName, settings);
+    if (this.observationStatus === ObservationStatus.NotDeployed) {
+      this.agentStatus = await loadAgentStatus(this.$store, this.resource.id);
+    }
 
     this.snapshot = await getSnapshot(
       this.$store,
@@ -107,12 +102,19 @@ export default {
           {{ t("observability.clusterCard.clusterIs") }}
           <HealthState class="state-badge" health="unobserved" color="grey" />
         </p>
-        <div class="flex-text">
-          <p>{{ t('observability.clusterCard.notObservedPrepend') }}</p>
-          <router-link :to="chartRoute">
-            {{ t('observability.clusterCard.notObservedInstall') }}
-          </router-link>
-          <p>{{ t('observability.clusterCard.notObservedPostpend') }}</p>
+        <div v-if="agentStatus !== AgentStatus.Installed" class="flex-text">
+          <p>
+            {{ t('observability.clusterCard.notObservedPrepend') }}
+            <a :href="installUrl">{{ t('observability.clusterCard.notObservedInstall') }}</a>
+            {{ t('observability.clusterCard.notObservedPostpend') }}
+          </p>
+        </div>
+        <div v-else>
+          <p>
+            {{ t('observability.clusterCard.noDataPrepend') }}
+            <a :href="installUrl">{{ t('observability.clusterCard.noDataInstall') }}</a>
+            {{ t('observability.clusterCard.noDataPostpend') }}
+          </p>
         </div>
       </div>
       <div v-else>

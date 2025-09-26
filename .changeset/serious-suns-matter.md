@@ -1,0 +1,5 @@
+---
+"observability": patch
+---
+
+UI improvements

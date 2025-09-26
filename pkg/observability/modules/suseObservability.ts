@@ -187,20 +187,49 @@ export async function loadObservationStatus(
 ): Promise<ObservationStatus> {
   try {
     const clusterUrn = `urn:cluster:/kubernetes:${ clusterName }`;
-    const clusterStatus = await loadComponent(store, settings, clusterUrn);
-    return clusterStatus ? ObservationStatus.Observed : ObservationStatus.NotDeployed;
+    await loadComponent(store, settings, clusterUrn);
+    return ObservationStatus.Observed;
   } catch (e) {
-    return ObservationStatus.ConnectionError;
+    if (e instanceof Error) {
+      return ObservationStatus.ConnectionError;
+    } else {
+      return ObservationStatus.NotDeployed;
+    }
+  }
+}
+
+export enum AgentStatus {
+  Installed = 0,
+  NotInstalled,
+  ConnectionError
+}
+
+export async function loadAgentStatus(
+  store: any,
+  clusterId: string
+): Promise<AgentStatus> {
+  try {
+    const response = await store.dispatch(`cluster/request`, { url: `/k8s/clusters/${ clusterId }/v1/apps.deployments` });
+    const deployments = response?.data?.filter((depl: any) => depl.metadata?.labels && (
+        depl.metadata.labels['app.kubernetes.io/name'] === 'suse-observability-agent' ||
+        // backwards compatibility
+        depl.metadata.labels['app.kubernetes.io/name'] === 'stackstate-k8s-agent'
+      )
+    );
+
+    return deployments.length > 0 ? AgentStatus.Installed : AgentStatus.NotInstalled;
+  } catch (e) {
+    return AgentStatus.ConnectionError;
   }
 }
 
 export async function getSnapshot(
   store: any,
   stql: string,
-  settings: undefined | ObservabilitySettings,
+  settings: ObservabilitySettings,
 ): Promise<any | void> {
-  const suseObservabilityURL = settings ? settings.url : await store.getters['observability/apiURL'];
-  const serviceToken = settings ? settings.serviceToken : await store.getters['observability/serviceToken'];
+  const suseObservabilityURL = settings.url;
+  const serviceToken = settings.serviceToken;
 
   if (!suseObservabilityURL || !serviceToken) {
     return;
@@ -208,7 +237,7 @@ export async function getSnapshot(
 
   const httpToken = token(serviceToken);
 
-  return store.dispatch('management/request', {
+  return await store.dispatch('management/request', {
     url:     `${ suseObservabilityURL }/api/snapshot`,
     method:  'POST',
     headers: {
