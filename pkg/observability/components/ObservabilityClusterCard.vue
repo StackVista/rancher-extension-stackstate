@@ -147,12 +147,16 @@ export default {
           <p>
             <HealthDisc :health="HEALTH_STATE_TYPES.DEVIATING" />
             {{ t("observability.clusterCard.deviating") }}
-            <span class="item-count" data-testid="obs-deviating-count">{{ countDeviating }}</span>
+            <span class="item-count" data-testid="obs-deviating-count">{{
+              countDeviating
+            }}</span>
           </p>
           <p>
             <HealthDisc :health="HEALTH_STATE_TYPES.CRITICAL" />
             {{ t("observability.clusterCard.critical") }}
-            <span class="item-count" data-testid="obs-critical-count">{{ countCritical }}</span>
+            <span class="item-count" data-testid="obs-critical-count">{{
+              countCritical
+            }}</span>
           </p>
         </div>
       </div>
