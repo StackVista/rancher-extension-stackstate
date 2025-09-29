@@ -1,9 +1,9 @@
 <script>
-import ConfigurationView from '../components/Dashboard/ConfigurationView';
-import InstallView from '../components/Dashboard/InstallView';
+import ConfigurationView from "../components/Dashboard/ConfigurationView";
+import InstallView from "../components/Dashboard/InstallView";
 
 export default {
-  name:       'ObservabilityDashboard',
+  name: "ObservabilityDashboard",
   components: {
     ConfigurationView,
     InstallView,
@@ -11,13 +11,13 @@ export default {
 
   computed: {
     isConfigured() {
-      return this.$store.getters['observability/hasCredentials'];
+      return this.$store.getters["observability/hasCredentials"];
     },
     missingCrd() {
-      return this.$store.getters['observability/isCrdMissing'];
+      return this.$store.getters["observability/isCrdMissing"];
     },
     observabilityRepoPresent() {
-      return this.$store.getters['observability/isRepoPresent'];
+      return this.$store.getters["observability/isRepoPresent"];
     },
   },
 };
@@ -32,7 +32,7 @@ export default {
       <h1>{{ t("observability.name") }}</h1>
       <p>{{ t("observability.dashboard.description") }}</p>
     </div>
-    <InstallView v-if="(missingCrd || !observabilityRepoPresent)" class="mt-40" />
+    <InstallView v-if="missingCrd || !observabilityRepoPresent" class="mt-40" />
     <ConfigurationView v-else :mode="isConfigured ? 'edit' : 'create'" />
   </div>
 </template>

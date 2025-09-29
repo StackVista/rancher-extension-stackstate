@@ -1,8 +1,8 @@
 <script>
-import { HEALTH_STATE_TYPES } from '../../types/types';
+import { HEALTH_STATE_TYPES } from "../../types/types";
 
 export default {
-  name:  'HealthDisc',
+  name: "HealthDisc",
   props: { health: { type: String, default: HEALTH_STATE_TYPES.UNKNOWN } },
 };
 </script>

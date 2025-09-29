@@ -1,4 +1,4 @@
-import { importTypes } from '@rancher/auto-import';
+import { importTypes } from "@rancher/auto-import";
 import {
   CardLocation,
   IPlugin,
@@ -6,7 +6,7 @@ import {
   PanelLocation,
   TableColumnLocation,
   TabLocation,
-} from '@shell/core/types';
+} from "@shell/core/types";
 import {
   NODE,
   POD,
@@ -18,24 +18,24 @@ import {
   PV,
   PVC,
   MANAGEMENT,
-} from '@shell/config/types';
+} from "@shell/config/types";
 
 import {
   isCrdLoaded,
   isSuseObservabilityRepoPresent,
   loadConnectionInfo,
-} from './modules/suseObservability';
-import extensionRouting from './routing/extension-routing';
-import observabilityStore from './store';
-import { ObservabilityHealth } from './types/headers';
+} from "./modules/suseObservability";
+import extensionRouting from "./routing/extension-routing";
+import observabilityStore from "./store";
+import { ObservabilityHealth } from "./types/headers";
 
-const onEnter: OnNavToPackage = async(store) => {
-  if (!await isSuseObservabilityRepoPresent(store)) {
-    await store.dispatch('observability/setRepoPresent', false);
+const onEnter: OnNavToPackage = async (store) => {
+  if (!(await isSuseObservabilityRepoPresent(store))) {
+    await store.dispatch("observability/setRepoPresent", false);
   }
 
   if (!isCrdLoaded(store)) {
-    await store.dispatch('observability/setMissingCrd', true);
+    await store.dispatch("observability/setMissingCrd", true);
 
     return;
   }
@@ -43,20 +43,20 @@ const onEnter: OnNavToPackage = async(store) => {
 };
 
 // Init the package
-export default function(plugin: IPlugin): void {
+export default function (plugin: IPlugin): void {
   // Auto-import model, detail, edit from the folders
   importTypes(plugin);
 
   // Provide plugin metadata from package.json
-  plugin.metadata = require('./package.json');
+  plugin.metadata = require("./package.json");
 
   // Load a product
-  plugin.addProduct(require('./product'));
+  plugin.addProduct(require("./product"));
 
   plugin.addDashboardStore(
     observabilityStore.config.namespace,
     observabilityStore.specifics,
-    observabilityStore.config
+    observabilityStore.config,
   );
 
   plugin.addTableColumn(
@@ -78,16 +78,16 @@ export default function(plugin: IPlugin): void {
         PVC,
       ],
     },
-    ObservabilityHealth
+    ObservabilityHealth,
   );
 
   plugin.addCard(
     CardLocation.CLUSTER_DASHBOARD_CARD,
     {},
     {
-      labelKey:  'sts.observed',
-      component: () => import('./components/ObservabilityClusterCard.vue'),
-    }
+      labelKey: "sts.observed",
+      component: () => import("./components/ObservabilityClusterCard.vue"),
+    },
   );
 
   plugin.addPanel(
@@ -109,7 +109,7 @@ export default function(plugin: IPlugin): void {
         PVC,
       ],
     },
-    { component: () => import('./components/ComponentHealth.vue') }
+    { component: () => import("./components/ComponentHealth.vue") },
   );
 
   plugin.addTab(
@@ -133,11 +133,11 @@ export default function(plugin: IPlugin): void {
       ],
     },
     {
-      name:       'observability',
-      labelKey:   'observability.name',
+      name: "observability",
+      labelKey: "observability.name",
       showHeader: false,
-      component:  () => import('./components/MonitorTab.vue'),
-    }
+      component: () => import("./components/MonitorTab.vue"),
+    },
   );
 
   // Add Vue Routes

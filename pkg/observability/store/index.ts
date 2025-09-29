@@ -1,8 +1,8 @@
-import { CoreStoreConfig, CoreStoreSpecifics } from '@rancher/shell/core/types';
-import { OBSERVABILITY_PRODUCT_NAME } from '../types/types';
-import getters from './getters';
-import mutations from './mutations';
-import actions from './actions';
+import { CoreStoreConfig, CoreStoreSpecifics } from "@rancher/shell/core/types";
+import { OBSERVABILITY_PRODUCT_NAME } from "../types/types";
+import getters from "./getters";
+import mutations from "./mutations";
+import actions from "./actions";
 
 export interface ObservabilityState {
   apiURL?: string;
@@ -11,19 +11,21 @@ export interface ObservabilityState {
   repoPresent?: boolean;
 }
 
-const observabilityStoreFactory = (config: ObservabilityState): CoreStoreSpecifics => {
+const observabilityStoreFactory = (
+  config: ObservabilityState,
+): CoreStoreSpecifics => {
   return {
     state: (): ObservabilityState => {
       return {
-        apiURL:         config.apiURL,
-        serviceToken:   config.serviceToken,
-        missingCrd:   config.missingCrd,
-        repoPresent:    config.repoPresent,
+        apiURL: config.apiURL,
+        serviceToken: config.serviceToken,
+        missingCrd: config.missingCrd,
+        repoPresent: config.repoPresent,
       };
     },
-    getters:   { ...getters },
+    getters: { ...getters },
     mutations: { ...mutations },
-    actions:   { ...actions },
+    actions: { ...actions },
   };
 };
 
@@ -31,10 +33,10 @@ const config: CoreStoreConfig = { namespace: OBSERVABILITY_PRODUCT_NAME };
 
 export default {
   specifics: observabilityStoreFactory({
-    apiURL:         '',
-    serviceToken:   '',
-    missingCrd:   false,
-    repoPresent:    true,
+    apiURL: "",
+    serviceToken: "",
+    missingCrd: false,
+    repoPresent: true,
   }),
   config,
 };

@@ -15,7 +15,8 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.11",
-    "@nuxtjs/eslint-config-typescript": "6.0.1"
+    "@nuxtjs/eslint-config-typescript": "6.0.1",
+    "prettier": "^3.0.0"
   },
   "resolutions": {
     "@types/lodash": "4.14.184"
@@ -25,6 +26,8 @@
     "dev": "NODE_ENV=dev vue-cli-service serve",
     "build": "vue-cli-service build",
     "typecheck": "yarn workspaces run typecheck",
+    "format": "prettier --write",
+    "format:check": "prettier --check",
     "clean": "./node_modules/@rancher/shell/scripts/clean",
     "build-pkg": "./node_modules/@rancher/shell/scripts/build-pkg.sh",
     "serve-pkgs": "./node_modules/@rancher/shell/scripts/serve-pkgs",

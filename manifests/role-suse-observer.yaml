@@ -8,14 +8,14 @@ external: false
 context: project
 metadata:
   name: suse-observability-observer
-  namespace: {{ .Release.Namespace }}
-  labels: {{ include "extension-server.labels" . | nindent 4 }}
+  namespace: { { .Release.Namespace } }
+  labels: { { include "extension-server.labels" . | nindent 4 } }
 rules:
-- apiGroups:
-    - scope.observability.cattle.io
-  resources:
-    - metrics
-    - topology
-    - traces
-  verbs:
-    - get
+  - apiGroups:
+      - scope.observability.cattle.io
+    resources:
+      - metrics
+      - topology
+      - traces
+    verbs:
+      - get
