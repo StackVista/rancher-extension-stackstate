@@ -75,16 +75,25 @@ export default {
       this.agentStatus = await loadAgentStatus(this.$store, this.resource.id);
     }
 
-    this.snapshot = await getSnapshot(
-      this.$store,
-      `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${this.resource.spec.displayName}"`,
-      settings,
-    );
-    for (const component of this.snapshot.viewSnapshotResponse.components) {
-      if (component.state.healthState === "DEVIATING") {
-        this.deviating++;
-      } else if (component.state.healthState === "CRITICAL") {
-        this.critical++;
+    try {
+      this.snapshot = await getSnapshot(
+        this.$store,
+        `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${this.resource.spec.displayName}"`,
+        settings,
+      );
+      for (const component of this.snapshot.viewSnapshotResponse.components) {
+        if (component.state.healthState === "DEVIATING") {
+          this.deviating++;
+        } else if (component.state.healthState === "CRITICAL") {
+          this.critical++;
+        }
+      }
+    } catch (e) {
+      if (this.observationStatus === ObservationStatus.Observed) {
+        logger.log(
+          "ERROR: Unable to obtain topology, even though cluster is observed",
+          e,
+        );
       }
     }
   },

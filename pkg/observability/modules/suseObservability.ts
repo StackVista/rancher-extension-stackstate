@@ -234,6 +234,7 @@ export async function loadAgentStatus(
             "stackstate-k8s-agent"),
     );
 
+    console.log(deployments);
     return deployments.length > 0
       ? AgentStatus.Installed
       : AgentStatus.NotInstalled;
