@@ -74,6 +74,11 @@ jobs:
       - name: Run prettier
         run: yarn format:check .
 
+      - name: Run tests
+        run: |
+          cd pkg/observability
+          yarn run vitest
+
       - name: Build Observability Package
         run: yarn build-pkg observability
 
