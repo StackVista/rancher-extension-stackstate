@@ -75,16 +75,25 @@ export default {
       this.agentStatus = await loadAgentStatus(this.$store, this.resource.id);
     }
 
-    this.snapshot = await getSnapshot(
-      this.$store,
-      `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${this.resource.spec.displayName}"`,
-      settings,
-    );
-    for (const component of this.snapshot.viewSnapshotResponse.components) {
-      if (component.state.healthState === "DEVIATING") {
-        this.deviating++;
-      } else if (component.state.healthState === "CRITICAL") {
-        this.critical++;
+    try {
+      this.snapshot = await getSnapshot(
+        this.$store,
+        `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${this.resource.spec.displayName}"`,
+        settings,
+      );
+      for (const component of this.snapshot.viewSnapshotResponse.components) {
+        if (component.state.healthState === "DEVIATING") {
+          this.deviating++;
+        } else if (component.state.healthState === "CRITICAL") {
+          this.critical++;
+        }
+      }
+    } catch (e) {
+      if (this.observationStatus === ObservationStatus.Observed) {
+        logger.log(
+          "ERROR: Unable to obtain topology, even though cluster is observed",
+          e,
+        );
       }
     }
   },
@@ -147,12 +156,16 @@ export default {
           <p>
             <HealthDisc :health="HEALTH_STATE_TYPES.DEVIATING" />
             {{ t("observability.clusterCard.deviating") }}
-            <span class="item-count">{{ countDeviating }}</span>
+            <span class="item-count" data-testid="obs-deviating-count">{{
+              countDeviating
+            }}</span>
           </p>
           <p>
             <HealthDisc :health="HEALTH_STATE_TYPES.CRITICAL" />
             {{ t("observability.clusterCard.critical") }}
-            <span class="item-count">{{ countCritical }}</span>
+            <span class="item-count" data-testid="obs-critical-count">{{
+              countCritical
+            }}</span>
           </p>
         </div>
       </div>
