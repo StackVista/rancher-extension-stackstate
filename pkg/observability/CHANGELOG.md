@@ -1,5 +1,12 @@
 # observability
 
+## 2.2.5
+
+### Patch Changes
+
+- c73bd74: Improve test coverage
+- 9f4d103: UI improvements
+
 ## 2.2.4
 
 ### Patch Changes
