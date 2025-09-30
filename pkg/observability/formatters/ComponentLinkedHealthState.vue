@@ -1,11 +1,8 @@
 <script>
 import { mapGetters } from "vuex";
 import HealthState from "../components/Health/HealthState";
-import {
-  loadSuseObservabilitySettings,
-  loadComponent,
-  isCrdLoaded,
-} from "../modules/suseObservability";
+import { loadComponent } from "../modules/suseObservability";
+import { loadSuseObservabilitySettings, isCrdLoaded } from "../modules/rancher";
 import { buildUrn } from "../modules/urn";
 import { HEALTH_STATE_TYPES } from "../types/types";
 

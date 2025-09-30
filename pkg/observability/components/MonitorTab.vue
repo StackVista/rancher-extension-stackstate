@@ -5,12 +5,11 @@ import SortableTable from "@shell/components/SortableTable";
 
 import {
   loadComponent,
-  mapKind,
-  loadSuseObservabilitySettings,
-  isCrdLoaded,
   loadObservationStatus,
   ObservationStatus,
 } from "../modules/suseObservability";
+import { loadSuseObservabilitySettings, isCrdLoaded } from "../modules/rancher";
+import { mapKind } from "../modules/urn";
 import { MONITOR_HEADERS } from "../types/headers";
 
 import HealthState from "./Health/HealthState.vue";
