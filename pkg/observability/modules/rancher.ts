@@ -42,7 +42,7 @@ export async function loadSuseObservabilitySettings(
 export async function saveSuseObservabilitySettings(
   store: any,
   settings: ObservabilitySettings,
-): Promise<undefined> {
+): Promise<void> {
   const saved = await store.dispatch("management/findAll", {
     type: OBSERVABILITY_CONFIGURATION_TYPE,
   });
@@ -163,5 +163,7 @@ export async function findNodeDrivers(store: any): Promise<Array<any>> {
     { type: "nodeDriver" },
     { root: true },
   );
-  return nodeDrivers.filter((driver: any) => driver.name === "stackstate");
+  return nodeDrivers.filter(
+    (driver: any) => driver.name === "suse-observability",
+  );
 }

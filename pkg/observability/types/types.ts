@@ -73,11 +73,11 @@ export const OBSERVABILITY_CRD = {
   },
 };
 
-export const STACKSTATEMACHINES_CRD = {
+export const SUSEOBSERVABILITYMACHINES_CRD = {
   apiVersion: "apiextensions.k8s.io/v1",
   kind: "CustomResourceDefinition",
   metadata: {
-    name: "stackstatemachines.rke-machine.cattle.io",
+    name: "suse-observabilitymachines.rke-machine.cattle.io",
   },
   spec: {
     group: "rke-machine.cattle.io",
@@ -96,10 +96,10 @@ export const STACKSTATEMACHINES_CRD = {
     ],
     scope: "Namespaced",
     names: {
-      plural: "stackstatemachines",
-      singular: "stackstatemachine",
-      kind: "StackstateMachine",
-      listKind: "StackstateMachineList",
+      plural: "suse-observabilitymachines",
+      singular: "suse-observabilitymachine",
+      kind: "suse-observabilitymachine",
+      listKind: "suse-observabilitymachineList",
     },
   },
 };

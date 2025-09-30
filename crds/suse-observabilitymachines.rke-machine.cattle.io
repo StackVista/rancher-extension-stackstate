@@ -1,7 +1,7 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: stackstatemachines.rke-machine.cattle.io
+  name: suse-observabilitymachines.rke-machine.cattle.io
 spec:
   group: rke-machine.cattle.io
   versions:
@@ -14,7 +14,7 @@ spec:
           properties: {}
   scope: Namespaced
   names:
-    plural: stackstatemachines
-    singular: stackstatemachine
-    kind: StackstateMachine
-    listKind: StackstateMachineList
+    plural: suse-observabilitymachines
+    singular: suse-observabilitymachine
+    kind: suse-observabilitymachine
+    listKind: suse-observabilitymachineList

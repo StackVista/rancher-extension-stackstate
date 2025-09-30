@@ -11,7 +11,7 @@ import {
   loadSuseObservabilitySettings,
   saveSuseObservabilitySettings,
 } from "../../modules/rancher";
-import { STACKSTATEMACHINES_CRD } from "../../types/types";
+import { SUSEOBSERVABILITYMACHINES_CRD } from "../../types/types";
 import { logger } from "../../utils/logger";
 import { handleGrowl } from "../../utils/growl";
 
@@ -107,6 +107,7 @@ export default {
           url: this.suseObservabilityURL,
           serviceToken: this.suseObservabilityServiceToken,
         });
+        this.migratedSettings = false;
 
         await this.$store.dispatch("observability/setConnectionInfo", {
           apiURL: this.suseObservabilityURL,
@@ -131,21 +132,24 @@ export default {
     async upgrade(btnCb) {
       try {
         if (this.nodeDrivers.length > 0) {
-          await this.$store.dispatch("management/request", {
-            url: "/v1/apiextensions.k8s.io.customresourcedefinitions",
-            method: "POST",
-            data: STACKSTATEMACHINES_CRD,
-          });
-          await Promise.all(
-            this.nodeDrivers.map(async (driver) => {
-              await driver.remove();
-            }),
-          );
-          await this.$store.dispatch("management/request", {
-            url: "/v1/apiextensions.k8s.io.customresourcedefinitions/stackstatemachines.rke-machine.cattle.io",
-            method: "DELETE",
-          });
-          this.nodeDrivers = [];
+          try {
+            await this.$store.dispatch("management/request", {
+              url: "/v1/apiextensions.k8s.io.customresourcedefinitions",
+              method: "POST",
+              data: SUSEOBSERVABILITYMACHINES_CRD,
+            });
+            await Promise.all(
+              this.nodeDrivers.map(async (driver) => {
+                await driver.remove();
+              }),
+            );
+            this.nodeDrivers = [];
+          } finally {
+            await this.$store.dispatch("management/request", {
+              url: "/v1/apiextensions.k8s.io.customresourcedefinitions/suse-observabilitymachines.rke-machine.cattle.io",
+              method: "DELETE",
+            });
+          }
         }
 
         if (this.migratedSettings) {
