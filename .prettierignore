@@ -1,0 +1,2 @@
+# Don't format manifests - helm needs those double braces
+manifests/*

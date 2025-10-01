@@ -8,8 +8,8 @@ external: false
 context: project
 metadata:
   name: suse-observability-instance-troubleshooter
-  namespace: { { .Release.Namespace } }
-  labels: { { include "extension-server.labels" . | nindent 4 } }
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "extension-server.labels" . | nindent 4 }}
 rules:
   - apiGroups:
       - instance.observability.cattle.io
