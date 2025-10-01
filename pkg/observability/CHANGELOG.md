@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.7
+
+### Patch Changes
+
+- da14a9d: fix helm manifests
+
 ## 2.2.6
 
 ### Patch Changes
