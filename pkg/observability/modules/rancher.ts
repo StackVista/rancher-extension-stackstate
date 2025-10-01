@@ -102,7 +102,8 @@ export async function isSuseObservabilityRepoPresent(
 
 export async function createObservabilityRepoIfNotPresent(store: any) {
   logger.log("Creating Observability Repo if needed");
-  if (!(await isSuseObservabilityRepoPresent(store))) {
+  const isRepoPresent = await isSuseObservabilityRepoPresent(store);
+  if (!isRepoPresent) {
     logger.log("Creating Observability Repo");
     await store.dispatch("management/request", {
       url: "/v1/catalog.cattle.io.clusterrepos",
