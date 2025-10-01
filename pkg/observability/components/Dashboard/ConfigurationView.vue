@@ -3,12 +3,17 @@ import { LabeledInput } from "@components/Form/LabeledInput";
 import AsyncButton from "@shell/components/AsyncButton";
 import { Banner } from "@components/Banner";
 import {
-  loadSuseObservabilitySettings,
   checkConnection,
   ConnectionStatus,
 } from "../../modules/suseObservability";
+import {
+  findNodeDrivers,
+  loadSuseObservabilitySettings,
+  saveSuseObservabilitySettings,
+} from "../../modules/rancher";
+import { SUSEOBSERVABILITYMACHINES_CRD } from "../../types/types";
+import { logger } from "../../utils/logger";
 import { handleGrowl } from "../../utils/growl";
-import { OBSERVABILITY_CONFIGURATION_TYPE } from "../../types/types";
 
 export default {
   components: {
@@ -19,6 +24,13 @@ export default {
   props: { mode: { type: String, default: "edit" } },
   async fetch() {
     await this.fetchFormValues();
+    try {
+      this.nodeDrivers = await findNodeDrivers(this.$store);
+    } catch (e) {
+      logger.log(
+        `ERROR: Unable to determine presence of SUSE Observability NodeDrivers ${e}`,
+      );
+    }
   },
   data: () => ({
     suseObservabilityURL: "",
@@ -26,6 +38,8 @@ export default {
     showSuccessfulSave: false,
     showEditInterface: false,
     urlError: false,
+    nodeDrivers: [],
+    migratedSettings: false,
   }),
   watch: {
     suseObservabilityURL(neu) {
@@ -52,6 +66,7 @@ export default {
       if (settings) {
         this.suseObservabilityURL = settings.url;
         this.suseObservabilityServiceToken = settings.serviceToken;
+        this.migratedSettings = settings.migrated;
       }
     },
 
@@ -87,29 +102,12 @@ export default {
         // pass
       }
 
-      let newConfig;
-
-      if (this.isCreateMode) {
-        const config = {
-          metadata: { name: `suse-observability`, namespace: "default" },
-          spec: {},
-          type: OBSERVABILITY_CONFIGURATION_TYPE,
-        };
-
-        newConfig = await this.$store.dispatch("management/create", config);
-      } else {
-        const configs = await this.$store.dispatch("management/findAll", {
-          type: OBSERVABILITY_CONFIGURATION_TYPE,
-        });
-        newConfig = configs[0];
-      }
-
-      newConfig.apiVersion = "observability.rancher.io/v1";
-      newConfig.spec.url = this.suseObservabilityURL;
-      newConfig.spec.serviceToken = this.suseObservabilityServiceToken;
-
       try {
-        await newConfig.save();
+        await saveSuseObservabilitySettings(this.$store, {
+          url: this.suseObservabilityURL,
+          serviceToken: this.suseObservabilityServiceToken,
+        });
+        this.migratedSettings = false;
 
         await this.$store.dispatch("observability/setConnectionInfo", {
           apiURL: this.suseObservabilityURL,
@@ -126,6 +124,46 @@ export default {
       } catch (err) {
         handleGrowl(this.$store, {
           message: this.t("observability.errorMsg.failedSave"),
+          type: "error",
+        });
+        btnCb(false);
+      }
+    },
+    async upgrade(btnCb) {
+      try {
+        if (this.nodeDrivers.length > 0) {
+          try {
+            await this.$store.dispatch("management/request", {
+              url: "/v1/apiextensions.k8s.io.customresourcedefinitions",
+              method: "POST",
+              data: SUSEOBSERVABILITYMACHINES_CRD,
+            });
+            await Promise.all(
+              this.nodeDrivers.map(async (driver) => {
+                await driver.remove();
+              }),
+            );
+            this.nodeDrivers = [];
+          } finally {
+            await this.$store.dispatch("management/request", {
+              url: "/v1/apiextensions.k8s.io.customresourcedefinitions/suse-observabilitymachines.rke-machine.cattle.io",
+              method: "DELETE",
+            });
+          }
+        }
+
+        if (this.migratedSettings) {
+          await saveSuseObservabilitySettings(this.$store, {
+            url: this.suseObservabilityURL,
+            serviceToken: this.suseObservabilityServiceToken,
+          });
+          this.migratedSettings = false;
+        }
+
+        btnCb(true);
+      } catch (err) {
+        handleGrowl(this.$store, {
+          message: this.t("observability.errorMsg.failedUpgrade"),
           type: "error",
         });
         btnCb(false);
@@ -211,6 +249,30 @@ export default {
             </AsyncButton>
           </div>
         </div>
+
+        <Banner
+          v-if="nodeDrivers.length > 0 || migratedSettings"
+          class="connected-banner mt-50"
+          color="warning"
+        >
+          <div class="banner-info row">
+            <div class="col span-9 mr-10">
+              <p>{{ t("observability.dashboard.upgrade") }}</p>
+            </div>
+            <div class="col span-3">
+              <AsyncButton
+                @click="upgrade"
+                actionColor="role-tertiary"
+                :action-label="t('observability.configuration.upgrade')"
+                :waiting-label="
+                  t('observability.configuration.upgradeProgress')
+                "
+                :success-label="t('observability.configuration.upgradeSuccess')"
+                :error-label="t('observability.configuration.upgradeFailed')"
+              />
+            </div>
+          </div>
+        </Banner>
       </div>
     </div>
   </div>

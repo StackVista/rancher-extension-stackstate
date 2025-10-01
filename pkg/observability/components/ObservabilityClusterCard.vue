@@ -2,13 +2,16 @@
 import { FROM_CLUSTER } from "@shell/config/query-params";
 import {
   getSnapshot,
-  loadSuseObservabilitySettings,
-  isCrdLoaded,
   loadObservationStatus,
   ObservationStatus,
+} from "../modules/suseObservability";
+import {
+  loadSuseObservabilitySettings,
+  isCrdLoaded,
   AgentStatus,
   loadAgentStatus,
-} from "../modules/suseObservability";
+} from "../modules/rancher";
+
 import {
   HEALTH_STATE_TYPES,
   OBSERVABILITY_PRODUCT_NAME,

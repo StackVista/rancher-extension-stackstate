@@ -24,7 +24,7 @@ import {
   isCrdLoaded,
   isSuseObservabilityRepoPresent,
   loadConnectionInfo,
-} from "./modules/suseObservability";
+} from "./modules/rancher";
 import extensionRouting from "./routing/extension-routing";
 import observabilityStore from "./store";
 import { ObservabilityHealth } from "./types/headers";
