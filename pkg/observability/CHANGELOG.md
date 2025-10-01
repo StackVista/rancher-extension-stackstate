@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.6
+
+### Patch Changes
+
+- 2577a4c: Add upgrade action
+
 ## 2.2.5
 
 ### Patch Changes
