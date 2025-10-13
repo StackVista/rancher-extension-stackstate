@@ -1,5 +1,7 @@
-import { test, expect } from "vitest";
+import { beforeAll, afterAll, afterEach, test, expect } from "vitest";
 import { mount } from "@vue/test-utils";
+import { setupServer } from "msw/node";
+import { http, HttpResponse } from "msw";
 
 import ObservabilityClusterCard from "../ObservabilityClusterCard.vue";
 
@@ -22,6 +24,50 @@ const mountComponent = (mockStore: any) => {
     },
   });
 };
+
+export const restHandlers = [
+  http.get("https://ye-observability.invalid.com/api/components", () =>
+    HttpResponse.text("Unauthorized", { status: 401 }),
+  ),
+  http.post("https://ye-observability.invalid.com/api/snapshot", () =>
+    HttpResponse.text("Unauthorized", { status: 401 }),
+  ),
+  http.get("https://ye-observability.example.com/api/components", () =>
+    HttpResponse.json({}),
+  ),
+  http.post("https://ye-observability.example.com/api/snapshot", () =>
+    HttpResponse.json({
+      viewSnapshotResponse: {
+        components: [
+          {
+            state: {
+              healthState: "CRITICAL",
+            },
+          },
+        ],
+      },
+    }),
+  ),
+  http.get("https://no-observability.example.com/api/components", () =>
+    HttpResponse.text("Not found", { status: 404 }),
+  ),
+  http.post("https://no-observability.example.com/api/snapshot", () =>
+    HttpResponse.json({
+      viewSnapshotResponse: { components: [] },
+    }),
+  ),
+];
+
+const server = setupServer(...restHandlers);
+
+// Start server before all tests
+beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+
+// Close server after all tests
+afterAll(() => server.close());
+
+// Reset handlers after each test for test isolation
+afterEach(() => server.resetHandlers());
 
 test("initial state", () => {
   const mockStore = {};
@@ -57,18 +103,6 @@ test("happy flow - installed & connected", async () => {
               },
             },
           ]);
-        case "management/request":
-          return Promise.resolve({
-            viewSnapshotResponse: {
-              components: [
-                {
-                  state: {
-                    healthState: "CRITICAL",
-                  },
-                },
-              ],
-            },
-          });
       }
     },
   };
@@ -144,13 +178,11 @@ test("configured, but cannot connect", async () => {
               },
               apiVersion: "observability.rancher.io/v1",
               spec: {
-                url: "https://ye-observability.example.com",
+                url: "https://ye-observability.invalid.com",
                 serviceToken: "ye-token",
               },
             },
           ]);
-        case "management/request":
-          return Promise.reject(Error("Cannot connect to SUSE Observability"));
       }
     },
   };
@@ -183,14 +215,11 @@ test("no component for cluster, agent is not deployed", async () => {
               },
               apiVersion: "observability.rancher.io/v1",
               spec: {
-                url: "https://ye-observability.example.com",
+                url: "https://no-observability.example.com",
                 serviceToken: "ye-token",
               },
             },
           ]);
-        case "management/request":
-          // eslint-disable-next-line prefer-promise-reject-errors
-          return Promise.reject("no such cluster component");
         case "cluster/request":
           return Promise.resolve({ data: [] });
       }
@@ -225,14 +254,11 @@ test("no component for cluster, though agent is deployed", async () => {
               },
               apiVersion: "observability.rancher.io/v1",
               spec: {
-                url: "https://ye-observability.example.com",
+                url: "https://no-observability.example.com",
                 serviceToken: "ye-token",
               },
             },
           ]);
-        case "management/request":
-          // eslint-disable-next-line prefer-promise-reject-errors
-          return Promise.reject("no such cluster component");
         case "cluster/request":
           return Promise.resolve({
             data: [

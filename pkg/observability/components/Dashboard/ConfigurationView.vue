@@ -78,7 +78,7 @@ export default {
     },
 
     async save(btnCb) {
-      const conn = await checkConnection(this.$store, {
+      const conn = await checkConnection({
         apiURL: this.suseObservabilityURL,
         serviceToken: this.suseObservabilityServiceToken,
       });

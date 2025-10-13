@@ -70,7 +70,6 @@ export default {
     this.installUrl = `${settings.url}/#/stackpacks/kubernetes-v2`;
 
     this.observationStatus = await loadObservationStatus(
-      this.$store,
       this.resource.spec.displayName,
       settings,
     );
@@ -80,7 +79,6 @@ export default {
 
     try {
       this.snapshot = await getSnapshot(
-        this.$store,
         `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${this.resource.spec.displayName}"`,
         settings,
       );

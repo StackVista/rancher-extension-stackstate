@@ -46,7 +46,7 @@ export default {
       return;
     }
 
-    const component = await loadComponent(this.$store, settings, this.urn);
+    const component = await loadComponent(settings, this.urn);
     this.health = component.state.healthState;
   },
 };
