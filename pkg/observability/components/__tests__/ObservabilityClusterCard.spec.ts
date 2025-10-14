@@ -71,7 +71,6 @@ const setupServer = () => {
     },
   ];
   global.fetch = (url: RequestInfo | URL, options?: RequestInit) => {
-    console.log(url.toString());
     const handler = restHandlers.find((handler) =>
       url.toString().startsWith(handler.url),
     );
