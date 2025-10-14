@@ -36,13 +36,16 @@ export async function checkConnection(
         Authorization: creds,
       },
     });
-    return ConnectionStatus.Connected;
-  } catch (e) {
-    const err = e as FetchError;
-    if (err.status >= 500) {
-      return ConnectionStatus.CrossOriginError;
+    if (resp.ok) {
+      return ConnectionStatus.Connected;
     } else {
       return ConnectionStatus.InvalidToken;
+    }
+  } catch (e) {
+    if (e instanceof FetchError) {
+      return ConnectionStatus.InvalidToken;
+    } else {
+      return ConnectionStatus.CrossOriginError;
     }
   }
 }
@@ -62,13 +65,13 @@ export async function loadObservationStatus(
     await loadComponent(settings, clusterUrn);
     return ObservationStatus.Observed;
   } catch (e) {
-    const err = e as FetchError;
-    console.log("LOAD_STAATUS: ", err);
-    if (err.status === 404) {
-      return ObservationStatus.NotDeployed;
-    } else {
-      return ObservationStatus.ConnectionError;
+    if (e instanceof FetchError) {
+      const err = e as FetchError;
+      if (err.status === 404) {
+        return ObservationStatus.NotDeployed;
+      }
     }
+    return ObservationStatus.ConnectionError;
   }
 }
 
