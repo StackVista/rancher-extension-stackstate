@@ -1,4 +1,4 @@
-import { test, expect } from "vitest";
+import { beforeAll, afterAll, afterEach, test, expect } from "vitest";
 import { mount } from "@vue/test-utils";
 
 import ObservabilityClusterCard from "../ObservabilityClusterCard.vue";
@@ -22,6 +22,71 @@ const mountComponent = (mockStore: any) => {
     },
   });
 };
+
+const setupServer = () => {
+  const restHandlers = [
+    {
+      url: "https://ye-observability.invalid.com/api/components",
+      resp: () => new Response("Unauthorized", { status: 401 }),
+    },
+    {
+      url: "https://ye-observability.invalid.com/api/snapshot",
+      resp: () => new Response("Unauthorized", { status: 401 }),
+    },
+    {
+      url: "https://ye-observability.example.com/api/components",
+      resp: () => new Response(JSON.stringify({}), { status: 200 }),
+    },
+    {
+      url: "https://ye-observability.example.com/api/snapshot",
+      resp: () =>
+        new Response(
+          JSON.stringify({
+            viewSnapshotResponse: {
+              components: [
+                {
+                  state: {
+                    healthState: "CRITICAL",
+                  },
+                },
+              ],
+            },
+          }),
+          { status: 200 },
+        ),
+    },
+    {
+      url: "https://no-observability.example.com/api/components",
+      resp: () => new Response("Not found", { status: 404 }),
+    },
+    {
+      url: "https://no-observability.example.com/api/snapshot",
+      resp: () =>
+        new Response(
+          JSON.stringify({
+            viewSnapshotResponse: { components: [] },
+          }),
+          { status: 200 },
+        ),
+    },
+  ];
+  global.fetch = (url: RequestInfo | URL, options?: RequestInit) => {
+    const handler = restHandlers.find((handler) =>
+      url.toString().startsWith(handler.url),
+    );
+    return Promise.resolve(handler!.resp());
+  };
+};
+
+const fetch = global.fetch;
+
+// Start server before all tests
+beforeAll(() => setupServer());
+
+// Close server after all tests
+afterAll(() => {
+  global.fetch = fetch;
+});
 
 test("initial state", () => {
   const mockStore = {};
@@ -57,18 +122,6 @@ test("happy flow - installed & connected", async () => {
               },
             },
           ]);
-        case "management/request":
-          return Promise.resolve({
-            viewSnapshotResponse: {
-              components: [
-                {
-                  state: {
-                    healthState: "CRITICAL",
-                  },
-                },
-              ],
-            },
-          });
       }
     },
   };
@@ -144,13 +197,11 @@ test("configured, but cannot connect", async () => {
               },
               apiVersion: "observability.rancher.io/v1",
               spec: {
-                url: "https://ye-observability.example.com",
+                url: "https://ye-observability.invalid.com",
                 serviceToken: "ye-token",
               },
             },
           ]);
-        case "management/request":
-          return Promise.reject(Error("Cannot connect to SUSE Observability"));
       }
     },
   };
@@ -183,14 +234,11 @@ test("no component for cluster, agent is not deployed", async () => {
               },
               apiVersion: "observability.rancher.io/v1",
               spec: {
-                url: "https://ye-observability.example.com",
+                url: "https://no-observability.example.com",
                 serviceToken: "ye-token",
               },
             },
           ]);
-        case "management/request":
-          // eslint-disable-next-line prefer-promise-reject-errors
-          return Promise.reject("no such cluster component");
         case "cluster/request":
           return Promise.resolve({ data: [] });
       }
@@ -225,14 +273,11 @@ test("no component for cluster, though agent is deployed", async () => {
               },
               apiVersion: "observability.rancher.io/v1",
               spec: {
-                url: "https://ye-observability.example.com",
+                url: "https://no-observability.example.com",
                 serviceToken: "ye-token",
               },
             },
           ]);
-        case "management/request":
-          // eslint-disable-next-line prefer-promise-reject-errors
-          return Promise.reject("no such cluster component");
         case "cluster/request":
           return Promise.resolve({
             data: [

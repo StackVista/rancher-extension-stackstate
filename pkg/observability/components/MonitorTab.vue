@@ -97,10 +97,9 @@ export default {
 
     this.urn = this.componentIdentifier;
 
-    const component = await loadComponent(this.$store, settings, this.urn);
+    const component = await loadComponent(settings, this.urn);
     if (!component) {
       this.observationStatus = await loadObservationStatus(
-        this.$store,
         this.clusterId,
         settings,
       );

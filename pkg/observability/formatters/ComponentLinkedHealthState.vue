@@ -65,11 +65,7 @@ export default {
     try {
       const settings = await loadSuseObservabilitySettings(this.$store);
 
-      const component = await loadComponent(
-        this.$store,
-        settings,
-        componentIdentifier,
-      );
+      const component = await loadComponent(settings, componentIdentifier);
 
       this.data = {
         health: component.state.healthState,
