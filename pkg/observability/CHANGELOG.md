@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.8
+
+### Patch Changes
+
+- 5fd6253: use direct calls to observability
+
 ## 2.2.7
 
 ### Patch Changes
