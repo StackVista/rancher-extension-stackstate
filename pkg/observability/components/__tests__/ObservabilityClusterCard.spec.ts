@@ -1,7 +1,5 @@
 import { beforeAll, afterAll, afterEach, test, expect } from "vitest";
 import { mount } from "@vue/test-utils";
-import { setupServer } from "msw/node";
-import { http, HttpResponse } from "msw";
 
 import ObservabilityClusterCard from "../ObservabilityClusterCard.vue";
 
@@ -25,49 +23,71 @@ const mountComponent = (mockStore: any) => {
   });
 };
 
-export const restHandlers = [
-  http.get("https://ye-observability.invalid.com/api/components", () =>
-    HttpResponse.text("Unauthorized", { status: 401 }),
-  ),
-  http.post("https://ye-observability.invalid.com/api/snapshot", () =>
-    HttpResponse.text("Unauthorized", { status: 401 }),
-  ),
-  http.get("https://ye-observability.example.com/api/components", () =>
-    HttpResponse.json({}),
-  ),
-  http.post("https://ye-observability.example.com/api/snapshot", () =>
-    HttpResponse.json({
-      viewSnapshotResponse: {
-        components: [
-          {
-            state: {
-              healthState: "CRITICAL",
+const setupServer = () => {
+  const restHandlers = [
+    {
+      url: "https://ye-observability.invalid.com/api/components",
+      resp: () => new Response("Unauthorized", { status: 401 }),
+    },
+    {
+      url: "https://ye-observability.invalid.com/api/snapshot",
+      resp: () => new Response("Unauthorized", { status: 401 }),
+    },
+    {
+      url: "https://ye-observability.example.com/api/components",
+      resp: () => new Response(JSON.stringify({}), { status: 200 }),
+    },
+    {
+      url: "https://ye-observability.example.com/api/snapshot",
+      resp: () =>
+        new Response(
+          JSON.stringify({
+            viewSnapshotResponse: {
+              components: [
+                {
+                  state: {
+                    healthState: "CRITICAL",
+                  },
+                },
+              ],
             },
-          },
-        ],
-      },
-    }),
-  ),
-  http.get("https://no-observability.example.com/api/components", () =>
-    HttpResponse.text("Not found", { status: 404 }),
-  ),
-  http.post("https://no-observability.example.com/api/snapshot", () =>
-    HttpResponse.json({
-      viewSnapshotResponse: { components: [] },
-    }),
-  ),
-];
+          }),
+          { status: 200 },
+        ),
+    },
+    {
+      url: "https://no-observability.example.com/api/components",
+      resp: () => new Response("Not found", { status: 404 }),
+    },
+    {
+      url: "https://no-observability.example.com/api/snapshot",
+      resp: () =>
+        new Response(
+          JSON.stringify({
+            viewSnapshotResponse: { components: [] },
+          }),
+          { status: 200 },
+        ),
+    },
+  ];
+  global.fetch = (url: RequestInfo | URL, options?: RequestInit) => {
+    console.log(url.toString());
+    const handler = restHandlers.find((handler) =>
+      url.toString().startsWith(handler.url),
+    );
+    return Promise.resolve(handler!.resp());
+  };
+};
 
-const server = setupServer(...restHandlers);
+const fetch = global.fetch;
 
 // Start server before all tests
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+beforeAll(() => setupServer());
 
 // Close server after all tests
-afterAll(() => server.close());
-
-// Reset handlers after each test for test isolation
-afterEach(() => server.resetHandlers());
+afterAll(() => {
+  global.fetch = fetch;
+});
 
 test("initial state", () => {
   const mockStore = {};

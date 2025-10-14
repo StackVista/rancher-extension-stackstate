@@ -28,7 +28,7 @@ export async function checkConnection(
   const creds = token(credentials.serviceToken);
 
   try {
-    const resp = await window.fetch(`${credentials.apiURL}/api/server/info`, {
+    const resp = await fetch(`${credentials.apiURL}/api/server/info`, {
       credentials: "omit",
       mode: "cors",
       headers: {
@@ -63,6 +63,7 @@ export async function loadObservationStatus(
     return ObservationStatus.Observed;
   } catch (e) {
     const err = e as FetchError;
+    console.log("LOAD_STAATUS: ", err);
     if (err.status === 404) {
       return ObservationStatus.NotDeployed;
     } else {
@@ -84,7 +85,7 @@ export async function getSnapshot(
 
   const httpToken = token(serviceToken);
 
-  const resp = await window.fetch(`${suseObservabilityURL}/api/snapshot`, {
+  const resp = await fetch(`${suseObservabilityURL}/api/snapshot`, {
     method: "POST",
     credentials: "omit",
     mode: "cors",
@@ -121,7 +122,7 @@ export async function loadComponent(
   identifier: string,
 ) {
   const creds = token(spec.serviceToken);
-  const resp = await window.fetch(
+  const resp = await fetch(
     `${spec.url}/api/components?identifier=${encodeURIComponent(identifier)}`,
     {
       method: "GET",
