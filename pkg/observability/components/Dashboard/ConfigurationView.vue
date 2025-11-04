@@ -2,13 +2,16 @@
 import { LabeledInput } from "@components/Form/LabeledInput";
 import AsyncButton from "@shell/components/AsyncButton";
 import { Banner } from "@components/Banner";
+import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import {
   checkConnection,
   ConnectionStatus,
 } from "../../modules/suseObservability";
 import {
   findNodeDrivers,
+  findOIDCClients,
   loadSuseObservabilitySettings,
+  OIDC_POSTFIX,
   saveSuseObservabilitySettings,
 } from "../../modules/rancher";
 import { SUSEOBSERVABILITYMACHINES_CRD } from "../../types/types";
@@ -18,6 +21,7 @@ import { handleGrowl } from "../../utils/growl";
 export default {
   components: {
     LabeledInput,
+    LabeledSelect,
     AsyncButton,
     Banner,
   },
@@ -31,6 +35,13 @@ export default {
         `ERROR: Unable to determine presence of SUSE Observability NodeDrivers ${e}`,
       );
     }
+    try {
+      this.oidcClients = await findOIDCClients(this.$store);
+    } catch (e) {
+      logger.log(
+        `ERROR: Unable to determine presence of SUSE Observability OIDC Client ${e}`,
+      );
+    }
   },
   data: () => ({
     suseObservabilityURL: "",
@@ -40,6 +51,8 @@ export default {
     urlError: false,
     nodeDrivers: [],
     migratedSettings: false,
+    oidcClients: undefined,
+    validOidcClient: true,
   }),
   watch: {
     suseObservabilityURL(neu) {
@@ -52,7 +65,19 @@ export default {
       } else {
         this.urlError = false;
       }
+      if (this.oidcClients === undefined || this.oidcClients.indexOf(neu) >= 0) {
+        this.validOidcClient = true;
+      } else {
+        this.validOidcClient = false;
+      }
     },
+    oidcClients(clients) {
+      if (clients.indexOf(this.suseObservabilityURL) >= 0) {
+        this.validOidcClient = true;
+      } else {
+        this.validOidcClient = false;
+      }
+    }
   },
   computed: {
     isCreateMode() {
@@ -221,6 +246,16 @@ export default {
             class="url-input"
             :class="{ error: urlError }"
             required
+            v-if="!oidcClients"
+          />
+          <LabeledSelect
+            v-model:value="suseObservabilityURL"
+            :label="t('observability.configuration.url')"
+            class="url-input"
+            :class="{ error: urlError }"
+            required
+            :options="oidcClients"
+            v-if="oidcClients"
           />
           <div class="pt-10 pb-10">
             <p v-show="urlError" class="url-error mb-10">
@@ -272,6 +307,21 @@ export default {
               />
             </div>
           </div>
+        </Banner>
+
+        <Banner
+          v-if="suseObservabilityURL && !validOidcClient"
+          class="connected-banner mt-50"
+          color="warning"
+        >
+          <div class="banner-info row">
+            <div class="col span-9 mr-10">
+              <p>{{ t("observability.dashboard.invalidoidc") }}</p>
+              <a :href="`${suseObservabilityURL}${OIDC_POSTFIX}`">{{
+                 `${suseObservabilityURL}${OIDC_POSTFIX}`
+              }}</a>
+            </div>
+         </div>
         </Banner>
       </div>
     </div>

@@ -51,14 +51,13 @@ export default {
 
   async fetch() {
     if (!isCrdLoaded(this.$store)) {
+      this.isLoading = false;
       return;
     }
 
     const componentIdentifier = this.componentIdentifier;
-
     if (!componentIdentifier) {
       this.isLoading = false;
-
       return;
     }
 

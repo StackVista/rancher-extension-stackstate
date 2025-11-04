@@ -14,6 +14,8 @@ function isSuseObservabilitySettings(settings: any): boolean {
   return isSuseObservabilityName(settings.metadata.name);
 }
 
+export const OIDC_POSTFIX = "/loginCallback?client_name=StsOidcClient";
+
 export async function loadSuseObservabilitySettings(
   store: any,
 ): Promise<undefined | ObservabilitySettings> {
@@ -166,4 +168,18 @@ export async function findNodeDrivers(store: any): Promise<Array<any>> {
   return nodeDrivers.filter(
     (driver: any) => driver.name === "suse-observability",
   );
+}
+
+export async function findOIDCClients(
+  store: any,
+): Promise<boolean> {
+  const clients = await store.dispatch("management/request", {
+    url: "/v1/management.cattle.io.oidcclients",
+  });
+
+  return clients?.data?.flatMap((client: any) => {
+    return client.spec?.redirectURIs?.
+      filter((uri: string) => uri.endsWith(OIDC_POSTFIX)).
+      map((uri: string) => uri.substring(0, uri.length - OIDC_POSTFIX.length));
+  }) ?? [];
 }

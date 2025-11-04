@@ -52,6 +52,7 @@ observability:
     install: Install
     saveSuccess: Configuration saved successfully!
     upgrade: Remnants of an older installation were found.
+    invalidoidc: "To use Rancher OIDC, create an OIDCClient with redirect URI:"
   clusterCard:
     clusterIs: Cluster is
     notObservedPrepend: "Cluster is not observed by SUSE Observability. Please "
