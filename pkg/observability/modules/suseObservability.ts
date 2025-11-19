@@ -1,7 +1,7 @@
 import { ConnectionInfo } from "types/component";
 import { ObservabilitySettings } from "./settings";
 
-class FetchError extends Error {
+export class FetchError extends Error {
   status: number;
 
   constructor(message: string, status: number) {
@@ -20,6 +20,7 @@ export enum ConnectionStatus {
   Connected = 0,
   InvalidToken,
   CrossOriginError,
+  Unconfigured,
 }
 
 export async function checkConnection(
@@ -124,6 +125,12 @@ export async function loadComponent(
   spec: ObservabilitySettings,
   identifier: string,
 ) {
+  if (!spec) {
+    throw new FetchError(
+      "Extension not configured",
+      ConnectionStatus.Unconfigured,
+    );
+  }
   const creds = token(spec.serviceToken);
   const resp = await fetch(
     `${spec.url}/api/components?identifier=${encodeURIComponent(identifier)}`,

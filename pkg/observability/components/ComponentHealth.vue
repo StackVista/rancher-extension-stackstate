@@ -1,6 +1,10 @@
 <script>
 import { mapGetters } from "vuex";
-import { loadComponent } from "../modules/suseObservability";
+import {
+  ConnectionStatus,
+  FetchError,
+  loadComponent,
+} from "../modules/suseObservability";
 import { isCrdLoaded, loadSuseObservabilitySettings } from "../modules/rancher";
 import { buildUrn } from "../modules/urn";
 import { HEALTH_STATE_TYPES } from "../types/types";
@@ -17,7 +21,7 @@ export default {
   },
   data() {
     return {
-      health: HEALTH_STATE_TYPES.UNKNOWN,
+      health: HEALTH_STATE_TYPES.UNCONFIGURED,
       urn: "",
     };
   },
@@ -46,8 +50,19 @@ export default {
       return;
     }
 
-    const component = await loadComponent(settings, this.urn);
-    this.health = component.state.healthState;
+    try {
+      const component = await loadComponent(settings, this.urn);
+      this.health = component.state.healthState;
+    } catch (error) {
+      if (error instanceof FetchError) {
+        if (error.status === ConnectionStatus.Unconfigured) {
+          this.health = HEALTH_STATE_TYPES.UNCONFIGURED;
+          return;
+        }
+      }
+
+      this.health = HEALTH_STATE_TYPES.CONNECTION_ERROR;
+    }
   },
 };
 </script>

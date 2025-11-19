@@ -22,7 +22,7 @@ export default {
         case HEALTH_STATE_TYPES.CRITICAL:
           return "red";
         case HEALTH_STATE_TYPES.UNKNOWN:
-        case HEALTH_STATE_TYPES.NOT_MONITORED:
+        case HEALTH_STATE_TYPES.UNCONFIGURED:
           return "grey";
         default:
           return "skeleton";

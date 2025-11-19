@@ -3,7 +3,7 @@ import { TableColumn } from "@rancher/shell/core/types";
 export const ObservabilityHealth: TableColumn = {
   labelKey: "observability.health",
   getValue: (row: any) => {
-    return "UNKNOWN";
+    return "UNCONFIGURED";
   },
   formatter: "ComponentLinkedHealthState",
   width: 100,
