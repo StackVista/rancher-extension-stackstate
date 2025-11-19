@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.9
+
+### Patch Changes
+
+- b07fd49: Fix bug where health state badges show UNKNOWN health state when the extension is not fully configured
+
 ## 2.2.8
 
 ### Patch Changes
