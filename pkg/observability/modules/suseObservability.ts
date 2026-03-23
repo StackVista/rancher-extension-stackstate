@@ -98,6 +98,7 @@ export async function getSnapshot(
       Authorization: httpToken,
     },
     body: JSON.stringify({
+      _type: "SnapshotRequest",
       query: stql,
       queryVersion: "1.0",
       metadata: {
