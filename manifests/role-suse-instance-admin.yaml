@@ -68,6 +68,7 @@ rules:
       - componentactions
       - monitors
       - restrictedscripts
+      - ai
     verbs:
       - execute
   - apiGroups:
