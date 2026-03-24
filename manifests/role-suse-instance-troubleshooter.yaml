@@ -49,6 +49,7 @@ rules:
     resources:
       - componentactions
       - monitors
+      - ai
     verbs:
       - execute
   - apiGroups:
