@@ -1,5 +1,11 @@
 # observability
 
+## 2.2.10
+
+### Patch Changes
+
+- 8f1969e: Adds additional permissions to role templates for using Liz, the AI Agent
+
 ## 2.2.9
 
 ### Patch Changes
