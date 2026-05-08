@@ -17,11 +17,11 @@ function isSuseObservabilitySettings(settings: any): boolean {
 export async function loadSuseObservabilitySettings(
   store: any,
 ): Promise<undefined | ObservabilitySettings> {
-  const secret = await store.dispatch("management/find", {
-    type: SECRET,
-    id: `${EXTENSION_NAMESPACE}/${CONFIGURATION_NAME}`,
-  });
-  if (secret) {
+  try {
+    const secret = await store.dispatch("management/find", {
+      type: SECRET,
+      id: `${EXTENSION_NAMESPACE}/${CONFIGURATION_NAME}`,
+    });
     return secret.data?.url && secret.data?.serviceToken
       ? {
           url: secret.data?.url ? atob(secret.data.url) : "",
@@ -31,28 +31,38 @@ export async function loadSuseObservabilitySettings(
           migrated: false,
         }
       : undefined;
+  } catch (e: any) {
+    // fall through if configuration doesn't exist yet - bail out otherwise
+    if (e?.status !== 404) {
+      return undefined;
+    }
   }
 
   // legacy: used a CR(D) to define and store configuration
 
-  const settings = await store.dispatch("management/findAll", {
-    type: OBSERVABILITY_CONFIGURATION_TYPE,
-  });
-  const record = settings?.find(isSuseObservabilitySettings);
+  try {
+    const settings = await store.dispatch("management/findAll", {
+      type: OBSERVABILITY_CONFIGURATION_TYPE,
+    });
+    const record = settings?.find(isSuseObservabilitySettings);
 
-  if (record?.apiVersion == "observability.rancher.io/v1beta1") {
-    return {
-      url: `https://${record.spec.url}`,
-      serviceToken: record.spec.serviceToken,
-      migrated: true,
-    };
-  } else if (record) {
-    return {
-      url: record.spec.url,
-      serviceToken: record.spec.serviceToken,
-      migrated: true,
-    };
-  } else {
+    if (record?.apiVersion == "observability.rancher.io/v1beta1") {
+      return {
+        url: `https://${record.spec.url}`,
+        serviceToken: record.spec.serviceToken,
+        migrated: true,
+      };
+    } else if (record) {
+      return {
+        url: record.spec.url,
+        serviceToken: record.spec.serviceToken,
+        migrated: true,
+      };
+    } else {
+      return undefined;
+    }
+  } catch (e) {
+    // CRD - based configuration not available
     return undefined;
   }
 }
@@ -61,18 +71,17 @@ export async function saveSuseObservabilitySettings(
   store: any,
   settings: ObservabilitySettings,
 ): Promise<void> {
-  let secret = await store.dispatch("management/find", {
-    type: SECRET,
-    id: `${EXTENSION_NAMESPACE}/${CONFIGURATION_NAME}`,
-  });
-
-  if (!secret) {
+  let secret;
+  try {
+    secret = await store.dispatch("management/find", {
+      type: SECRET,
+      id: `${EXTENSION_NAMESPACE}/${CONFIGURATION_NAME}`,
+    });
+  } catch (e) {
     const config = {
       metadata: { namespace: EXTENSION_NAMESPACE, name: CONFIGURATION_NAME },
-      spec: {},
       type: SECRET,
     };
-
     secret = await store.dispatch("management/create", config);
   }
 
