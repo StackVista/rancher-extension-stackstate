@@ -63,7 +63,7 @@ export async function saveSuseObservabilitySettings(
 ): Promise<void> {
   let secret = await store.dispatch("management/find", {
     type: SECRET,
-    id: "suse-observability-extension/configuration",
+    id: `${EXTENSION_NAMESPACE}/${CONFIGURATION_NAME}`,
   });
 
   if (!secret) {
