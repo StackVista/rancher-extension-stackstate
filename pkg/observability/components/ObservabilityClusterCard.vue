@@ -7,7 +7,6 @@ import {
 } from "../modules/suseObservability";
 import {
   loadSuseObservabilitySettings,
-  isCrdLoaded,
   AgentStatus,
   loadAgentStatus,
 } from "../modules/rancher";
@@ -56,12 +55,6 @@ export default {
     };
   },
   async fetch() {
-    this.isMissingCrd = !isCrdLoaded(this.$store);
-    if (this.isMissingCrd) {
-      this.isConfigured = false;
-      return;
-    }
-
     const settings = await loadSuseObservabilitySettings(this.$store);
     if (!settings) {
       this.isConfigured = false;

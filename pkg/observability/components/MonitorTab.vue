@@ -1,14 +1,14 @@
 <script>
-import { mapGetters } from "vuex";
 import LiveDate from "@shell/components/formatter/LiveDate.vue";
 import SortableTable from "@shell/components/SortableTable";
+import { mapGetters } from "vuex";
 
+import { loadSuseObservabilitySettings } from "../modules/rancher";
 import {
   loadComponent,
   loadObservationStatus,
   ObservationStatus,
 } from "../modules/suseObservability";
-import { loadSuseObservabilitySettings, isCrdLoaded } from "../modules/rancher";
 import { mapKind } from "../modules/urn";
 import { MONITOR_HEADERS } from "../types/headers";
 
@@ -74,10 +74,6 @@ export default {
     },
   },
   async fetch() {
-    if (!isCrdLoaded(this.$store)) {
-      return;
-    }
-
     if (!this.resource?.metadata) {
       const routeResource = this.$route?.params?.resource;
       const routeNamespace = this.$route?.params?.namespace;

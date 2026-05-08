@@ -1,46 +1,26 @@
 import { importTypes } from "@rancher/auto-import";
 import {
+  CONFIG_MAP,
+  MANAGEMENT,
+  NAMESPACE,
+  NODE,
+  POD,
+  PV,
+  PVC,
+  SECRET,
+  SERVICE,
+  WORKLOAD_TYPES,
+} from "@shell/config/types";
+import {
   CardLocation,
   IPlugin,
-  OnNavToPackage,
   PanelLocation,
   TableColumnLocation,
   TabLocation,
 } from "@shell/core/types";
-import {
-  NODE,
-  POD,
-  SERVICE,
-  WORKLOAD_TYPES,
-  NAMESPACE,
-  SECRET,
-  CONFIG_MAP,
-  PV,
-  PVC,
-  MANAGEMENT,
-} from "@shell/config/types";
 
-import {
-  isCrdLoaded,
-  isSuseObservabilityRepoPresent,
-  loadConnectionInfo,
-} from "./modules/rancher";
 import extensionRouting from "./routing/extension-routing";
-import observabilityStore from "./store";
 import { ObservabilityHealth } from "./types/headers";
-
-const onEnter: OnNavToPackage = async (store) => {
-  if (!(await isSuseObservabilityRepoPresent(store))) {
-    await store.dispatch("observability/setRepoPresent", false);
-  }
-
-  if (!isCrdLoaded(store)) {
-    await store.dispatch("observability/setMissingCrd", true);
-
-    return;
-  }
-  await loadConnectionInfo(store);
-};
 
 // Init the package
 export default function (plugin: IPlugin): void {
@@ -52,12 +32,6 @@ export default function (plugin: IPlugin): void {
 
   // Load a product
   plugin.addProduct(require("./product"));
-
-  plugin.addDashboardStore(
-    observabilityStore.config.namespace,
-    observabilityStore.specifics,
-    observabilityStore.config,
-  );
 
   plugin.addTableColumn(
     TableColumnLocation.RESOURCE,
@@ -142,6 +116,4 @@ export default function (plugin: IPlugin): void {
 
   // Add Vue Routes
   plugin.addRoutes(extensionRouting);
-
-  plugin.addNavHooks(onEnter);
 }

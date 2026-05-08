@@ -1,9 +1,9 @@
-import {
-  OBSERVABILITY_CLUSTERREPO,
-  OBSERVABILITY_CONFIGURATION_TYPE,
-} from "../types/types";
-import { logger } from "../utils/logger";
+import { SECRET } from "@shell/config/types";
+import { OBSERVABILITY_CONFIGURATION_TYPE } from "../types/types";
 import { ObservabilitySettings } from "./settings";
+
+const EXTENSION_NAMESPACE = "suse-observability-extension";
+const CONFIGURATION_NAME = "configuration";
 
 function isSuseObservabilityName(name: string): boolean {
   // match either the legacy (stackstate) or new (suse-observability) name
@@ -17,6 +17,24 @@ function isSuseObservabilitySettings(settings: any): boolean {
 export async function loadSuseObservabilitySettings(
   store: any,
 ): Promise<undefined | ObservabilitySettings> {
+  const secret = await store.dispatch("management/find", {
+    type: SECRET,
+    id: `${EXTENSION_NAMESPACE}/${CONFIGURATION_NAME}`,
+  });
+  if (secret) {
+    return secret.data?.url && secret.data?.serviceToken
+      ? {
+          url: secret.data?.url ? atob(secret.data.url) : "",
+          serviceToken: secret.data?.serviceToken
+            ? atob(secret.data.serviceToken)
+            : "",
+          migrated: false,
+        }
+      : undefined;
+  }
+
+  // legacy: used a CR(D) to define and store configuration
+
   const settings = await store.dispatch("management/findAll", {
     type: OBSERVABILITY_CONFIGURATION_TYPE,
   });
@@ -32,7 +50,7 @@ export async function loadSuseObservabilitySettings(
     return {
       url: record.spec.url,
       serviceToken: record.spec.serviceToken,
-      migrated: false,
+      migrated: true,
     };
   } else {
     return undefined;
@@ -43,31 +61,43 @@ export async function saveSuseObservabilitySettings(
   store: any,
   settings: ObservabilitySettings,
 ): Promise<void> {
-  const saved = await store.dispatch("management/findAll", {
-    type: OBSERVABILITY_CONFIGURATION_TYPE,
+  let secret = await store.dispatch("management/find", {
+    type: SECRET,
+    id: `${EXTENSION_NAMESPACE}/${CONFIGURATION_NAME}`,
   });
-  const record = saved?.find(isSuseObservabilitySettings);
 
-  let newConfig;
-  if (!record) {
+  if (!secret) {
     const config = {
-      metadata: { name: `suse-observability`, namespace: "default" },
+      metadata: { namespace: EXTENSION_NAMESPACE, name: CONFIGURATION_NAME },
       spec: {},
-      type: OBSERVABILITY_CONFIGURATION_TYPE,
+      type: SECRET,
     };
 
-    newConfig = await store.dispatch("management/create", config);
-  } else {
-    const configs = await store.dispatch("management/findAll", {
-      type: OBSERVABILITY_CONFIGURATION_TYPE,
-    });
-    newConfig = configs[0];
+    secret = await store.dispatch("management/create", config);
   }
 
-  newConfig.apiVersion = "observability.rancher.io/v1";
-  newConfig.spec.url = settings.url;
-  newConfig.spec.serviceToken = settings.serviceToken;
-  newConfig.save();
+  secret.data = {
+    url: btoa(settings.url),
+    serviceToken: btoa(settings.serviceToken),
+  };
+  await secret.save();
+}
+
+export async function deleteCustomResources(store: any) {
+  const saved: Array<any> = await store.dispatch("management/findAll", {
+    type: OBSERVABILITY_CONFIGURATION_TYPE,
+  });
+
+  await Promise.all(
+    saved.map(async (config) => {
+      await config.remove();
+    }),
+  );
+
+  await store.dispatch("management/request", {
+    url: "/v1/apiextensions.k8s.io.customresourcedefinitions/configurations.observability.rancher.io",
+    method: "DELETE",
+  });
 }
 
 /**
@@ -77,52 +107,7 @@ export function isCrdLoaded(store: any): boolean {
   const loaded = store.getters["management/schemaFor"](
     OBSERVABILITY_CONFIGURATION_TYPE,
   );
-
-  return loaded?.attributes.version == "v1";
-}
-
-export async function isSuseObservabilityRepoPresent(
-  store: any,
-): Promise<boolean> {
-  logger.log("Checking if Observability Repo is present");
-
-  const repos: undefined | ReadonlyArray<any> = await store.dispatch(
-    "management/findAll",
-    { type: "catalog.cattle.io.clusterrepo" },
-  );
-
-  logger.log("Checking if Observability Repo is present", repos);
-
-  const isPresent = repos?.some(isSuseObservabilitySettings) ?? false;
-
-  logger.log("Checking if Observability Repo is present", isPresent);
-
-  return isPresent;
-}
-
-export async function createObservabilityRepoIfNotPresent(store: any) {
-  logger.log("Creating Observability Repo if needed");
-  const isRepoPresent = await isSuseObservabilityRepoPresent(store);
-  if (!isRepoPresent) {
-    logger.log("Creating Observability Repo");
-    await store.dispatch("management/request", {
-      url: "/v1/catalog.cattle.io.clusterrepos",
-      method: "POST",
-      data: OBSERVABILITY_CLUSTERREPO,
-    });
-    logger.log("Created Observability Repo");
-  }
-}
-
-export async function loadConnectionInfo(store: any): Promise<void> {
-  const suseObservabilitySettings = await loadSuseObservabilitySettings(store);
-
-  if (suseObservabilitySettings) {
-    await store.dispatch("observability/setConnectionInfo", {
-      apiURL: suseObservabilitySettings.url,
-      serviceToken: suseObservabilitySettings.serviceToken,
-    });
-  }
+  return loaded !== undefined;
 }
 
 export enum AgentStatus {

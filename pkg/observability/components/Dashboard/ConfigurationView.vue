@@ -7,7 +7,9 @@ import {
   ConnectionStatus,
 } from "../../modules/suseObservability";
 import {
+  deleteCustomResources,
   findNodeDrivers,
+  isCrdLoaded,
   loadSuseObservabilitySettings,
   saveSuseObservabilitySettings,
 } from "../../modules/rancher";
@@ -31,6 +33,7 @@ export default {
         `ERROR: Unable to determine presence of SUSE Observability NodeDrivers ${e}`,
       );
     }
+    this.crdPresent = isCrdLoaded(this.$store);
   },
   data: () => ({
     suseObservabilityURL: "",
@@ -39,6 +42,7 @@ export default {
     showEditInterface: false,
     urlError: false,
     nodeDrivers: [],
+    crdPresent: false,
     migratedSettings: false,
   }),
   watch: {
@@ -109,11 +113,6 @@ export default {
         });
         this.migratedSettings = false;
 
-        await this.$store.dispatch("observability/setConnectionInfo", {
-          apiURL: this.suseObservabilityURL,
-          serviceToken: this.suseObservabilityServiceToken,
-        });
-
         this.showEditInterface = false;
         this.showSuccessfulSave = true;
 
@@ -158,6 +157,11 @@ export default {
             serviceToken: this.suseObservabilityServiceToken,
           });
           this.migratedSettings = false;
+        }
+
+        if (this.crdPresent) {
+          await deleteCustomResources(this.$store);
+          this.crdPresent = false;
         }
 
         btnCb(true);
@@ -251,7 +255,7 @@ export default {
         </div>
 
         <Banner
-          v-if="nodeDrivers.length > 0 || migratedSettings"
+          v-if="nodeDrivers.length > 0 || migratedSettings || crdPresent"
           class="connected-banner mt-50"
           color="warning"
         >

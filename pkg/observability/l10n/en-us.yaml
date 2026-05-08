@@ -18,7 +18,6 @@ components:
     state: State
     monitor: Monitor
     lastUpdate: Last update
-  observedCard:
 
 observability:
   health: "Health"
@@ -47,9 +46,7 @@ observability:
     cancelEditConfig: Cancel
     error:
       notconfigured: "The connection details for have not been configured yet. Please enter the URL and Service Token to start using SUSE Observability:"
-      repomissing: "The SUSE Observability Extension is not fully installed yet. Please install it in order to proceed to configuration:"
     connected: "SUSE Rancher Prime is now connected to SUSE Observability at:"
-    install: Install
     saveSuccess: Configuration saved successfully!
     upgrade: Remnants of an older installation were found.
   clusterCard:
@@ -60,7 +57,6 @@ observability:
     noDataPrepend: "The SUSE Observability Agent is installed, but no data is received. Please "
     noDataInstall: "configure"
     noDataPostpend: "the Stackpack or align the agent configuration."
-    accessDenied: Unable to test if SUSE Observability is installed
     connecting: "Connecting to SUSE Observability Plane..."
     notConnectedPrepend: "SUSE Observability has not been configured or has a connection error, please go to the"
     notConnectedObservability: "SUSE Observability Configuration."

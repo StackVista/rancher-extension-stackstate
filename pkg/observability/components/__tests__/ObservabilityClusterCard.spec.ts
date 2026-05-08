@@ -98,7 +98,32 @@ test("initial state", () => {
   );
 });
 
-test("happy flow - installed & connected", async () => {
+test("happy flow - installed and connected", async () => {
+  const mockStore = {
+    dispatch: (name: string, opts: any) => {
+      switch (name) {
+        case "management/find":
+          return Promise.resolve({
+            data: {
+              url: btoa("https://ye-observability.example.com"),
+              serviceToken: btoa("ye-token"),
+            },
+          });
+      }
+    },
+  };
+  const wrapper = mountComponent(mockStore);
+
+  await (ObservabilityClusterCard as any).fetch.call(wrapper.vm);
+
+  const critical = wrapper.find("[data-testid=obs-critical-count]");
+  expect(critical.text()).toContain("1");
+
+  const deviating = wrapper.find("[data-testid=obs-deviating-count]");
+  expect(deviating.text()).toContain("0");
+});
+
+test("crd based configuration", async () => {
   const mockStore = {
     getters: {
       "management/schemaFor": () => ({
@@ -109,6 +134,8 @@ test("happy flow - installed & connected", async () => {
     },
     dispatch: (name: string, opts: any) => {
       switch (name) {
+        case "management/find":
+          return Promise.resolve(undefined);
         case "management/findAll":
           return Promise.resolve([
             {
@@ -136,33 +163,12 @@ test("happy flow - installed & connected", async () => {
   expect(deviating.text()).toContain("0");
 });
 
-test("no schema yet", async () => {
-  const mockStore = {
-    getters: {
-      "management/schemaFor": () => undefined,
-    },
-  };
-  const wrapper = mountComponent(mockStore);
-
-  await (ObservabilityClusterCard as any).fetch.call(wrapper.vm);
-
-  // Assert the rendered text of the component
-  expect(wrapper.text()).toContain(
-    "%observability.clusterCard.notConnectedPrepend%",
-  );
-});
-
 test("no configuration yet", async () => {
   const mockStore = {
-    getters: {
-      "management/schemaFor": () => ({
-        attributes: {
-          version: "v1",
-        },
-      }),
-    },
     dispatch: (name: string, opts: any) => {
       switch (name) {
+        case "management/find":
+          return Promise.resolve(undefined);
         case "management/findAll":
           return Promise.resolve([]);
       }
@@ -180,28 +186,15 @@ test("no configuration yet", async () => {
 
 test("configured, but cannot connect", async () => {
   const mockStore = {
-    getters: {
-      "management/schemaFor": () => ({
-        attributes: {
-          version: "v1",
-        },
-      }),
-    },
     dispatch: (name: string, opts: any) => {
       switch (name) {
-        case "management/findAll":
-          return Promise.resolve([
-            {
-              metadata: {
-                name: "suse-observability",
-              },
-              apiVersion: "observability.rancher.io/v1",
-              spec: {
-                url: "https://ye-observability.invalid.com",
-                serviceToken: "ye-token",
-              },
+        case "management/find":
+          return Promise.resolve({
+            data: {
+              url: btoa("https://ye-observability.invalid.com"),
+              serviceToken: btoa("ye-token"),
             },
-          ]);
+          });
       }
     },
   };
@@ -217,28 +210,15 @@ test("configured, but cannot connect", async () => {
 
 test("no component for cluster, agent is not deployed", async () => {
   const mockStore = {
-    getters: {
-      "management/schemaFor": () => ({
-        attributes: {
-          version: "v1",
-        },
-      }),
-    },
     dispatch: (name: string, opts: any) => {
       switch (name) {
-        case "management/findAll":
-          return Promise.resolve([
-            {
-              metadata: {
-                name: "suse-observability",
-              },
-              apiVersion: "observability.rancher.io/v1",
-              spec: {
-                url: "https://no-observability.example.com",
-                serviceToken: "ye-token",
-              },
+        case "management/find":
+          return Promise.resolve({
+            data: {
+              url: btoa("https://no-observability.example.com"),
+              serviceToken: btoa("ye-token"),
             },
-          ]);
+          });
         case "cluster/request":
           return Promise.resolve({ data: [] });
       }
@@ -256,28 +236,15 @@ test("no component for cluster, agent is not deployed", async () => {
 
 test("no component for cluster, though agent is deployed", async () => {
   const mockStore = {
-    getters: {
-      "management/schemaFor": () => ({
-        attributes: {
-          version: "v1",
-        },
-      }),
-    },
     dispatch: (name: string, opts: any) => {
       switch (name) {
-        case "management/findAll":
-          return Promise.resolve([
-            {
-              metadata: {
-                name: "suse-observability",
-              },
-              apiVersion: "observability.rancher.io/v1",
-              spec: {
-                url: "https://no-observability.example.com",
-                serviceToken: "ye-token",
-              },
+        case "management/find":
+          return Promise.resolve({
+            data: {
+              url: btoa("https://no-observability.example.com"),
+              serviceToken: btoa("ye-token"),
             },
-          ]);
+          });
         case "cluster/request":
           return Promise.resolve({
             data: [
