@@ -1,5 +1,11 @@
 # observability
 
+## 2.3.1
+
+### Patch Changes
+
+- c60a351: fix upgrade
+
 ## 2.3.0
 
 ### Minor Changes
