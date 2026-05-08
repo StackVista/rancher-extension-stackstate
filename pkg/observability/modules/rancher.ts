@@ -1,7 +1,5 @@
 import { SECRET } from "@shell/config/types";
-import {
-  OBSERVABILITY_CONFIGURATION_TYPE
-} from "../types/types";
+import { OBSERVABILITY_CONFIGURATION_TYPE } from "../types/types";
 import { ObservabilitySettings } from "./settings";
 
 const EXTENSION_NAMESPACE = "suse-observability-extension";
@@ -24,13 +22,15 @@ export async function loadSuseObservabilitySettings(
     id: `${EXTENSION_NAMESPACE}/${CONFIGURATION_NAME}`,
   });
   if (secret) {
-    return (secret.data?.url && secret.data?.serviceToken) ? {
-      url: secret.data?.url ? atob(secret.data.url) : "",
-      serviceToken: secret.data?.serviceToken
-        ? atob(secret.data.serviceToken)
-        : "",
-      migrated: false,
-    } : undefined;
+    return secret.data?.url && secret.data?.serviceToken
+      ? {
+          url: secret.data?.url ? atob(secret.data.url) : "",
+          serviceToken: secret.data?.serviceToken
+            ? atob(secret.data.serviceToken)
+            : "",
+          migrated: false,
+        }
+      : undefined;
   }
 
   // legacy: used a CR(D) to define and store configuration

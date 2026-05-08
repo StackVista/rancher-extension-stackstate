@@ -104,10 +104,10 @@ test("happy flow - installed and connected", async () => {
       switch (name) {
         case "management/find":
           return Promise.resolve({
-              data: {
-                url: btoa("https://ye-observability.example.com"),
-                serviceToken: btoa("ye-token"),
-              },
+            data: {
+              url: btoa("https://ye-observability.example.com"),
+              serviceToken: btoa("ye-token"),
+            },
           });
       }
     },
@@ -190,10 +190,10 @@ test("configured, but cannot connect", async () => {
       switch (name) {
         case "management/find":
           return Promise.resolve({
-              data: {
-                url: btoa("https://ye-observability.invalid.com"),
-                serviceToken: btoa("ye-token"),
-              },
+            data: {
+              url: btoa("https://ye-observability.invalid.com"),
+              serviceToken: btoa("ye-token"),
+            },
           });
       }
     },
@@ -214,10 +214,10 @@ test("no component for cluster, agent is not deployed", async () => {
       switch (name) {
         case "management/find":
           return Promise.resolve({
-              data: {
-                url: btoa("https://no-observability.example.com"),
-                serviceToken: btoa("ye-token"),
-              },
+            data: {
+              url: btoa("https://no-observability.example.com"),
+              serviceToken: btoa("ye-token"),
+            },
           });
         case "cluster/request":
           return Promise.resolve({ data: [] });
@@ -240,10 +240,10 @@ test("no component for cluster, though agent is deployed", async () => {
       switch (name) {
         case "management/find":
           return Promise.resolve({
-              data: {
-                url: btoa("https://no-observability.example.com"),
-                serviceToken: btoa("ye-token"),
-              },
+            data: {
+              url: btoa("https://no-observability.example.com"),
+              serviceToken: btoa("ye-token"),
+            },
           });
         case "cluster/request":
           return Promise.resolve({

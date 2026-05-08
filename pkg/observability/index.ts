@@ -16,7 +16,7 @@ import {
   IPlugin,
   PanelLocation,
   TableColumnLocation,
-  TabLocation
+  TabLocation,
 } from "@shell/core/types";
 
 import extensionRouting from "./routing/extension-routing";
