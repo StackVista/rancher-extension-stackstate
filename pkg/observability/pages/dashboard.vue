@@ -1,19 +1,10 @@
 <script>
 import ConfigurationView from "../components/Dashboard/ConfigurationView";
-import { loadSuseObservabilitySettings } from "../modules/rancher";
 
 export default {
   name: "ObservabilityDashboard",
   components: {
     ConfigurationView,
-  },
-
-  data: () => ({
-    isConfigured: true,
-  }),
-  async fetch() {
-    this.isConfigured =
-      (await loadSuseObservabilitySettings(this.$store)) !== undefined;
   },
 };
 </script>
@@ -27,7 +18,7 @@ export default {
       <h1>{{ t("observability.name") }}</h1>
       <p>{{ t("observability.dashboard.description") }}</p>
     </div>
-    <ConfigurationView :mode="isConfigured ? 'edit' : 'create'" />
+    <ConfigurationView />
   </div>
 </template>
 

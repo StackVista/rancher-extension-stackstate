@@ -2,6 +2,7 @@ import { beforeAll, afterAll, afterEach, test, expect } from "vitest";
 import { mount } from "@vue/test-utils";
 
 import ObservabilityClusterCard from "../ObservabilityClusterCard.vue";
+import { FetchError } from "../../modules/suseObservability";
 
 const mountComponent = (mockStore: any) => {
   return mount(ObservabilityClusterCard, {
@@ -135,7 +136,7 @@ test("crd based configuration", async () => {
     dispatch: (name: string, opts: any) => {
       switch (name) {
         case "management/find":
-          return Promise.resolve(undefined);
+          return Promise.reject(new FetchError("not found", 404));
         case "management/findAll":
           return Promise.resolve([
             {
@@ -168,7 +169,7 @@ test("no configuration yet", async () => {
     dispatch: (name: string, opts: any) => {
       switch (name) {
         case "management/find":
-          return Promise.resolve(undefined);
+          return Promise.reject(new FetchError("not found", 404));
         case "management/findAll":
           return Promise.resolve([]);
       }

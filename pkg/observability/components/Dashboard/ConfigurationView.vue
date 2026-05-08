@@ -23,7 +23,6 @@ export default {
     AsyncButton,
     Banner,
   },
-  props: { mode: { type: String, default: "edit" } },
   async fetch() {
     await this.fetchFormValues();
     try {
@@ -44,6 +43,7 @@ export default {
     nodeDrivers: [],
     crdPresent: false,
     migratedSettings: false,
+    isCreateMode: false,
   }),
   watch: {
     suseObservabilityURL(neu) {
@@ -58,11 +58,6 @@ export default {
       }
     },
   },
-  computed: {
-    isCreateMode() {
-      return this.mode === "create";
-    },
-  },
   methods: {
     async fetchFormValues() {
       const settings = await loadSuseObservabilitySettings(this.$store);
@@ -71,6 +66,10 @@ export default {
         this.suseObservabilityURL = settings.url;
         this.suseObservabilityServiceToken = settings.serviceToken;
         this.migratedSettings = settings.migrated;
+        this.showEditInterface = false;
+      } else {
+        this.isCreateMode = true;
+        this.showEditInterface = true;
       }
     },
 
@@ -113,6 +112,7 @@ export default {
         });
         this.migratedSettings = false;
 
+        this.isCreateMode = false;
         this.showEditInterface = false;
         this.showSuccessfulSave = true;
 
@@ -240,9 +240,9 @@ export default {
           />
           <div class="configuration-actions">
             <!-- don't delete this empty view as it's necessary to align to the right the controls -->
-            <div v-if="!showEditInterface"></div>
+            <div v-if="isCreateMode"></div>
             <button
-              v-if="showEditInterface"
+              v-if="!isCreateMode"
               class="btn role-secondary"
               @click="cancel"
             >
