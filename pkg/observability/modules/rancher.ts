@@ -125,10 +125,15 @@ export enum AgentStatus {
   ConnectionError,
 }
 
+export interface ObservabilityAgent {
+  status: AgentStatus;
+  clusterName?: string;
+}
+
 export async function loadAgentStatus(
   store: any,
   clusterId: string,
-): Promise<AgentStatus> {
+): Promise<ObservabilityAgent> {
   try {
     const response = await store.dispatch(`cluster/request`, {
       url: `/k8s/clusters/${clusterId}/v1/apps.deployments`,
@@ -143,11 +148,23 @@ export async function loadAgentStatus(
             "stackstate-k8s-agent"),
     );
 
-    return deployments.length > 0
-      ? AgentStatus.Installed
-      : AgentStatus.NotInstalled;
+    if (deployments.length == 0) {
+      return {
+        status: AgentStatus.NotInstalled,
+      };
+    }
+    const env = deployments[0].spec?.template.spec.containers[0].env;
+    const clusterNames = env
+      ?.filter((envVar: any) => envVar.name === "STS_CLUSTER_NAME")
+      .map((envVar: any) => envVar.value);
+    return {
+      status: AgentStatus.Installed,
+      clusterName: clusterNames?.[0],
+    };
   } catch (e) {
-    return AgentStatus.ConnectionError;
+    return {
+      status: AgentStatus.ConnectionError,
+    };
   }
 }
 
