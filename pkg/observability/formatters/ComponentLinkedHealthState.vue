@@ -4,6 +4,7 @@ import HealthState from "../components/Health/HealthState";
 import {
   loadSuseObservabilitySettings,
   loadAgentStatus,
+  AgentStatus,
 } from "../modules/rancher";
 import {
   ConnectionStatus,
@@ -55,13 +56,19 @@ export default {
       this.$store,
       this.currentCluster?.id,
     );
+    if (agentStatus.status === AgentStatus.NotInstalled) {
+      this.data = {
+        health: HEALTH_STATE_TYPES.UNOBSERVED,
+      };
+      this.isLoading = false;
+      return;
+    }
+
     const clusterName =
       agentStatus.clusterName ?? this.currentCluster.spec.displayName;
     const componentIdentifier = buildUrn(this.row, clusterName);
-
     if (!componentIdentifier) {
       this.isLoading = false;
-
       return;
     }
 

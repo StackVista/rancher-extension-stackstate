@@ -4,6 +4,7 @@ import SortableTable from "@shell/components/SortableTable";
 import { mapGetters } from "vuex";
 
 import {
+  AgentStatus,
   loadAgentStatus,
   loadSuseObservabilitySettings,
 } from "../modules/rancher";
@@ -68,11 +69,14 @@ export default {
       });
     }
 
-    const settings = await loadSuseObservabilitySettings(this.$store);
     const agentStatus = await loadAgentStatus(
       this.$store,
       this.currentCluster?.id,
     );
+    if (agentStatus.status === AgentStatus.NotInstalled) {
+      this.observationStatus = ObservationStatus.NotDeployed;
+      return;
+    }
     const clusterName =
       agentStatus.clusterName ?? this.currentCluster?.spec.displayName;
 
@@ -93,6 +97,7 @@ export default {
     this.urn = identifier;
 
     try {
+      const settings = await loadSuseObservabilitySettings(this.$store);
       const component = await loadComponent(settings, this.urn);
       this.monitors = component.syncedCheckStates;
 

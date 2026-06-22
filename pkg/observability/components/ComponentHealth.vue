@@ -3,6 +3,7 @@ import { mapGetters } from "vuex";
 import {
   loadSuseObservabilitySettings,
   loadAgentStatus,
+  AgentStatus,
 } from "../modules/rancher";
 import {
   ConnectionStatus,
@@ -36,15 +37,18 @@ export default {
     },
   },
   async fetch() {
-    const settings = await loadSuseObservabilitySettings(this.$store);
-
     const agentStatus = await loadAgentStatus(
       this.$store,
       this.currentCluster?.id,
     );
+    if (agentStatus.status === AgentStatus.NotInstalled) {
+      this.health = HEALTH_STATE_TYPES.UNOBSERVED;
+      return;
+    }
     const clusterName =
       agentStatus.clusterName ?? this.currentCluster.spec.displayName;
 
+    const settings = await loadSuseObservabilitySettings(this.$store);
     this.urn = buildUrn(this.resource, clusterName);
     if (!this.urn || !settings) {
       return;

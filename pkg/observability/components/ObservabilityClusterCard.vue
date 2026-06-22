@@ -65,6 +65,10 @@ export default {
     this.installUrl = `${settings.url}/#/stackpacks/kubernetes-v2`;
 
     this.agentStatus = await loadAgentStatus(this.$store, this.resource.id);
+    if (this.agentStatus.status === AgentStatus.NotInstalled) {
+      this.observationStatus = ObservationStatus.NotDeployed;
+      return;
+    }
     const clusterName =
       this.agentStatus.clusterName ?? this.resource.spec.displayName;
 
