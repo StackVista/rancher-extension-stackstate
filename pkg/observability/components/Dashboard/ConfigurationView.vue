@@ -81,6 +81,7 @@ export default {
     },
 
     async save(btnCb) {
+      this.suseObservabilityURL = this.suseObservabilityURL.replace(/\/+$/, "");
       const conn = await checkConnection({
         apiURL: this.suseObservabilityURL,
         serviceToken: this.suseObservabilityServiceToken,
