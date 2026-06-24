@@ -71,7 +71,7 @@ export function buildUrn(
 
   switch (kind) {
     case STS_CLUSTER:
-      return `urn:cluster:/${clusterName}`;
+      return `urn:cluster:/kubernetes:${clusterName}`;
     case STS_NODE:
       return `urn:kubernetes:/${clusterName}:node/${name}`;
     case STS_NAMESPACE:

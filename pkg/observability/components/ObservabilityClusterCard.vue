@@ -47,6 +47,7 @@ export default {
       critical: 0,
       isConfigured: true,
       installUrl: undefined,
+      componentUrl: undefined,
       HEALTH_STATE_TYPES,
       ObservationStatus,
       AgentStatus,
@@ -71,6 +72,11 @@ export default {
     }
     const clusterName =
       this.agentStatus.clusterName ?? this.resource.spec.displayName;
+
+    const componentIdentifier = `urn:cluster:/kubernetes:${clusterName}`;
+    this.componentUrl = `${settings.url}/#/components/${encodeURIComponent(
+      componentIdentifier,
+    )}`;
 
     this.observationStatus = await loadObservationStatus(clusterName, settings);
 
@@ -150,7 +156,13 @@ export default {
       <div v-else>
         <p class="mb-20">
           {{ t("observability.clusterCard.clusterHealth") }}
-          <HealthState health="observed" color="green" />
+          <a
+            :href="componentUrl"
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+          >
+            <HealthState health="observed" color="green" />
+          </a>
         </p>
         <div>
           <p>{{ t("observability.clusterCard.componentsHealth") }}</p>
