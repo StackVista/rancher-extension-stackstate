@@ -29,14 +29,17 @@ export async function checkConnection(
   const creds = token(credentials.serviceToken);
 
   try {
-    const resp = await fetch(`${credentials.apiURL}/api/server/info`, {
-      credentials: "omit",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: creds,
+    const resp = await fetch(
+      `${credentials.apiURL}/api/user/authorization/for?permission=get-topology`,
+      {
+        credentials: "omit",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: creds,
+        },
       },
-    });
+    );
     if (resp.ok) {
       return ConnectionStatus.Connected;
     } else {
