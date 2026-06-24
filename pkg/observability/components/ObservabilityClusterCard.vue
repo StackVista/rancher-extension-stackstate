@@ -39,12 +39,15 @@ export default {
   data() {
     return {
       observationStatus: ObservationStatus.Observed,
-      agentStatus: AgentStatus.Installed,
+      agentStatus: {
+        status: AgentStatus.Installed,
+      },
       snapshot: undefined,
       deviating: 0,
       critical: 0,
       isConfigured: true,
       installUrl: undefined,
+      componentUrl: undefined,
       HEALTH_STATE_TYPES,
       ObservationStatus,
       AgentStatus,
@@ -62,17 +65,24 @@ export default {
     }
     this.installUrl = `${settings.url}/#/stackpacks/kubernetes-v2`;
 
-    this.observationStatus = await loadObservationStatus(
-      this.resource.spec.displayName,
-      settings,
-    );
-    if (this.observationStatus === ObservationStatus.NotDeployed) {
-      this.agentStatus = await loadAgentStatus(this.$store, this.resource.id);
+    this.agentStatus = await loadAgentStatus(this.$store, this.resource.id);
+    if (this.agentStatus.status === AgentStatus.NotInstalled) {
+      this.observationStatus = ObservationStatus.NotDeployed;
+      return;
     }
+    const clusterName =
+      this.agentStatus.clusterName ?? this.resource.spec.displayName;
+
+    const componentIdentifier = `urn:cluster:/kubernetes:${clusterName}`;
+    this.componentUrl = `${settings.url}/#/components/${encodeURIComponent(
+      componentIdentifier,
+    )}`;
+
+    this.observationStatus = await loadObservationStatus(clusterName, settings);
 
     try {
       this.snapshot = await getSnapshot(
-        `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${this.resource.spec.displayName}"`,
+        `not healthstate in ("CLEAR", "UNKNOWN") AND label = "cluster-name:${clusterName}"`,
         settings,
       );
       for (const component of this.snapshot.viewSnapshotResponse.components) {
@@ -121,10 +131,13 @@ export default {
           {{ t("observability.clusterCard.clusterIs") }}
           <HealthState class="state-badge" health="unobserved" color="grey" />
         </p>
-        <div v-if="agentStatus !== AgentStatus.Installed" class="flex-text">
+        <div
+          v-if="agentStatus.status !== AgentStatus.Installed"
+          class="flex-text"
+        >
           <p>
             {{ t("observability.clusterCard.notObservedPrepend") }}
-            <a :href="installUrl">{{
+            <a :href="installUrl" target="_blank">{{
               t("observability.clusterCard.notObservedInstall")
             }}</a>
             {{ t("observability.clusterCard.notObservedPostpend") }}
@@ -133,7 +146,7 @@ export default {
         <div v-else>
           <p>
             {{ t("observability.clusterCard.noDataPrepend") }}
-            <a :href="installUrl">{{
+            <a :href="installUrl" target="_blank">{{
               t("observability.clusterCard.noDataInstall")
             }}</a>
             {{ t("observability.clusterCard.noDataPostpend") }}
@@ -143,7 +156,13 @@ export default {
       <div v-else>
         <p class="mb-20">
           {{ t("observability.clusterCard.clusterHealth") }}
-          <HealthState health="observed" color="green" />
+          <a
+            :href="componentUrl"
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+          >
+            <HealthState health="observed" color="green" />
+          </a>
         </p>
         <div>
           <p>{{ t("observability.clusterCard.componentsHealth") }}</p>

@@ -1,7 +1,11 @@
 <script>
 import { mapGetters } from "vuex";
 import HealthState from "../components/Health/HealthState";
-import { loadSuseObservabilitySettings } from "../modules/rancher";
+import {
+  loadSuseObservabilitySettings,
+  loadAgentStatus,
+  AgentStatus,
+} from "../modules/rancher";
 import {
   ConnectionStatus,
   FetchError,
@@ -27,12 +31,6 @@ export default {
   computed: {
     ...mapGetters(["currentCluster"]),
 
-    componentIdentifier() {
-      const cluster = this.currentCluster?.spec.displayName;
-
-      return buildUrn(this.row, cluster);
-    },
-
     color() {
       switch (this.value) {
         case "active":
@@ -54,11 +52,23 @@ export default {
   },
 
   async fetch() {
-    const componentIdentifier = this.componentIdentifier;
+    const agentStatus = await loadAgentStatus(
+      this.$store,
+      this.currentCluster?.id,
+    );
+    if (agentStatus.status === AgentStatus.NotInstalled) {
+      this.data = {
+        health: HEALTH_STATE_TYPES.UNOBSERVED,
+      };
+      this.isLoading = false;
+      return;
+    }
 
+    const clusterName =
+      agentStatus.clusterName ?? this.currentCluster.spec.displayName;
+    const componentIdentifier = buildUrn(this.row, clusterName);
     if (!componentIdentifier) {
       this.isLoading = false;
-
       return;
     }
 

@@ -3,7 +3,11 @@ import LiveDate from "@shell/components/formatter/LiveDate.vue";
 import SortableTable from "@shell/components/SortableTable";
 import { mapGetters } from "vuex";
 
-import { loadSuseObservabilitySettings } from "../modules/rancher";
+import {
+  AgentStatus,
+  loadAgentStatus,
+  loadSuseObservabilitySettings,
+} from "../modules/rancher";
 import {
   loadComponent,
   loadObservationStatus,
@@ -48,30 +52,6 @@ export default {
     hasMonitors() {
       return this.monitors?.length > 0;
     },
-
-    componentIdentifier() {
-      const cluster = this.currentCluster?.spec.displayName;
-
-      if (!cluster) {
-        return "";
-      }
-
-      let identifier = `urn:kubernetes:/${cluster}`;
-
-      const resourceData = this.resource?.metadata
-        ? this.resource
-        : this.currResourceData;
-
-      if (resourceData?.metadata?.namespace) {
-        identifier += `:${resourceData.metadata.namespace}`;
-      }
-
-      identifier += `:${mapKind(resourceData?.type?.toLowerCase())}/${
-        resourceData?.metadata?.name
-      }`;
-
-      return identifier;
-    },
   },
   async fetch() {
     if (!this.resource?.metadata) {
@@ -89,11 +69,35 @@ export default {
       });
     }
 
-    const settings = await loadSuseObservabilitySettings(this.$store);
+    const agentStatus = await loadAgentStatus(
+      this.$store,
+      this.currentCluster?.id,
+    );
+    if (agentStatus.status === AgentStatus.NotInstalled) {
+      this.observationStatus = ObservationStatus.NotDeployed;
+      return;
+    }
+    const clusterName =
+      agentStatus.clusterName ?? this.currentCluster?.spec.displayName;
 
-    this.urn = this.componentIdentifier;
+    let identifier = `urn:kubernetes:/${clusterName}`;
+
+    const resourceData = this.resource?.metadata
+      ? this.resource
+      : this.currResourceData;
+
+    if (resourceData?.metadata?.namespace) {
+      identifier += `:${resourceData.metadata.namespace}`;
+    }
+
+    identifier += `:${mapKind(resourceData?.type?.toLowerCase())}/${
+      resourceData?.metadata?.name
+    }`;
+
+    this.urn = identifier;
 
     try {
+      const settings = await loadSuseObservabilitySettings(this.$store);
       const component = await loadComponent(settings, this.urn);
       this.monitors = component.syncedCheckStates;
 

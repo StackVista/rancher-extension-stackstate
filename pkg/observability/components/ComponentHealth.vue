@@ -1,6 +1,10 @@
 <script>
 import { mapGetters } from "vuex";
-import { loadSuseObservabilitySettings } from "../modules/rancher";
+import {
+  loadSuseObservabilitySettings,
+  loadAgentStatus,
+  AgentStatus,
+} from "../modules/rancher";
 import {
   ConnectionStatus,
   FetchError,
@@ -31,17 +35,21 @@ export default {
     clusterId() {
       return this.currentCluster?.id;
     },
-
-    componentIdentifier() {
-      const cluster = this.currentCluster?.spec.displayName;
-
-      return buildUrn(this.resource, cluster);
-    },
   },
   async fetch() {
-    const settings = await loadSuseObservabilitySettings(this.$store);
+    const agentStatus = await loadAgentStatus(
+      this.$store,
+      this.currentCluster?.id,
+    );
+    if (agentStatus.status === AgentStatus.NotInstalled) {
+      this.health = HEALTH_STATE_TYPES.UNOBSERVED;
+      return;
+    }
+    const clusterName =
+      agentStatus.clusterName ?? this.currentCluster.spec.displayName;
 
-    this.urn = this.componentIdentifier;
+    const settings = await loadSuseObservabilitySettings(this.$store);
+    this.urn = buildUrn(this.resource, clusterName);
     if (!this.urn || !settings) {
       return;
     }

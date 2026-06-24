@@ -6,6 +6,8 @@ import {
   SECRET,
   SERVICE,
   WORKLOAD_TYPES,
+  PV,
+  PVC,
 } from "@shell/config/types";
 import { CLUSTER } from "@shell/store/prefs";
 
@@ -23,6 +25,8 @@ export const STS_CLUSTER = "cluster";
 export const STS_CONFIG_MAP = "configmap";
 export const STS_SECRET = "secret";
 export const STS_NAMESPACE = "namespace";
+export const STS_PV = "persistent-volume";
+export const STS_PVC = "persistent-volume-claim";
 
 // Map of kinds to their display names
 const KINDS = new Map<string, string>([
@@ -40,6 +44,8 @@ const KINDS = new Map<string, string>([
   [CONFIG_MAP, STS_CONFIG_MAP],
   [SECRET, STS_SECRET],
   [NAMESPACE, STS_NAMESPACE],
+  [PV, STS_PV],
+  [PVC, STS_PVC],
 ]);
 
 export function mapKind(kind: string): string {
@@ -65,11 +71,13 @@ export function buildUrn(
 
   switch (kind) {
     case STS_CLUSTER:
-      return `urn:cluster:/${clusterName}`;
+      return `urn:cluster:/kubernetes:${clusterName}`;
     case STS_NODE:
       return `urn:kubernetes:/${clusterName}:node/${name}`;
     case STS_NAMESPACE:
       return `urn:kubernetes:/${clusterName}:namespace/${name}`;
+    case STS_PV:
+      return `urn:kubernetes:/${clusterName}:${kind}/${name}`;
     default:
       return `urn:kubernetes:/${clusterName}:${namespace}:${kind}/${name}`;
   }
