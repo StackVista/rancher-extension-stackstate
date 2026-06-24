@@ -1,5 +1,11 @@
 # observability
 
+## 2.3.2
+
+### Patch Changes
+
+- 79384fc: various bugs
+
 ## 2.3.1
 
 ### Patch Changes
