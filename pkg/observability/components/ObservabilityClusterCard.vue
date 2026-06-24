@@ -131,7 +131,7 @@ export default {
         >
           <p>
             {{ t("observability.clusterCard.notObservedPrepend") }}
-            <a :href="installUrl">{{
+            <a :href="installUrl" target="_blank">{{
               t("observability.clusterCard.notObservedInstall")
             }}</a>
             {{ t("observability.clusterCard.notObservedPostpend") }}
@@ -140,7 +140,7 @@ export default {
         <div v-else>
           <p>
             {{ t("observability.clusterCard.noDataPrepend") }}
-            <a :href="installUrl">{{
+            <a :href="installUrl" target="_blank">{{
               t("observability.clusterCard.noDataInstall")
             }}</a>
             {{ t("observability.clusterCard.noDataPostpend") }}

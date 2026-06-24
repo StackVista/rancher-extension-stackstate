@@ -195,7 +195,7 @@ export default {
           <div class="banner-info">
             <p>{{ t("observability.dashboard.connected") }}</p>
             <!-- reserve a line when the url is an empty string so UI won't jump on change -->
-            <a :href="`${suseObservabilityURL}/`">{{
+            <a :href="`${suseObservabilityURL}/`" target="_blank">{{
               suseObservabilityURL || "&nbsp;"
             }}</a>
           </div>
