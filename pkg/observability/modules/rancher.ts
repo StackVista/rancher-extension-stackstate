@@ -136,31 +136,42 @@ export async function loadAgentStatus(
 ): Promise<ObservabilityAgent> {
   try {
     const response = await store.dispatch(`cluster/request`, {
-      url: `/k8s/clusters/${clusterId}/v1/apps.deployments`,
+      url: `/k8s/clusters/${clusterId}/v1/configmaps`,
     });
-    const deployments = response?.data?.filter(
+    const configmaps = response?.data?.filter(
       (depl: any) =>
         depl.metadata?.labels &&
-        (depl.metadata.labels["app.kubernetes.io/name"] ===
-          "suse-observability-agent" ||
-          // backwards compatibility
-          depl.metadata.labels["app.kubernetes.io/name"] ===
-            "stackstate-k8s-agent"),
+        depl.metadata.labels["app.kubernetes.io/component"] ===
+          "suse-observability-agent" &&
+        depl.metadata?.name?.endsWith("-cluster-name"),
     );
-
-    if (deployments.length == 0) {
+    if (configmaps.length > 0) {
+      const clusterNames = configmaps.flatMap((depl: any) =>
+        depl.data && "STS_CLUSTER_NAME" in depl.data
+          ? [depl.data["STS_CLUSTER_NAME"]]
+          : [],
+      );
       return {
-        status: AgentStatus.NotInstalled,
+        status: AgentStatus.Installed,
+        clusterName: clusterNames?.[0],
+      };
+    } else {
+      const deployResponse = await store.dispatch(`cluster/request`, {
+        url: `/k8s/clusters/${clusterId}/v1/apps.deployments`,
+      });
+      const deployments = deployResponse?.data?.filter(
+        (depl: any) =>
+          depl.metadata?.labels &&
+          depl.metadata.labels["app.kubernetes.io/name"] ===
+            "suse-observability-agent",
+      );
+      return {
+        status:
+          deployments.length > 0
+            ? AgentStatus.Installed
+            : AgentStatus.NotInstalled,
       };
     }
-    const env = deployments[0].spec?.template.spec.containers[0].env;
-    const clusterNames = env
-      ?.filter((envVar: any) => envVar.name === "STS_CLUSTER_NAME")
-      .map((envVar: any) => envVar.value);
-    return {
-      status: AgentStatus.Installed,
-      clusterName: clusterNames?.[0],
-    };
   } catch (e) {
     return {
       status: AgentStatus.ConnectionError,
