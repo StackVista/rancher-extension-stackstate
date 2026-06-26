@@ -252,8 +252,12 @@ test("no component for cluster, though agent is deployed", async () => {
               {
                 metadata: {
                   labels: {
-                    "app.kubernetes.io/name": "suse-observability-agent",
+                    "app.kubernetes.io/component": "suse-observability-agent",
                   },
+                  name: "suse-observability-agent-cluster-name",
+                },
+                data: {
+                  STS_CLUSTER_NAME: "ye-cluster",
                 },
               },
             ],
