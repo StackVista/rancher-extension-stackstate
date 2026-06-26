@@ -1,5 +1,11 @@
 # observability
 
+## 2.3.3
+
+### Patch Changes
+
+- 906b5fa: use configmap to find cluster name
+
 ## 2.3.2
 
 ### Patch Changes
