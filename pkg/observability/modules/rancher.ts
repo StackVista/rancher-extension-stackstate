@@ -138,28 +138,40 @@ export async function loadAgentStatus(
     const response = await store.dispatch(`cluster/request`, {
       url: `/k8s/clusters/${clusterId}/v1/configmaps`,
     });
-    const deployments = response?.data?.filter(
+    const configmaps = response?.data?.filter(
       (depl: any) =>
         depl.metadata?.labels &&
         depl.metadata.labels["app.kubernetes.io/component"] ===
           "suse-observability-agent" &&
         depl.metadata?.name?.endsWith("-cluster-name"),
     );
-
-    if (deployments.length == 0) {
+    if (configmaps.length > 0) {
+      const clusterNames = configmaps.flatMap((depl: any) =>
+        depl.data && "STS_CLUSTER_NAME" in depl.data
+          ? [depl.data["STS_CLUSTER_NAME"]]
+          : [],
+      );
       return {
-        status: AgentStatus.NotInstalled,
+        status: AgentStatus.Installed,
+        clusterName: clusterNames?.[0],
+      };
+    } else {
+      const deployResponse = await store.dispatch(`cluster/request`, {
+        url: `/k8s/clusters/${clusterId}/v1/apps.deployments`,
+      });
+      const deployments = deployResponse?.data?.filter(
+        (depl: any) =>
+          depl.metadata?.labels &&
+          depl.metadata.labels["app.kubernetes.io/name"] ===
+            "suse-observability-agent",
+      );
+      return {
+        status:
+          deployments.length > 0
+            ? AgentStatus.Installed
+            : AgentStatus.NotInstalled,
       };
     }
-    const clusterNames = deployments.flatMap((depl: any) =>
-      depl.data && "STS_CLUSTER_NAME" in depl.data
-        ? [depl.data["STS_CLUSTER_NAME"]]
-        : [],
-    );
-    return {
-      status: AgentStatus.Installed,
-      clusterName: clusterNames?.[0],
-    };
   } catch (e) {
     return {
       status: AgentStatus.ConnectionError,
