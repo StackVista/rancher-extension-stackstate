@@ -1,5 +1,11 @@
 # observability
 
+## 2.3.4
+
+### Patch Changes
+
+- bc8c6b1: Add otelmappings permissions to the instance admin
+
 ## 2.3.3
 
 ### Patch Changes
