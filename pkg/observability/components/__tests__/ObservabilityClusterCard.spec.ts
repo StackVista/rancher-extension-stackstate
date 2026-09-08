@@ -124,46 +124,6 @@ test("happy flow - installed and connected", async () => {
   expect(deviating.text()).toContain("0");
 });
 
-test("crd based configuration", async () => {
-  const mockStore = {
-    getters: {
-      "management/schemaFor": () => ({
-        attributes: {
-          version: "v1",
-        },
-      }),
-    },
-    dispatch: (name: string, opts: any) => {
-      switch (name) {
-        case "management/find":
-          return Promise.reject(new FetchError("not found", 404));
-        case "management/findAll":
-          return Promise.resolve([
-            {
-              metadata: {
-                name: "suse-observability",
-              },
-              apiVersion: "observability.rancher.io/v1",
-              spec: {
-                url: "https://ye-observability.example.com",
-                serviceToken: "ye-token",
-              },
-            },
-          ]);
-      }
-    },
-  };
-  const wrapper = mountComponent(mockStore);
-
-  await (ObservabilityClusterCard as any).fetch.call(wrapper.vm);
-
-  const critical = wrapper.find("[data-testid=obs-critical-count]");
-  expect(critical.text()).toContain("1");
-
-  const deviating = wrapper.find("[data-testid=obs-deviating-count]");
-  expect(deviating.text()).toContain("0");
-});
-
 test("no configuration yet", async () => {
   const mockStore = {
     dispatch: (name: string, opts: any) => {

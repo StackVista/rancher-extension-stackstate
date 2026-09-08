@@ -7,14 +7,9 @@ import {
   ConnectionStatus,
 } from "../../modules/suseObservability";
 import {
-  deleteCustomResources,
-  findNodeDrivers,
-  isCrdLoaded,
   loadSuseObservabilitySettings,
   saveSuseObservabilitySettings,
 } from "../../modules/rancher";
-import { SUSEOBSERVABILITYMACHINES_CRD } from "../../types/types";
-import { logger } from "../../utils/logger";
 import { handleGrowl } from "../../utils/growl";
 
 export default {
@@ -25,14 +20,6 @@ export default {
   },
   async fetch() {
     await this.fetchFormValues();
-    try {
-      this.nodeDrivers = await findNodeDrivers(this.$store);
-    } catch (e) {
-      logger.log(
-        `ERROR: Unable to determine presence of SUSE Observability NodeDrivers ${e}`,
-      );
-    }
-    this.crdPresent = isCrdLoaded(this.$store);
   },
   data: () => ({
     suseObservabilityURL: "",
@@ -40,8 +27,6 @@ export default {
     showSuccessfulSave: false,
     showEditInterface: false,
     urlError: false,
-    nodeDrivers: [],
-    crdPresent: false,
     migratedSettings: false,
     isCreateMode: false,
   }),
@@ -132,38 +117,12 @@ export default {
     },
     async upgrade(btnCb) {
       try {
-        if (this.nodeDrivers.length > 0) {
-          try {
-            await this.$store.dispatch("management/request", {
-              url: "/v1/apiextensions.k8s.io.customresourcedefinitions",
-              method: "POST",
-              data: SUSEOBSERVABILITYMACHINES_CRD,
-            });
-            await Promise.all(
-              this.nodeDrivers.map(async (driver) => {
-                await driver.remove();
-              }),
-            );
-            this.nodeDrivers = [];
-          } finally {
-            await this.$store.dispatch("management/request", {
-              url: "/v1/apiextensions.k8s.io.customresourcedefinitions/suse-observabilitymachines.rke-machine.cattle.io",
-              method: "DELETE",
-            });
-          }
-        }
-
         if (this.migratedSettings) {
           await saveSuseObservabilitySettings(this.$store, {
             url: this.suseObservabilityURL,
             serviceToken: this.suseObservabilityServiceToken,
           });
           this.migratedSettings = false;
-        }
-
-        if (this.crdPresent) {
-          await deleteCustomResources(this.$store);
-          this.crdPresent = false;
         }
 
         btnCb(true);
@@ -257,7 +216,7 @@ export default {
         </div>
 
         <Banner
-          v-if="nodeDrivers.length > 0 || migratedSettings || crdPresent"
+          v-if="migratedSettings"
           class="connected-banner mt-50"
           color="warning"
         >
