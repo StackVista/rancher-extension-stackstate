@@ -1,5 +1,11 @@
 # observability
 
+## 2.4.0
+
+### Minor Changes
+
+- 02c5e26: drop custom resource configuration
+
 ## 2.3.4
 
 ### Patch Changes
