@@ -1,18 +1,8 @@
 import { SECRET } from "@shell/config/types";
-import { OBSERVABILITY_CONFIGURATION_TYPE } from "../types/types";
 import { ObservabilitySettings } from "./settings";
 
 const EXTENSION_NAMESPACE = "suse-observability-extension";
 const CONFIGURATION_NAME = "configuration";
-
-function isSuseObservabilityName(name: string): boolean {
-  // match either the legacy (stackstate) or new (suse-observability) name
-  return name === "stackstate" || name === "suse-observability";
-}
-
-function isSuseObservabilitySettings(settings: any): boolean {
-  return isSuseObservabilityName(settings.metadata.name);
-}
 
 export async function loadSuseObservabilitySettings(
   store: any,
@@ -38,33 +28,7 @@ export async function loadSuseObservabilitySettings(
     }
   }
 
-  // legacy: used a CR(D) to define and store configuration
-
-  try {
-    const settings = await store.dispatch("management/findAll", {
-      type: OBSERVABILITY_CONFIGURATION_TYPE,
-    });
-    const record = settings?.find(isSuseObservabilitySettings);
-
-    if (record?.apiVersion == "observability.rancher.io/v1beta1") {
-      return {
-        url: `https://${record.spec.url}`,
-        serviceToken: record.spec.serviceToken,
-        migrated: true,
-      };
-    } else if (record) {
-      return {
-        url: record.spec.url,
-        serviceToken: record.spec.serviceToken,
-        migrated: true,
-      };
-    } else {
-      return undefined;
-    }
-  } catch (e) {
-    // CRD - based configuration not available
-    return undefined;
-  }
+  return undefined;
 }
 
 export async function saveSuseObservabilitySettings(
@@ -90,33 +54,6 @@ export async function saveSuseObservabilitySettings(
     serviceToken: btoa(settings.serviceToken),
   };
   await secret.save();
-}
-
-export async function deleteCustomResources(store: any) {
-  const saved: Array<any> = await store.dispatch("management/findAll", {
-    type: OBSERVABILITY_CONFIGURATION_TYPE,
-  });
-
-  await Promise.all(
-    saved.map(async (config) => {
-      await config.remove();
-    }),
-  );
-
-  await store.dispatch("management/request", {
-    url: "/v1/apiextensions.k8s.io.customresourcedefinitions/configurations.observability.rancher.io",
-    method: "DELETE",
-  });
-}
-
-/**
- * Check if the CRD is loaded
- */
-export function isCrdLoaded(store: any): boolean {
-  const loaded = store.getters["management/schemaFor"](
-    OBSERVABILITY_CONFIGURATION_TYPE,
-  );
-  return loaded !== undefined;
 }
 
 export enum AgentStatus {
@@ -177,15 +114,4 @@ export async function loadAgentStatus(
       status: AgentStatus.ConnectionError,
     };
   }
-}
-
-export async function findNodeDrivers(store: any): Promise<Array<any>> {
-  const nodeDrivers = await store.dispatch(
-    "rancher/findAll",
-    { type: "nodeDriver" },
-    { root: true },
-  );
-  return nodeDrivers.filter(
-    (driver: any) => driver.name === "suse-observability",
-  );
 }
