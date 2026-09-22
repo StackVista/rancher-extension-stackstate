@@ -32,6 +32,7 @@ rules:
       - metrics
       - metricbindings
       - settings
+      - silencingrules
       - stackpacks
       - systemnotifications
       - topology
@@ -57,6 +58,7 @@ rules:
     resources:
       - favoriteviews
       - favoritedashboards
+      - silencingrules
     verbs:
       - delete
       - create

@@ -16,6 +16,7 @@ rules:
     resources:
       - apitokens
       - stackpacks
+      - silencingrules
     verbs:
       - get
   - apiGroups:
