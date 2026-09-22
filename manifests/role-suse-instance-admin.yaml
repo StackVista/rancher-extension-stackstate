@@ -38,6 +38,7 @@ rules:
       - instance.observability.cattle.io
     resources:
       - stackpacks
+      - silencingrules
     verbs:
       - create
       - get
@@ -84,5 +85,6 @@ rules:
       - favoriteviews
       - syncdata
       - favoritedashboards
+      - silencingrules
     verbs:
       - delete
