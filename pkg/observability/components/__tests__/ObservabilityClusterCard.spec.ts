@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, afterEach, test, expect } from "vitest";
+import { beforeAll, afterAll, afterEach, test, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
 import ObservabilityClusterCard from "../ObservabilityClusterCard.vue";
@@ -231,4 +231,75 @@ test("no component for cluster, though agent is deployed", async () => {
 
   // Assert the rendered text of the component
   expect(wrapper.text()).toContain("%observability.clusterCard.noDataInstall%");
+});
+
+test("uses the Secret cluster name for health queries and component links", async () => {
+  const mockStore = {
+    dispatch: vi.fn((action: string, options: any) => {
+      if (action === "management/find") {
+        return {
+          data: {
+            url: btoa("https://ye-observability.example.com"),
+            serviceToken: btoa("ye-token"),
+          },
+        };
+      }
+      if (options.url.endsWith("/v1/configmaps")) {
+        return { data: [] };
+      }
+      if (options.url.endsWith("/v1/apps.deployments")) {
+        return {
+          data: [
+            {
+              metadata: {
+                namespace: "agents",
+                labels: {
+                  "app.kubernetes.io/name": "suse-observability-agent",
+                },
+              },
+              spec: {
+                template: {
+                  spec: {
+                    containers: [
+                      {
+                        env: [
+                          {
+                            name: "STS_CLUSTER_NAME",
+                            valueFrom: {
+                              secretKeyRef: { name: "config", key: "cluster" },
+                            },
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        };
+      }
+      if (options.url.endsWith("/v1/secrets/agents/config")) {
+        return { data: { cluster: btoa("secret-cluster") } };
+      }
+      throw new Error(`Unexpected request: ${options.url}`);
+    }),
+  };
+  const fetchSpy = vi.spyOn(global, "fetch");
+  try {
+    const wrapper = mountComponent(mockStore);
+    await (ObservabilityClusterCard as any).fetch.call(wrapper.vm);
+
+    expect(wrapper.vm.componentUrl).toBe(
+      `https://ye-observability.example.com/#/components/${encodeURIComponent("urn:cluster:/kubernetes:secret-cluster")}`,
+    );
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "https://ye-observability.example.com/api/snapshot",
+      expect.objectContaining({
+        body: expect.stringContaining("cluster-name:secret-cluster"),
+      }),
+    );
+  } finally {
+    fetchSpy.mockRestore();
+  }
 });
