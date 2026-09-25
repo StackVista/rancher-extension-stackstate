@@ -71,6 +71,9 @@ export async function loadAgentStatus(
   store: any,
   clusterId: string,
 ): Promise<ObservabilityAgent> {
+  let installed = false;
+  let configMapLookupFailed = false;
+
   try {
     const response = await store.dispatch(`cluster/request`, {
       url: `/k8s/clusters/${clusterId}/v1/configmaps`,
@@ -82,36 +85,108 @@ export async function loadAgentStatus(
           "suse-observability-agent" &&
         depl.metadata?.name?.endsWith("-cluster-name"),
     );
-    if (configmaps.length > 0) {
-      const clusterNames = configmaps.flatMap((depl: any) =>
-        depl.data && "STS_CLUSTER_NAME" in depl.data
-          ? [depl.data["STS_CLUSTER_NAME"]]
-          : [],
+    installed = configmaps.length > 0;
+    const clusterName = configmaps
+      .map((configmap: any) => configmap.data?.STS_CLUSTER_NAME)
+      .find(
+        (name: unknown) => typeof name === "string" && name.trim().length > 0,
       );
+
+    if (clusterName) {
       return {
         status: AgentStatus.Installed,
-        clusterName: clusterNames?.[0],
-      };
-    } else {
-      const deployResponse = await store.dispatch(`cluster/request`, {
-        url: `/k8s/clusters/${clusterId}/v1/apps.deployments`,
-      });
-      const deployments = deployResponse?.data?.filter(
-        (depl: any) =>
-          depl.metadata?.labels &&
-          depl.metadata.labels["app.kubernetes.io/name"] ===
-            "suse-observability-agent",
-      );
-      return {
-        status:
-          deployments.length > 0
-            ? AgentStatus.Installed
-            : AgentStatus.NotInstalled,
+        clusterName,
       };
     }
+  } catch {
+    configMapLookupFailed = true;
+  }
+
+  try {
+    const deployResponse = await store.dispatch(`cluster/request`, {
+      url: `/k8s/clusters/${clusterId}/v1/apps.deployments`,
+    });
+    const deployments = deployResponse?.data?.filter(
+      (depl: any) =>
+        depl.metadata?.labels &&
+        depl.metadata.labels["app.kubernetes.io/name"] ===
+          "suse-observability-agent",
+    );
+    installed = deployments.length > 0 || installed;
+    const clusterName = await loadClusterNameFromSecret(
+      store,
+      clusterId,
+      deployments,
+    );
+
+    if (clusterName) {
+      return { status: AgentStatus.Installed, clusterName };
+    }
+
+    if (!installed && configMapLookupFailed) {
+      return { status: AgentStatus.ConnectionError };
+    }
+
+    return {
+      status: installed ? AgentStatus.Installed : AgentStatus.NotInstalled,
+    };
   } catch (e) {
     return {
-      status: AgentStatus.ConnectionError,
+      status: installed ? AgentStatus.Installed : AgentStatus.ConnectionError,
     };
   }
+}
+
+async function loadClusterNameFromSecret(
+  store: any,
+  clusterId: string,
+  deployments: any[],
+): Promise<string | undefined> {
+  const visited = new Set<string>();
+
+  for (const deployment of deployments) {
+    const namespace = deployment.metadata?.namespace;
+    if (!namespace) {
+      continue;
+    }
+
+    for (const container of deployment.spec?.template?.spec?.containers ?? []) {
+      for (const variable of container.env ?? []) {
+        if (
+          variable.name !== "STS_CLUSTER_NAME" &&
+          variable.name !== "K8S_CLUSTER_NAME"
+        ) {
+          continue;
+        }
+
+        const reference = variable.valueFrom?.secretKeyRef;
+        if (!reference?.name || !reference.key) {
+          continue;
+        }
+
+        const referenceId = `${namespace}/${reference.name}/${reference.key}`;
+        if (visited.has(referenceId)) {
+          continue;
+        }
+        visited.add(referenceId);
+
+        try {
+          const secret = await store.dispatch("cluster/request", {
+            url: `/k8s/clusters/${clusterId}/v1/secrets/${encodeURIComponent(namespace)}/${encodeURIComponent(reference.name)}`,
+          });
+          const encodedName = secret?.data?.[reference.key];
+          if (typeof encodedName !== "string") {
+            continue;
+          }
+
+          const clusterName = atob(encodedName);
+          if (clusterName.trim()) {
+            return clusterName;
+          }
+        } catch {}
+      }
+    }
+  }
+
+  return undefined;
 }
