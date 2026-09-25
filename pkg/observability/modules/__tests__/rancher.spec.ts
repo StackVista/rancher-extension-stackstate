@@ -234,6 +234,35 @@ describe("loadAgentStatus", () => {
     expect(store.dispatch).toHaveBeenCalledTimes(2);
   });
 
+  it("preserves a ConfigMap lookup error when no deployment proves installation", async () => {
+    const store = {
+      dispatch: vi
+        .fn()
+        .mockRejectedValueOnce(new Error("Forbidden"))
+        .mockResolvedValueOnce({ data: [] }),
+    };
+
+    expect(await loadAgentStatus(store, clusterId)).toEqual({
+      status: AgentStatus.ConnectionError,
+    });
+    expect(store.dispatch).toHaveBeenCalledTimes(2);
+  });
+
+  it("preserves a known deployment when ConfigMap and Secret access fail", async () => {
+    const store = {
+      dispatch: vi
+        .fn()
+        .mockRejectedValueOnce(new Error("Forbidden"))
+        .mockResolvedValueOnce({ data: [agentDeployment()] })
+        .mockRejectedValueOnce(new Error("Forbidden")),
+    };
+
+    expect(await loadAgentStatus(store, clusterId)).toEqual({
+      status: AgentStatus.Installed,
+    });
+    expect(store.dispatch).toHaveBeenCalledTimes(3);
+  });
+
   it("preserves installation detection from a ConfigMap without a name", async () => {
     const store = createStore([agentConfigMap("")], []);
 

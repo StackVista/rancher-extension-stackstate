@@ -72,6 +72,7 @@ export async function loadAgentStatus(
   clusterId: string,
 ): Promise<ObservabilityAgent> {
   let installed = false;
+  let configMapLookupFailed = false;
 
   try {
     const response = await store.dispatch(`cluster/request`, {
@@ -97,7 +98,9 @@ export async function loadAgentStatus(
         clusterName,
       };
     }
-  } catch {}
+  } catch {
+    configMapLookupFailed = true;
+  }
 
   try {
     const deployResponse = await store.dispatch(`cluster/request`, {
@@ -118,6 +121,10 @@ export async function loadAgentStatus(
 
     if (clusterName) {
       return { status: AgentStatus.Installed, clusterName };
+    }
+
+    if (!installed && configMapLookupFailed) {
+      return { status: AgentStatus.ConnectionError };
     }
 
     return {
