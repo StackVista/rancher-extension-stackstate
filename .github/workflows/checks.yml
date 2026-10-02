@@ -130,6 +130,7 @@ jobs:
           commit: ${{ env.MESSAGE }}
           # define the publish command, so changeset creates a release in GitHub
           publish: yarn release-tag
+          commitMode: github-api
 
       - name: Extract Release Info
         id: release-info
