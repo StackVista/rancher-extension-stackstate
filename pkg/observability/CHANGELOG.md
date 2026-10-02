@@ -1,5 +1,11 @@
 # observability
 
+## 2.4.2
+
+### Patch Changes
+
+- 7dded19: only create namespace if it doesn't exist
+
 ## 2.4.1
 
 ### Patch Changes
