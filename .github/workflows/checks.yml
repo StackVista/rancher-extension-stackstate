@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
         with:
           # changesets status requires deeper history
           fetch-depth: 0
@@ -91,7 +91,7 @@ jobs:
       tagged_release: ${{ steps.release-info.outputs.tag }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
         with:
           # changesets status requires deeper history
           fetch-depth: 0
@@ -120,7 +120,7 @@ jobs:
       - name: Create Release Pull Request or Publish
         id: changesets
         # runs only when the changeset's base_branch is the target branch
-        if: steps.changeset-status.outputs.base_branch == '${{ github.ref_name }}'
+        if: steps.changeset-status.outputs.base_branch == github.ref_name
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "🚀 Release `${{ steps.changeset-status.outputs.name }}@${{ steps.changeset-status.outputs.old_version }} → ${{ steps.changeset-status.outputs.new_version }}`"
@@ -173,7 +173,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Target Branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
         with:
           ref: "${{ env.HELM_CHART_BRANCH }}"
 

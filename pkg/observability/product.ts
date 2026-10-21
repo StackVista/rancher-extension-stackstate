@@ -33,7 +33,6 @@ export function init($plugin: IPlugin, store: any) {
   const BLANK_CLUSTER = "_";
 
   product({
-    // @ts-ignore -- though `svg` is not part of the interface, it does work.
     svg: stsIcon,
     name: OBSERVABILITY_PRODUCT_NAME,
     inStore: "management",
