@@ -1,4 +1,4 @@
-import { ConnectionInfo } from "types/component";
+import { ConnectionInfo } from "../types/component";
 import { ObservabilitySettings } from "./settings";
 
 export class FetchError extends Error {

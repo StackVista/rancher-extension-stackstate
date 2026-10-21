@@ -1,10 +1,7 @@
-// eslint.config.mjs
-import pluginVue from "eslint-plugin-vue";
-import { withVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
+import shellConfig from "@rancher/shell/eslint.config.base.mjs";
 
-export default withVueTs(
-  pluginVue.configs["flat/essential"],
-  vueTsConfigs.recommended,
+export default [
+  ...shellConfig,
   {
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
@@ -34,4 +31,4 @@ export default withVueTs(
       "tmp",
     ],
   },
-);
+];
