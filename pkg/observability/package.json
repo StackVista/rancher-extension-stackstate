@@ -20,7 +20,7 @@
     "test": "TZ=UTC vitest run"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "5.0.9",
