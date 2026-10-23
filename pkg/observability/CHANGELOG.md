@@ -1,5 +1,11 @@
 # observability
 
+## 2.4.3
+
+### Patch Changes
+
+- 01f5a03: fix release process
+
 ## 2.4.2
 
 ### Patch Changes
