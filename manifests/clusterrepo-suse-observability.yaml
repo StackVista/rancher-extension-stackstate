@@ -1,4 +1,4 @@
-{{- if not (lookup "catalog.cattle.io/v1" "ClusterRepo" "default" "suse-observability") }}
+{{- if include "suse-observability-extension.absentOrOwned" (list (lookup "catalog.cattle.io/v1" "ClusterRepo" "default" "suse-observability") $) }}
 apiVersion: catalog.cattle.io/v1
 kind: ClusterRepo
 metadata:

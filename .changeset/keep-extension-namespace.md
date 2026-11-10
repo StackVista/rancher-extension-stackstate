@@ -2,4 +2,4 @@
 "observability": patch
 ---
 
-keep the extension namespace and its configuration on chart upgrade
+keep the extension namespace, its configuration and the ClusterRepo on chart upgrade
