@@ -1,5 +1,11 @@
 # observability
 
+## 2.4.4
+
+### Patch Changes
+
+- 5cc63ce: keep the extension namespace, its configuration and the ClusterRepo on chart upgrade
+
 ## 2.4.3
 
 ### Patch Changes
