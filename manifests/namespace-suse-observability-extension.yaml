@@ -2,8 +2,12 @@
   Hosted rancher pre-creates the namespace.
   This is so that the hosted-admin role gets sufficient permission to
   create all resources in the extension.
+  Keep rendering it when this release owns it, or Helm prunes it on upgrade.
 */ -}}
-{{- if not (lookup "v1" "Namespace" "" "suse-observability-extension") }}
+{{- $ns := lookup "v1" "Namespace" "" "suse-observability-extension" | default dict }}
+{{- $owner := dig "metadata" "annotations" "meta.helm.sh/release-name" "" $ns }}
+{{- $ownerNs := dig "metadata" "annotations" "meta.helm.sh/release-namespace" "" $ns }}
+{{- if or (not $ns) (and (eq $owner .Release.Name) (eq $ownerNs .Release.Namespace)) }}
 apiVersion: v1
 kind: Namespace
 metadata:
