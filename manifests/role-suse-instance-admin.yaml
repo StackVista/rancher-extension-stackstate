@@ -54,6 +54,7 @@ rules:
       - topology
       - topicmessages
       - traces
+      - logs
     verbs:
       - get
   - apiGroups:
